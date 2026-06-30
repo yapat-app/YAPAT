@@ -1,0 +1,14 @@
+.git/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+*.log
+wssed_jobs/
+birdnet_cache/
+birdnet_txt_embeddings/
+focal-data/birdnet_cache/
+focal-data/outputs/
+TALNet/outputs/

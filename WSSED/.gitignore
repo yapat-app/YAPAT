@@ -1,0 +1,20 @@
+.env
+.DS_Store
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.log
+wssed_jobs/
+birdnet_cache/
+birdnet_txt_embeddings/
+# BirdNET segment cache (any path)
+*.birdnet_segments.npz
+focal-data/birdnet_cache/
+focal-data/outputs/
+focal-data/*.pt
+TALNet/outputs/
+
+# Local / deploy tooling (may contain credentials)
+sftp-config.json

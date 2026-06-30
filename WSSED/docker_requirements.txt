@@ -1,0 +1,25 @@
+# ── GPU server (wssed_gpu_server.py) ─────────────────────────────────────────
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+httpx>=0.25.0
+python-dotenv>=1.0.0
+
+# ── Training core (main.py) ───────────────────────────────────────────────────
+numpy
+pandas
+scipy
+scikit-learn
+scikit-multilearn
+tqdm
+matplotlib
+validators==0.18.2
+
+# ── Audio stack ───────────────────────────────────────────────────────────────
+librosa
+soundfile
+audioread
+
+# ── BirdNET pipeline ─────────────────────────────────────────────────────────
+# Pulls in tensorflow-cpu; omit if you only run the classic CDur/TALNet pipeline.
+birdnet-analyzer

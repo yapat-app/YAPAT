@@ -1,0 +1,53 @@
+services:
+  wssed-gpu-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wssed-gpu-server:latest
+    container_name: wssed-gpu-server
+    command: ["/app/.venv/bin/python", "-u", "wssed_gpu_server.py"]
+
+    # ── Networking ─────────────────────────────────────────────────────────────
+    ports:
+      - "${WSSED_PORT:-8004}:${WSSED_PORT:-8004}"
+
+    # ── Configuration ──────────────────────────────────────────────────────────
+    # Values from .env (copy from .env.example); anything here overrides .env.
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - WSSED_HOST=0.0.0.0
+      - WSSED_PORT=${WSSED_PORT:-8004}
+      - WSSED_DATA_ROOT=${WSSED_DATA_ROOT:-/data}
+      - WSSED_JOBS_DIR=${WSSED_JOBS_DIR:-/wssed_jobs}
+
+    # ── Volumes ────────────────────────────────────────────────────────────────
+    volumes:
+      # Datasets must be writable: BirdNET extraction creates
+      # <dataset>_birdnet_embeddings/ beside the audio folder.
+      - ${WSSED_DATA_ROOT:-/srv/demos/shared/datasets}:${WSSED_DATA_ROOT:-/srv/demos/shared/datasets}:rw
+      # Job state (writable – status.json, generated configs, training.log).
+      - ${WSSED_JOBS_DIR:-/srv/demos/apps/yapat-tool/WSSED-YAPAT/wssed_jobs}:${WSSED_JOBS_DIR:-/wssed_jobs}:rw
+      # Persist checkpoints/visuals and use host focal-data scripts without rebuilding.
+      - ./focal-data:/app/focal-data:rw
+
+    # ── GPU access ─────────────────────────────────────────────────────────────
+    # Exposes a single physical GPU to the container (appears as cuda:0 inside).
+    # Change device_ids to the GPU index you want (check `nvidia-smi`).
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${WSSED_GPU_DEVICE_ID:-2}"]
+              capabilities: [gpu]
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:${WSSED_PORT:-8004}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
