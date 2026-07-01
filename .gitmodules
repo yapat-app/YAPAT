@@ -1,0 +1,12 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/yapat-app/yapat-frontend
+[submodule "backend"]
+	path = backend
+	url = https://github.com/yapat-app/yapat-backend
+[submodule "oe_yapat"]
+	path = oe_yapat
+	url = https://github.com/yapat-app/oe_yapat
+[submodule "WSSED"]
+	path = WSSED
+	url = https://github.com/MammadliN/WSSED-YAPAT
