@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Deploying YAPAT with Docker Compose: services, workers, queues, resource limits, and operational settings.">
+  <title>Deployment — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Deployment</h1>
+
+    <p class="lede">
+      The recommended deployment runs the complete Docker Compose stack. This
+      page covers what each piece does and the operational settings that matter
+      at scale.
+    </p>
+
+    <h2>Components</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>api</code></td>
+          <td>FastAPI application. The base Compose file starts one uvicorn process; the override file starts four workers.</td>
+        </tr>
+        <tr>
+          <td><code>celery-worker</code></td>
+          <td>General queues: <code>embeddings</code>, <code>processing</code>, <code>exports</code>, <code>default</code>.</td>
+        </tr>
+        <tr>
+          <td><code>celery-worker-pam-al</code></td>
+          <td>Dedicated worker for the <code>pam_al</code> queue; heavy training.</td>
+        </tr>
+        <tr>
+          <td><code>celery-beat</code></td>
+          <td>Periodic scheduler.</td>
+        </tr>
+        <tr>
+          <td><code>flower</code></td>
+          <td>Celery monitoring dashboard on port 5555.</td>
+        </tr>
+        <tr>
+          <td><code>db</code> / <code>redis</code></td>
+          <td>PostgreSQL with pgvector; Redis broker and result backend.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <figure class="docs-infographic" aria-label="Service layout: the api service queues work in Redis; the general worker and the PAM active-learning worker consume it.">
+      <div class="di-cols">
+        <div class="di-node">api<span class="di-sub">FastAPI</span></div>
+        <span class="di-arrow" aria-hidden="true">&rarr;</span>
+        <div class="di-node">redis<span class="di-sub">broker and result backend</span></div>
+        <span class="di-arrow" aria-hidden="true">&rarr;</span>
+        <div class="di-stack">
+          <div class="di-node">celery-worker<span class="di-sub">default, embeddings, processing, exports</span></div>
+          <div class="di-node">celery-worker-pam-al<span class="di-sub">pam_al</span></div>
+        </div>
+      </div>
+      <figcaption>Task path. db (PostgreSQL with pgvector) is used by the api and both workers; celery-beat schedules periodic tasks; flower monitors the workers.</figcaption>
+    </figure>
+
+    <h2>Async processing</h2>
+
+    <p>
+      The API and workers share the same broker, so operators control load by
+      scaling worker concurrency. Three load classes exist:
+    </p>
+
+    <ul>
+      <li>
+        <strong>Dataset work</strong> — scanning and snippet creation on the
+        <code>processing</code> queue. <code>scan_dataset</code> has its own,
+        longer time budget because it can run for hours on very large datasets.
+      </li>
+      <li>
+        <strong>Embedding work</strong> — chunked across recordings on the
+        <code>embeddings</code> queue; the chunk size is controlled by
+        <code>EMBEDDING_CHORD_CHUNK_SIZE</code>.
+      </li>
+      <li>
+        <strong>Training</strong> — the PAM active-learning worker has the
+        largest memory allowance of the stack (a 160 GB limit in the Compose
+        file) because it loads embedding matrices and PyTorch models.
+      </li>
+    </ul>
+
+    <h2>Worker memory</h2>
+
+    <p>
+      The Compose file notes that Celery pool children retain model and
+      audio-decoding memory, so the general worker replaces a child after a
+      configured number of tasks (<code>CELERY_WORKER_MAX_TASKS_PER_CHILD</code>,
+      default 100) to bound memory growth. If the worker still approaches its
+      memory limit, lower the value.
+    </p>
+
+    <h2>Task time limits</h2>
+
+    <p>
+      App-wide Celery limits default to 3600s (hard) and 3300s (soft), matching
+      the settings file. The dataset scan task is granted its own much longer
+      budget (default 90000s hard / 86400s soft). Overrides must be passed
+      through the worker environment rather than edited in code.
+    </p>
+
+    <h2>Database connection pool</h2>
+
+    <p>
+      Every worker process and uvicorn worker opens its own pool. The stack's
+      worst-case connection count is the sum of
+      <code>processes × (POOL_SIZE + MAX_OVERFLOW)</code> and must stay under the
+      server's PostgreSQL <code>max_connections</code>. The API threadpool limit
+      is meant to match the API pool size (pool size plus overflow) so that
+      synchronous endpoints wait for a thread rather than time out on a
+      connection.
+    </p>
+
+    <h2>GPU deployments</h2>
+
+    <p>
+      The stack runs on CPU by default. The GPU file adds NVIDIA device
+      reservations to the API and to both Celery workers; the general worker
+      uses it for embedding inference. Set <code>DEVICE=gpu</code> and select
+      the GPU file:
+    </p>
+
+    <pre><code>DEVICE=gpu
+COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml</code></pre>
+
+    <p>
+      Setting <code>COMPOSE_FILE</code> replaces Docker Compose's default file
+      list, so the override file is not loaded unless you add it, as described
+      under <a href="../docker/">Docker</a>.
+    </p>
+
+    <p>
+      <code>PAM_DEFAULT_DEVICE</code> controls which device active-learning
+      training targets (<code>cpu</code> or <code>cuda</code>).
+    </p>
+
+    <h2>Data mounts</h2>
+
+    <p>
+      Raw datasets are mounted read-only at <code>/data</code>
+      (<code>HOST_DATA_ROOT</code>). Model checkpoints are stored in
+      <code>/app/models_AL</code>, a bind mount of <code>HOST_MODELS_AL</code>
+      (default <code>./models_AL</code>) that is writable so retraining can save
+      new checkpoints. Focal-recordings data for the WSSED flow is mounted
+      read-only at <code>/wssed-focal-data</code>.
+    </p>
+
+    <h2>Migrations</h2>
+
+    <p>
+      Migrations run automatically on startup in the container. When updating
+      an existing deployment, rebuild containers and verify:
+    </p>
+
+    <pre><code>docker compose down
+docker compose build --no-cache
+docker compose up -d
+docker compose exec api alembic current</code></pre>
+
+    <h2>Health and monitoring</h2>
+
+    <ul>
+      <li><code>GET /health</code> — liveness probe.</li>
+      <li><code>GET /api/tasks/status/{task_id}</code> — task progress.</li>
+      <li>Flower at <code>:5555</code> — queue and task inspection.</li>
+    </ul>
+
+    <div class="callout callout--tip">
+      <strong>Service to service.</strong> The API reaches the ontology service
+      at <code>OE_YAPAT_SERVICE_URL</code> (the Compose file points it at
+      <code>host.docker.internal:8002</code>) and the GPU server at
+      <code>WSSED_GPU_SERVER_URL</code>, which Compose does not preset; set it
+      in <code>.env</code>. Label-space grounding also needs outbound access to
+      the GBIF and EBI OLS services.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

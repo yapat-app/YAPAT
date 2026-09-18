@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Using the YAPAT Annotation Hub: modes, configuration, the workspace, and feedback.">
+  <title>Annotation Hub — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Annotation Hub</h1>
+
+    <p class="lede">
+      The Annotation Hub is where annotation happens. One workspace handles every
+      sampling mode; the mode is selected with a URL parameter and the dataset
+      with another.
+    </p>
+
+    <h2>Opening a mode</h2>
+
+    <pre><code>/annotate?mode=al&amp;dataset_id=1
+/annotate?mode=validate&amp;dataset_id=1</code></pre>
+
+    <p>
+      Supported modes are <code>al</code> (active learning),
+      <code>validate</code>, <code>similarity</code>, and <code>filter</code>.
+      When no mode is given, the hub opens a random feed. If no dataset is
+      specified, the hub restores the dataset you last annotated with, which the
+      browser remembers per user.
+    </p>
+
+    <h2>The workspace</h2>
+
+    <p>
+      The classic workspace is a resizable split view:
+    </p>
+
+    <ul>
+      <li><strong>ProjectionView</strong> — a spatial view of the snippets, useful for seeing clusters and where the current snippet sits.</li>
+      <li><strong>PredictionFeed</strong> — the stack of snippet cards to review, each with its spectrogram, player, and labels.</li>
+    </ul>
+
+    <p>
+      In active-learning mode, the projection can be coloured by model prediction,
+      by uncertainty, or by taxon. The projection is shown in two dimensions.
+    </p>
+
+    <h2>Configuring a feed</h2>
+
+    <p>
+      Each mode opens its own configuration dialog:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Random</td>
+          <td>Feed limit.</td>
+        </tr>
+        <tr>
+          <td>Similarity</td>
+          <td>Upload a reference audio clip, choose its start and end seconds, and set the limit.</td>
+        </tr>
+        <tr>
+          <td>Filter</td>
+          <td>Annotation status, locations, species, and limit.</td>
+        </tr>
+        <tr>
+          <td>Active learning / Validate</td>
+          <td>Model checkpoint (or a cold-start configuration), top-K, and label scope. Validate adds a minimum-confidence threshold.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      In a cold-start active-learning configuration, the expert supplies the
+      model family name, an embedding model, and optionally a ground-truth
+      metadata file and a label-config file, and may run training before
+      inference.
+    </p>
+
+    <h2>Reviewing and labelling</h2>
+
+    <p>
+      For model-assisted modes, each card presents an Accept / Reject / Modify
+      prompt. Accept confirms the suggestion, Reject marks it wrong, and Modify
+      lets you edit the labels before confirming. In the classic modes, labels
+      are chosen directly from the active label space.
+    </p>
+
+    <p>
+      Confirmed labels are saved to the backend. In active-learning mode the
+      same action also records feedback, which counts toward the auto-retrain
+      threshold.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Remember.</strong> Feeds are snapshotted.
+      <a href="../feed-history/">Feed History</a> lets you reopen a previous
+      configuration instead of rebuilding it.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create, inspect, and manage datasets in YAPAT.">
+  <title>Datasets — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Datasets</h1>
+
+    <p class="lede">
+      The Datasets page is the entry point for the data you annotate. It lists
+      every dataset you can access and exposes the actions that prepare a
+      dataset for feeds.
+    </p>
+
+    <h2>Creating a dataset</h2>
+
+    <p>
+      In the interface, only administrators can create datasets. The creation
+      form collects:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name</td>
+          <td>Display name of the dataset.</td>
+        </tr>
+        <tr>
+          <td>Dataset type</td>
+          <td><code>PAM</code> for soundscapes, <code>FOCAL_RECORDINGS</code> for the species-model workflow.</td>
+        </tr>
+        <tr>
+          <td>Source folder</td>
+          <td>Chosen from the mounted data volume with the folder picker.</td>
+        </tr>
+        <tr>
+          <td>Team</td>
+          <td>Assigns the dataset to a team. The API requires it for non-administrators.</td>
+        </tr>
+        <tr>
+          <td>Spectrogram range</td>
+          <td>Optional frequency bounds used when rendering spectrograms.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      On save, the API creates the dataset and dispatches a background processing
+      task that scans the folder and discovers recordings. The response includes
+      the task identifier used to follow progress.
+    </p>
+
+    <h2>Dataset readiness</h2>
+
+    <p>
+      A newly created dataset is not immediately usable. It passes through two
+      gates:
+    </p>
+
+    <ol>
+      <li><strong>Recordings present</strong> — after the scan task completes.</li>
+      <li><strong>Embeddings present</strong> — after an embedding job completes and the dataset's default snippet set is ready.</li>
+    </ol>
+
+    <p>
+      The dataset card shows these states, and feed generation stays disabled
+      until the dataset is ready for feeds.
+    </p>
+
+    <h2>Inspecting a dataset</h2>
+
+    <ul>
+      <li><strong>Explorer</strong> — shows the folder and audio-file structure discovered on disk.</li>
+      <li><strong>Recording locations</strong> — the distinct location values available for filter feeds.</li>
+      <li><strong>Quick labels</strong> — a short list of commonly used labels; if unset, the page falls back to the species list of the active checkpoint, without saving it.</li>
+      <li><strong>Annotation stats</strong> — per-dataset counts across accessible datasets.</li>
+    </ul>
+
+    <h2>Editing and deleting</h2>
+
+    <p>
+      Administrators and the owning team's owner can update metadata such as the
+      name, description, type, source folder, and spectrogram range, and the
+      dataset's <code>retrain_after_threshold</code>, the number of feedback
+      entries after which active-learning retraining is triggered. Deleting a
+      dataset removes it and its recordings; the action requires the same
+      management permission.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Next step.</strong> With recordings in place, the interface lets an administrator or the team
+      owner generate embeddings; then open the <a href="../annotation-hub/">Annotation Hub</a>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

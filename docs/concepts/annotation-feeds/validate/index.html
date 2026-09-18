@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Validate mode inspects high-confidence model suggestions and lets experts confirm them.">
+  <title>Validate — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Validate</h1>
+
+    <p class="lede">
+      Validate mode is a review pass: it ranks unannotated snippets by the
+      model's confidence so an expert can confirm or correct them. It is
+      available from the Annotation Hub with
+      <code>?mode=validate</code>.
+    </p>
+
+    <h2>Configuration</h2>
+
+    <ul>
+      <li><strong>Label scope</strong> — restrict the pass to one or more focus species.</li>
+      <li><strong>Minimum confidence</strong> — ignore suggestions below a threshold.</li>
+      <li><strong>Top-K</strong> — cap the number of unannotated snippets to review.</li>
+    </ul>
+
+    <p>
+      The result is a confidence-ranked list of unannotated snippets. The
+      annotator works through it, accepting a suggestion to turn it into a
+      label or rejecting it when the model is wrong.
+    </p>
+
+    <h2>Why validate</h2>
+
+    <p>
+      A validation pass lets an annotator check the model's most confident
+      suggestions. Each accepted suggestion becomes a stored label and is recorded
+      as feedback, so the pass also checks the model's output and supplies labels
+      for later retraining.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Difference from active learning.</strong> Active learning orders
+      snippets with a chosen strategy, such as uncertainty, diversity, density, or
+      a composite of them. Validate orders unannotated snippets by the model's
+      confidence instead.
+    </div>
+
+  </main>
+
+  <script src="../../../js/docs-config.js"></script>
+  <script src="../../../js/docs-framework.js"></script>
+</body>
+</html>

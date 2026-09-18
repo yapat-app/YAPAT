@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How embedding jobs create snippet sets, and how snippet audio and spectrograms are served.">
+  <title>Snippets &amp; Embeddings — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Snippets &amp; Embeddings</h1>
+
+    <p class="lede">
+      Snippets are created as a by-product of embedding generation. A single job
+      cuts each recording into windows, embeds them, and stores the result as a
+      snippet set.
+    </p>
+
+    <h2>Creating a snippet set</h2>
+
+    <pre><code>POST /api/datasets/{dataset_id}/embeddings
+{
+  "embedding_model_id": 1
+}</code></pre>
+
+    <p>
+      The request can also carry <code>window_size</code>, <code>step_size</code>,
+      and <code>overlap</code>, but a model that requires a fixed value for one of
+      them ignores the request and uses its own. BirdNET, the model registered by
+      the initial migration, requires all three: a 3-second window, a 3-second
+      step, and no overlap. The job is queued on the <code>embeddings</code>
+      queue and processes recordings in chunks of
+      <code>EMBEDDING_CHORD_CHUNK_SIZE</code> (default 25), so that broker
+      overhead follows worker concurrency rather than the number of recordings.
+    </p>
+
+    <h2>Ready for feeds</h2>
+
+    <p>
+      A dataset becomes <code>is_ready_for_feed</code> once its default snippet set
+      exists and has status <code>ready</code>. Until then, feed generation is
+      disabled in the interface and embedding-dependent features are unavailable.
+    </p>
+
+    <h2>Serving snippet data</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Returns</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>GET /api/snippets/</code></td>
+          <td>Paginated snippets for a dataset and snippet set, with optional recording filter and ID-prefix search.</td>
+        </tr>
+        <tr>
+          <td><code>GET /api/snippets/{id}</code></td>
+          <td>A single snippet's timing and source metadata.</td>
+        </tr>
+        <tr>
+          <td><code>GET /api/snippets/{id}/audio</code></td>
+          <td>The extracted window as WAV, with sample-rate and channel headers.</td>
+        </tr>
+        <tr>
+          <td><code>GET /api/snippets/{id}/spectrogram</code></td>
+          <td>A mel spectrogram rendered as PNG, with configurable mel bands and frequency range.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Extracted audio and rendered spectrograms are cached, so repeated review
+      of the same snippet is cheap.
+    </p>
+
+    <h2>Deleting a snippet set</h2>
+
+    <p>
+      Deleting a snippet set removes its snippets and embeddings. If annotations
+      exist against those snippets, the request is rejected unless it explicitly
+      acknowledges the annotation loss, protecting against accidental data loss.
+    </p>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

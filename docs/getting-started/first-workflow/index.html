@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A first pass through YAPAT: account, dataset registration, embeddings, feeds, annotation, and export.">
+  <title>First Workflow — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>First Workflow</h1>
+
+    <p class="lede">
+      This walkthrough follows one dataset from registration to exported
+      annotations. It assumes a running backend and frontend, as described in
+      <a href="../installation/">Installation</a>.
+    </p>
+
+    <h2>1. Create an account and sign in</h2>
+
+    <p>
+      Accounts can be created on the sign-up page. Invitation links attach a new
+      account to a team or to datasets:
+    </p>
+
+    <ul>
+      <li>
+        A <strong>team invitation</strong> adds the new user to that team with the
+        role stored in the link, either owner or user. Links created through the
+        interface expire after two days by default.
+      </li>
+      <li>
+        A <strong>dataset invitation</strong>, created by an administrator, makes
+        the new user a team owner of the team that holds the invited datasets. For
+        datasets without a team, it grants direct access instead.
+      </li>
+    </ul>
+
+    <h2>2. Register a dataset</h2>
+
+    <p>
+      In the web interface, administrators add datasets from the
+      <a href="../../guides/datasets/">Datasets</a> page. Adding a dataset means
+      choosing a folder on the mounted data volume and a dataset type,
+      <code>PAM</code> or <code>FOCAL_RECORDINGS</code>. A background task then
+      scans the folder and records each audio file it finds.
+    </p>
+
+    <h2>3. Generate embeddings</h2>
+
+    <p>
+      Embeddings are vectors computed for short audio segments. Similarity search
+      and active learning depend on them. On the dataset card, an administrator or
+      team owner chooses an embedding model and starts the job. It runs on a Celery
+      worker and, when finished, leaves the dataset with a snippet set that feeds
+      can use.
+    </p>
+
+    <h2>4. Build a feed</h2>
+
+    <p>
+      Once the dataset is ready for feeds, open the
+      <a href="../../guides/annotation-hub/">Annotation Hub</a> and choose a mode:
+    </p>
+
+    <ul>
+      <li><strong>Random</strong> — an unordered sample, useful for a first look.</li>
+      <li><strong>Similarity</strong> — snippets close to a reference sound.</li>
+      <li><strong>Active Learning</strong> — snippets ranked by a model.</li>
+      <li><strong>Filter</strong> — snippets narrowed by annotation status, location, or species.</li>
+      <li><strong>Validate</strong> — unannotated snippets ordered by model confidence.</li>
+    </ul>
+
+    <h2>5. Annotate</h2>
+
+    <p>
+      Review each snippet's spectrogram and audio, and assign labels from the
+      active label space. In the model-assisted modes each card offers Accept,
+      Reject, and Modify actions for the model's suggestion; in the other modes you
+      pick labels directly. Confirmed labels are saved to the backend database.
+    </p>
+
+    <h2>6. Revisit earlier feeds</h2>
+
+    <p>
+      Feeds from the random, similarity, and filter methods are saved per user.
+      The <a href="../../guides/feed-history/">Feed History</a> page lists the most
+      recent ones so you can reopen a batch instead of rebuilding it.
+    </p>
+
+    <h2>7. Export</h2>
+
+    <p>
+      A dataset's annotations can be exported as JSON or CSV. See
+      <a href="../../workflow/import-export/">Import &amp; Export</a> for the
+      filters and the columns.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Going further.</strong>
+      Once labels exist, an active-learning session can train a model on them and
+      rank the remaining snippets. See
+      <a href="../../concepts/annotation-feeds/active-learning/">Active Learning</a>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

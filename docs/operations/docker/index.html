@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The Docker Compose services that make up a YAPAT deployment.">
+  <title>Docker — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Docker</h1>
+
+    <p class="lede">
+      The backend ships three Compose files: the base stack in
+      <code>docker-compose.yml</code>, a development override, and a GPU file.
+    </p>
+
+    <h2>Compose files</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>docker-compose.yml</code></td><td>Base services: database, Redis, API, workers, beat, Flower.</td></tr>
+        <tr><td><code>docker-compose.override.yml</code></td><td>Development override: starts the API with four uvicorn workers and bind-mounts the source directory (<code>.:/app</code>) into the API, workers, beat, and Flower.</td></tr>
+        <tr><td><code>docker-compose.gpu.yml</code></td><td>NVIDIA device reservations for the API and both Celery workers.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      When <code>COMPOSE_FILE</code> is not set, Docker Compose merges the override
+      automatically. The GPU file must be selected explicitly with
+      <code>COMPOSE_FILE</code>, which replaces that default; to combine all
+      three files, list them (see below).
+    </p>
+
+    <h2>Services</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Image / build</th>
+          <th>Host port</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>db</code></td>
+          <td><code>pgvector/pgvector:pg15</code></td>
+          <td>5432</td>
+          <td>PostgreSQL with the pgvector extension; 1 GB shared memory for large similarity queries.</td>
+        </tr>
+        <tr>
+          <td><code>redis</code></td>
+          <td><code>redis:7-alpine</code></td>
+          <td>6380</td>
+          <td>Celery broker and result backend; append-only persistence.</td>
+        </tr>
+        <tr>
+          <td><code>api</code></td>
+          <td>Built from <code>./Dockerfile</code></td>
+          <td>8000</td>
+          <td>FastAPI; the <code>DEVICE</code> setting selects the CPU or GPU build.</td>
+        </tr>
+        <tr>
+          <td><code>celery-worker</code></td>
+          <td>Same build</td>
+          <td>—</td>
+          <td>Queues <code>default,embeddings,processing,exports</code>.</td>
+        </tr>
+        <tr>
+          <td><code>celery-worker-pam-al</code></td>
+          <td>Same build</td>
+          <td>—</td>
+          <td>Queue <code>pam_al</code>; large memory reservations.</td>
+        </tr>
+        <tr>
+          <td><code>celery-beat</code></td>
+          <td>Same build</td>
+          <td>—</td>
+          <td>Periodic scheduler.</td>
+        </tr>
+        <tr>
+          <td><code>flower</code></td>
+          <td>Same build</td>
+          <td>5555</td>
+          <td>Task monitoring dashboard.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Volumes and mounts</h2>
+
+    <ul>
+      <li><code>postgres_data</code> — database storage.</li>
+      <li><code>redis_data</code> — Redis persistence.</li>
+      <li><code>${HOST_DATA_ROOT}:/data</code> — raw datasets, read-only.</li>
+      <li><code>${HOST_MODELS_AL:-./models_AL}:/app/models_AL</code> — model checkpoints, read-write.</li>
+      <li><code>${HOST_MODELS_AL:-./models_AL}:/app/assets/models/single_species_models</code> — species model weights, read-only, in the API service.</li>
+      <li><code>${HOST_WSSED_FOCAL_DIR}:/wssed-focal-data</code> — focal recordings for the WSSED flow, read-only. The default host path in the Compose file is specific to the maintainers' server, so set it for your environment.</li>
+    </ul>
+
+    <h2>Frontend container</h2>
+
+    <p>
+      The frontend has its own <code>Dockerfile</code> and
+      <code>docker-compose.yml</code> for serving the built React application.
+      It is never part of the backend stack.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Compose a GPU deployment.</strong> Put the file list in
+      <code>.env</code> (or export it) and start the stack normally:
+      <pre><code>DEVICE=gpu
+COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml
+# with the development override as well:
+# COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose.gpu.yml</code></pre>
+      <pre><code>docker compose up</code></pre>
+      See <a href="../environment/">Environment Setup</a> for the variables each
+      service reads.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Managing teams, members, roles, and invitations in YAPAT.">
+  <title>Teams — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Teams</h1>
+
+    <p class="lede">
+      Teams are the unit of sharing in YAPAT. Datasets, label spaces, and
+      annotations belong to a team, and membership determines what a user can
+      see and do.
+    </p>
+
+    <h2>Roles</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Scope</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Admin</strong></td>
+          <td>Platform-wide (global role). Sees all datasets and teams, and in the interface creates datasets and teams and dataset invitation links.</td>
+        </tr>
+        <tr>
+          <td><strong>Team owner</strong></td>
+          <td>Global role <code>team_owner</code>; also a per-team membership role. Manages a team: its members, invitations, and active label space, and can promote label-space versions and delete the team.</td>
+        </tr>
+        <tr>
+          <td><strong>User</strong></td>
+          <td>A team member. Annotates the datasets the team can access.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Creating a team</h2>
+
+    <p>
+      The Teams page offers team creation to administrators, who may assign
+      available datasets at creation. A dataset can belong to only one team;
+      datasets already assigned elsewhere appear disabled. The backend also
+      accepts team creation from other authenticated users. When the creator is
+      not an administrator, they become the team's owner; an administrator who
+      creates a team does not become its owner.
+    </p>
+
+    <h2>Member management</h2>
+
+    <p>
+      Opening a team shows its details and members. From here an owner can review
+      members with their roles and join dates and invite more people. The
+      backend has no route for renaming a team or changing its description.
+    </p>
+
+    <h2>Invitations</h2>
+
+    <p>
+      Invitation links attach a new account to a team or to datasets. They are
+      not required for registration, which is also available on the sign-up
+      page. Team invitations are created by a team owner or an administrator and
+      expire after two days by default. A link carries a token and, for team
+      invitations, an intended role:
+    </p>
+
+    <ul>
+      <li>
+        <strong>Team owner invitation</strong> — the role stored in the link is
+        owner. Registering through it makes the new user an owner of the team.
+      </li>
+      <li>
+        <strong>Team member invitation</strong> — the role stored in the link is
+        user. Registering through it joins the team as a member.
+      </li>
+      <li>
+        <strong>Dataset invitation</strong> — created by an administrator,
+        grants a user access to specific datasets.
+      </li>
+    </ul>
+
+    <p>
+      A user who registers with an invitation is linked to the corresponding
+      team or datasets. Invitation links can be deleted to revoke them.
+    </p>
+
+    <h2>Deleting a team</h2>
+
+    <p>
+      Administrators and team owners can delete a team. Deleting it unassigns its datasets — they are not deleted — while
+      removing memberships and invitations. Users who had access through the team
+      lose it. This action is irreversible.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Access checks.</strong> The backend verifies team membership and
+      dataset access on the operations that need them; administrators bypass
+      team-level checks. See <a href="../../reference/rest-api/">REST API</a> for
+      the endpoint-level rules.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

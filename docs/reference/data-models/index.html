@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Core data models behind YAPAT's datasets, snippets, annotations, and active-learning objects.">
+  <title>Data Models — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Data Models</h1>
+
+    <p class="lede">
+      The tables below summarise the main entities as defined by the backend's
+      SQLAlchemy models and response schemas. They list the fields most useful
+      for integration, not every column.
+    </p>
+
+    <figure class="docs-infographic" aria-label="Entity relationships: a dataset has recordings and snippet sets; snippets belong to a recording and a snippet set; annotations belong to a snippet.">
+      <ul class="di-tree">
+        <li><span class="di-node">Dataset</span><span class="di-note">belongs to a team</span>
+          <ul>
+            <li><span class="di-node">Recording</span>
+              <ul>
+                <li><span class="di-node">Snippet</span><span class="di-note">also belongs to one snippet set</span>
+                  <ul>
+                    <li><span class="di-node">Annotation</span><span class="di-note">snippet + taxon, by a user</span></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><span class="di-node">SnippetSet</span><span class="di-note">one embedding model; the dataset has a default</span></li>
+          </ul>
+        </li>
+      </ul>
+      <figcaption>How the main entities relate (foreign keys in the backend models).</figcaption>
+    </figure>
+
+    <h2>Dataset</h2>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
+        <tr><td><code>name</code></td><td>string</td><td>Display name.</td></tr>
+        <tr><td><code>description</code></td><td>string | null</td><td>Optional description.</td></tr>
+        <tr><td><code>source_uri</code></td><td>string</td><td>Path on the mounted data volume; unique per team.</td></tr>
+        <tr><td><code>dataset_type</code></td><td>string</td><td><code>PAM</code> or <code>FOCAL_RECORDINGS</code>.</td></tr>
+        <tr><td><code>team_id</code></td><td>integer | null</td><td>Team that owns the dataset.</td></tr>
+        <tr><td><code>spectrogram_f_min_hz</code></td><td>float | null</td><td>Lower spectrogram bound.</td></tr>
+        <tr><td><code>spectrogram_f_max_hz</code></td><td>float | null</td><td>Upper spectrogram bound.</td></tr>
+        <tr><td><code>default_snippet_set_id</code></td><td>integer | null</td><td>Snippet set that feeds use when none is given.</td></tr>
+        <tr><td><code>quick_labels</code></td><td>JSON | null</td><td>Optional short list of frequently used labels (read and written through the quick-labels endpoints).</td></tr>
+        <tr><td><code>retrain_after_threshold</code></td><td>integer | null</td><td>Feedback count that triggers retraining for this dataset; at least 1 when set.</td></tr>
+        <tr><td><code>recording_count</code></td><td>integer</td><td>Computed at read time.</td></tr>
+        <tr><td><code>is_ready_for_feed</code></td><td>bool</td><td>True once the default snippet set is <code>ready</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Recording</h2>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
+        <tr><td><code>dataset_id</code></td><td>integer</td><td>Parent dataset.</td></tr>
+        <tr><td><code>file_name</code></td><td>string</td><td>Audio filename.</td></tr>
+        <tr><td><code>file_path</code></td><td>string</td><td>Full path on the data volume.</td></tr>
+        <tr><td><code>duration</code></td><td>float | null</td><td>Length in seconds.</td></tr>
+        <tr><td><code>sample_rate</code></td><td>float | null</td><td>Hz.</td></tr>
+        <tr><td><code>extra_metadata</code></td><td>JSON | null</td><td>Values such as <code>location</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Snippet set and snippet</h2>
+
+    <h3>SnippetSet</h3>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
+        <tr><td><code>dataset_id</code></td><td>integer</td><td>Parent dataset.</td></tr>
+        <tr><td><code>embedding_model_id</code></td><td>integer</td><td>Model used to create embeddings.</td></tr>
+        <tr><td><code>window_size</code></td><td>float</td><td>Window length from the model.</td></tr>
+        <tr><td><code>step_size</code></td><td>float</td><td>Stride between windows.</td></tr>
+        <tr><td><code>overlap</code></td><td>float</td><td>Window overlap.</td></tr>
+        <tr><td><code>status</code></td><td>string</td><td><code>pending</code>, <code>ready</code>, or <code>failed</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Snippet</h3>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
+        <tr><td><code>recording_id</code></td><td>integer</td><td>Source recording.</td></tr>
+        <tr><td><code>snippet_set_id</code></td><td>integer</td><td>Parent snippet set.</td></tr>
+        <tr><td><code>start_time</code></td><td>float</td><td>Offset in the recording (seconds).</td></tr>
+        <tr><td><code>end_time</code></td><td>float</td><td>End offset in the recording (seconds).</td></tr>
+        <tr><td><code>duration</code></td><td>float</td><td>Length in seconds.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Annotation</h2>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
+        <tr><td><code>snippet_id</code></td><td>integer</td><td>Annotated snippet.</td></tr>
+        <tr><td><code>user_id</code></td><td>integer</td><td>Author.</td></tr>
+        <tr><td><code>username</code></td><td>string | null</td><td>Author's username, in responses.</td></tr>
+        <tr><td><code>taxon_id</code></td><td>string</td><td>Namespaced concept ID such as <code>gbif:…</code>, <code>custom:…</code>, <code>wiki:…</code>, or <code>local:…</code>.</td></tr>
+        <tr><td><code>resolved_name_snapshot</code></td><td>string</td><td>Name of the concept at the time of annotation.</td></tr>
+        <tr><td><code>extra_metadata</code></td><td>JSON | null</td><td>Free-form metadata.</td></tr>
+        <tr><td><code>created_at</code>, <code>updated_at</code></td><td>datetime</td><td>Creation and last-update times.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      When creating an annotation, the request supplies exactly one of
+      <code>taxon_id</code> or <code>species_name</code>, plus an optional
+      <code>display_name</code>; the backend stores the resolved
+      <code>taxon_id</code> and name. A snippet can carry several labels, but
+      the pair <code>snippet_id</code> and <code>taxon_id</code> is unique.
+    </p>
+
+    <h2>User feed</h2>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
+        <tr><td><code>user_id</code></td><td>integer</td><td>User who generated the feed.</td></tr>
+        <tr><td><code>method</code></td><td>string</td><td><code>random</code>, <code>similarity</code>, or <code>filter</code>.</td></tr>
+        <tr><td><code>request_params</code></td><td>JSON</td><td>The full request that produced the feed.</td></tr>
+        <tr><td><code>response</code></td><td>JSON</td><td>The list of snippets the feed returned.</td></tr>
+        <tr><td><code>created_at</code></td><td>datetime</td><td>Snapshot time.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The database retains the last five snapshots per user and method; older
+      entries are dropped.
+    </p>
+
+    <h2>Custom taxonomy</h2>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>integer</td><td>Database primary key.</td></tr>
+        <tr><td><code>taxonomy_id</code></td><td>string</td><td>Unique identifier for the label space.</td></tr>
+        <tr><td><code>name</code></td><td>string</td><td>Unique per team and dataset. Submitted versions are named "Version N" automatically.</td></tr>
+        <tr><td><code>description</code></td><td>string | null</td><td>Optional description.</td></tr>
+        <tr><td><code>status</code></td><td>string</td><td><code>submitted</code>, <code>active</code>, or <code>archived</code> in normal use; a <code>draft</code> value exists but the current code does not set it.</td></tr>
+        <tr><td><code>team_id</code></td><td>integer | null</td><td>Team scope, or null for admin / dataset-scoped taxonomies.</td></tr>
+        <tr><td><code>dataset_id</code></td><td>integer | null</td><td>Optional dataset scope.</td></tr>
+        <tr><td><code>created_by_user_id</code></td><td>integer</td><td>User who created it.</td></tr>
+        <tr><td><code>taxonomy_data</code></td><td>JSON</td><td>The concept list.</td></tr>
+        <tr><td><code>is_global</code></td><td>bool</td><td>Whether the taxonomy is global.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Sample scores</h2>
+
+    <p>
+      The backend attaches <code>uncertainty</code>, <code>diversity</code>,
+      <code>density</code>, and <code>composite_score</code> to each projection
+      point. The table below is the frontend's per-snippet view model, which
+      also carries display fields; it is not a database entity.
+    </p>
+
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>uncertainty</code></td><td>float</td><td>Model uncertainty for the snippet.</td></tr>
+        <tr><td><code>diversity</code></td><td>float</td><td>Embedding-space dispersion.</td></tr>
+        <tr><td><code>density</code></td><td>float</td><td>Local neighbourhood density.</td></tr>
+        <tr><td><code>composite_score</code></td><td>float</td><td>Weighted blend of the above.</td></tr>
+        <tr><td><code>year_cycle</code></td><td>float | null</td><td>Temporal cycle feature.</td></tr>
+        <tr><td><code>day_cycle</code></td><td>float | null</td><td>Diurnal cycle feature.</td></tr>
+        <tr><td><code>sound_type</code></td><td>string | null</td><td><code>Bio</code>, <code>Anthro</code>, or <code>Geo</code>.</td></tr>
+        <tr><td><code>birdnet_label</code></td><td>string | null</td><td>BirdNET predicted label.</td></tr>
+        <tr><td><code>yamnet_label</code></td><td>string | null</td><td>YAMNet predicted label.</td></tr>
+        <tr><td><code>actual_label</code></td><td>string | null</td><td>User-supplied ground truth.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Feature-projection view</h2>
+
+    <p>
+      <code>POST</code> and <code>GET /api/visualisations/fpv</code> return the
+      projection data directly. The response holds <code>points</code> (snippet
+      ID, predicted labels, and the four scores), <code>projections_2d</code>,
+      and, when requested with <code>run_3d</code>, <code>projections_3d</code>.
+      Each projection map is keyed by method (<code>pca</code>,
+      <code>umap</code>, <code>tsne</code>, <code>isomap</code>). An optional
+      <code>method_availability</code> object marks methods that will not be
+      computed for a dataset of this size, with an <code>available</code> flag
+      and a <code>reason</code>. Asynchronous generation with a queued
+      <code>task_id</code> belongs to <code>POST /api/visualisations/fpv-dataset</code>,
+      whose data is then read with <code>GET</code> on the same path. The
+      Annotation Hub uses only the 2D projections.
+    </p>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Environment variables used by the YAPAT backend and frontend.">
+  <title>Environment Setup — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Environment Setup</h1>
+
+    <p class="lede">
+      The backend reads configuration from environment variables, with defaults
+      in <code>app/config.py</code> and a documented example in
+      <code>backend/.env.example</code>. The frontend uses Vite variables.
+    </p>
+
+    <h2>Mode selection</h2>
+
+    <table>
+      <thead><tr><th>Variable</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>DEVICE</code></td><td><code>cpu</code> (default) or <code>gpu</code>; selects the PyTorch build used by the Docker image.</td></tr>
+        <tr><td><code>COMPOSE_FILE</code></td><td>Set to <code>docker-compose.yml:docker-compose.gpu.yml</code> to add GPU runtime.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Core backend variables</h2>
+
+    <table>
+      <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>DATABASE_URL</code></td><td><code>postgresql://yapat_user:yapat_password@localhost/yapat</code></td><td>PostgreSQL connection string. The Compose stack sets it for the container.</td></tr>
+        <tr><td><code>SECRET_KEY</code></td><td>placeholder value</td><td>JWT signing secret. Change in production.</td></tr>
+        <tr><td><code>ALGORITHM</code></td><td><code>HS256</code></td><td>JWT algorithm.</td></tr>
+        <tr><td><code>ACCESS_TOKEN_EXPIRE_MINUTES</code></td><td><code>10080</code></td><td>JWT lifetime in minutes (7 days); the Compose stack also sets 10080.</td></tr>
+        <tr><td><code>API_STR</code></td><td><code>/api</code></td><td>URL prefix for every route.</td></tr>
+        <tr><td><code>ENABLE_DOCS</code></td><td><code>False</code></td><td>Serve <code>/docs</code>, <code>/redoc</code>, and <code>openapi.json</code>.</td></tr>
+        <tr><td><code>BACKEND_CORS_ORIGINS</code></td><td>localhost origins</td><td>Allowed CORS origins.</td></tr>
+        <tr><td><code>CELERY_BROKER_URL</code></td><td><code>redis://localhost:6379/0</code></td><td>Celery broker; Compose points it at the redis service.</td></tr>
+        <tr><td><code>CELERY_RESULT_BACKEND</code></td><td><code>redis://localhost:6379/0</code></td><td>Celery result backend; Compose points it at the redis service.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Data and models</h2>
+
+    <table>
+      <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>HOST_DATA_ROOT</code></td><td>—</td><td>Host folder mounted into the container at <code>/data</code>.</td></tr>
+        <tr><td><code>DATA_ROOT</code></td><td><code>/data</code></td><td>In-container mount point for datasets.</td></tr>
+        <tr><td><code>ACTIVE_LEARNING_MODELS_DIR</code></td><td>unset in code; <code>models_AL</code> in <code>.env.example</code>; <code>/app/models_AL</code> in Compose</td><td>Root for species model weights (<code>.pt</code> files).</td></tr>
+        <tr><td><code>HOST_MODELS_AL</code></td><td><code>./models_AL</code></td><td>Host path mounted for checkpoints.</td></tr>
+        <tr><td><code>PAM_CHECKPOINTS_DIR</code></td><td><code>models_AL/pam/checkpoints</code></td><td>Where PAM active-learning checkpoints are stored.</td></tr>
+        <tr><td><code>PAM_DEFAULT_DEVICE</code></td><td><code>cpu</code></td><td>Device for PAM AL training.</td></tr>
+        <tr><td><code>PAM_AUTO_RETRAIN_THRESHOLD</code></td><td><code>5</code></td><td>Feedback count that triggers auto-retrain.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Connection pools and task limits</h2>
+
+    <p>
+      The pool variables below are names read by the Compose files, which pass
+      them to each container as <code>DB_POOL_SIZE</code> and
+      <code>DB_MAX_OVERFLOW</code>. The application's own defaults for those two
+      settings are 5 and 5.
+    </p>
+
+    <table>
+      <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>API_DB_POOL_SIZE</code></td><td><code>12</code></td><td>Per-process pool for the API.</td></tr>
+        <tr><td><code>API_DB_MAX_OVERFLOW</code></td><td><code>3</code></td><td>API pool overflow.</td></tr>
+        <tr><td><code>WORKER_DB_POOL_SIZE</code></td><td><code>2</code></td><td>Pool size per Celery worker process.</td></tr>
+        <tr><td><code>WORKER_DB_MAX_OVERFLOW</code></td><td><code>2</code></td><td>Worker pool overflow.</td></tr>
+        <tr><td><code>API_THREADPOOL_LIMIT</code></td><td><code>15</code></td><td>Threads for synchronous endpoints; keep ≤ pool size.</td></tr>
+        <tr><td><code>CELERY_TASK_TIME_LIMIT</code></td><td><code>3600</code></td><td>Hard time limit for general tasks.</td></tr>
+        <tr><td><code>CELERY_TASK_SOFT_TIME_LIMIT</code></td><td><code>3300</code></td><td>Soft time limit for general tasks.</td></tr>
+        <tr><td><code>SCAN_TASK_TIME_LIMIT</code></td><td><code>90000</code></td><td>Longer budget for dataset scans.</td></tr>
+        <tr><td><code>SCAN_TASK_SOFT_TIME_LIMIT</code></td><td><code>86400</code></td><td>Soft budget for dataset scans.</td></tr>
+        <tr><td><code>EMBEDDING_CHORD_CHUNK_SIZE</code></td><td><code>25</code></td><td>Recordings per embedding chunk task.</td></tr>
+        <tr><td><code>CELERY_WORKER_MAX_TASKS_PER_CHILD</code></td><td><code>100</code></td><td>Worker memory-recycling threshold.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Integrated services</h2>
+
+    <table>
+      <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>OE_YAPAT_SERVICE_URL</code></td><td><code>http://localhost:8002</code></td><td>Ontology service used by the label-space chat.</td></tr>
+        <tr><td><code>OE_YAPAT_API_KEY</code></td><td>—</td><td>Optional bearer token for that service.</td></tr>
+        <tr><td><code>OE_YAPAT_TIMEOUT</code></td><td><code>120</code></td><td>Request timeout in seconds.</td></tr>
+        <tr><td><code>WSSED_GPU_SERVER_URL</code></td><td><code>http://localhost:8003</code></td><td>Remote GPU server for WSSED training.</td></tr>
+        <tr><td><code>WSSED_TIMEOUT</code></td><td><code>300</code></td><td>GPU server request timeout.</td></tr>
+        <tr><td><code>WSSED_FOCAL_DATA_ROOT</code></td><td>—</td><td>Path of the focal recordings mount inside the container (set to <code>/wssed-focal-data</code> by Compose).</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Frontend variables</h2>
+
+    <table>
+      <thead><tr><th>Variable</th><th>Required</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>VITE_YAPAT_BACKEND_URL</code></td><td>Yes</td><td>Backend API base URL (e.g. <code>http://localhost:8000</code>).</td></tr>
+        <tr><td><code>VITE_YAPAT_FRONTEND_URL</code></td><td>No</td><td>Public frontend URL used for invitation links.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout--tip">
+      <strong>Defaults vs. deployment.</strong> Compose files override some
+      defaults (for example JWT lifetime and broker addresses). Always diff the
+      environment against <code>backend/.env.example</code> and
+      <code>frontend/.env.example</code> when deploying a new stack.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

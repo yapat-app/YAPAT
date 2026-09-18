@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The similarity feed finds snippets that resemble a reference snippet or an uploaded audio region.">
+  <title>Similarity — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Similarity</h1>
+
+    <p class="lede">
+      The similarity feed uses embeddings to return snippets whose audio lies
+      closest to a reference. The reference can be an existing snippet or a
+      region of an audio file you upload.
+    </p>
+
+    <h2>Two ways to give a reference</h2>
+
+    <h3>From an existing snippet</h3>
+
+    <pre><code>GET /api/feed/?method=similarity&amp;dataset_id={dataset_id}&amp;query_snippet_id={snippet_id}&amp;embedding_model_id={model_id}&amp;limit=50</code></pre>
+
+    <p>
+      An optional <code>crop_start_sec</code> and <code>crop_end_sec</code>
+      restrict the reference to a sub-region of the query snippet, which is
+      useful when only part of the window contains the sound of interest.
+    </p>
+
+    <h3>From uploaded audio</h3>
+
+    <pre><code>POST /api/feed/similarity-search
+Content-Type: multipart/form-data</code></pre>
+
+    <p>
+      The multipart request carries the audio file plus
+      <code>start_time</code> and <code>end_time</code> selecting the reference
+      region, along with <code>dataset_id</code>, an
+      <code>embedding_model_id</code>, and a result <code>limit</code>.
+      Supported formats are WAV, MP3, FLAC, OGG, M4A, and AAC, up to 100 MB.
+    </p>
+
+    <h2>How it works</h2>
+
+    <p>
+      The reference region is embedded with the same model used for the dataset,
+      and the store is queried for the snippet vectors with the smallest cosine
+      distance. Because it
+      relies on the embedding space, the query must use the embedding model that
+      produced the dataset's snippet set.
+    </p>
+
+    <p>
+      Like other feed methods, a similarity response is saved as a snapshot so
+      the same result can be revisited from
+      <a href="../../../guides/feed-history/">Feed History</a>.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Typical use.</strong> Label one clear example of a species, then
+      run a similarity feed from it to quickly find and confirm the rest of its
+      occurrences.
+    </div>
+
+  </main>
+
+  <script src="../../../js/docs-config.js"></script>
+  <script src="../../../js/docs-framework.js"></script>
+</body>
+</html>

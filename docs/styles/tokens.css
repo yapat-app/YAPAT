@@ -1,0 +1,94 @@
+/* --------------------------------
+   Design tokens
+   Sourced from the existing YAPAT
+   frontend and docs landing page.
+-------------------------------- */
+
+:root {
+
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #f7fafc;
+
+  --text: #172033;
+  --text-secondary: #667085;
+  --text-muted: #8793a8;
+  --text-link: #4a709c;
+
+  --border: #e5e7eb;
+  --border-strong: rgba(30, 64, 175, 0.3);
+  --focus-border: rgba(30, 64, 175, 0.45);
+  --scrim: rgba(23, 32, 51, 0.34);
+
+  --primary: #1e40af;
+  --primary-hover: #17358f;
+  --primary-soft: #edf3ff;
+  --on-primary: #ffffff;
+
+  --green: #39b99a;
+  --green-soft: #eefaf7;
+  --green-text: #0e8f74;
+
+  --yellow: #eab308;
+  --yellow-soft: #fff9e8;
+
+  --violet: #7c3aed;
+
+  --font-sans: "IBM Plex Sans";
+  --font-mono: "IBM Plex Mono";
+
+  --page-width: 1280px;
+  --content-width: 1080px;
+  --header-height: 64px;
+
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --shadow-card: 0 10px 30px rgba(23, 32, 51, 0.035);
+  --shadow-card-hover: 0 16px 35px rgba(23, 32, 51, 0.07);
+
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-fast: 180ms ease;
+  --transition-med: 300ms ease;
+
+  color-scheme: light;
+}
+
+/* Dark theme — applied to the documentation shell via
+   data-theme="dark" on <html>. */
+html[data-theme="dark"] {
+
+  --background: #121212;
+  --surface: #181818;
+  --surface-soft: #202020;
+
+  --text: #f2f2f2;
+  --text-secondary: #b5b5b5;
+  --text-muted: #858585;
+  --text-link: #8ab4f8;
+
+  --border: #303030;
+  --border-strong: #3a3a3a;
+  --focus-border: rgba(122, 165, 255, 0.6);
+  --scrim: rgba(0, 0, 0, 0.6);
+
+  --primary: #7aa5ff;
+  --primary-hover: #93b7ff;
+  --primary-soft: #232323;
+  --on-primary: #121212;
+
+  --green: #3fd0a0;
+  --green-soft: #132f2b;
+  --green-text: #42d0a8;
+
+  --yellow: #e3b70a;
+  --yellow-soft: #2c2713;
+
+  --violet: #a78bfa;
+
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 16px 35px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
+}

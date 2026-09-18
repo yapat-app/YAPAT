@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The end-to-end YAPAT pipeline, from dataset registration to exported annotations.">
+  <title>Overview — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Workflow Overview</h1>
+
+    <p class="lede">
+      YAPAT turns raw audio into annotated training data through a sequence of
+      asynchronous stages. Each stage produces an object the next one consumes,
+      and each can be re-run independently.
+    </p>
+
+    <h2>Stages</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Stage</th>
+          <th>Produces</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Register dataset</td>
+          <td>A <code>Dataset</code> pointing at a folder on the data volume.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Scan / process</td>
+          <td><code>Recording</code> rows discovered from files, with metadata.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Embed</td>
+          <td>A <code>SnippetSet</code> of snippets and their embedding vectors.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Define label space</td>
+          <td>A label space promoted to <code>active</code> by a team owner (see <a href="../../concepts/label-space/managing-versions/">Managing Versions</a>).</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Generate feed</td>
+          <td>An ordered batch of snippets to annotate.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Annotate</td>
+          <td><code>Annotation</code> and feedback records.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Train / retrain</td>
+          <td>An active-learning checkpoint that re-ranks the next feed.</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Export</td>
+          <td>JSON or CSV of the dataset's annotations.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <figure class="docs-infographic" aria-label="The eight workflow stages, each with the object it produces.">
+      <ol class="di-flow di-flow--grid di-animate di-n8">
+        <li style="--i:0"><span class="di-num">1</span>Register dataset<span class="di-sub">Dataset</span></li>
+        <li style="--i:1"><span class="di-num">2</span>Scan / process<span class="di-sub">Recording rows</span></li>
+        <li style="--i:2"><span class="di-num">3</span>Embed<span class="di-sub">SnippetSet</span></li>
+        <li style="--i:3"><span class="di-num">4</span>Define label space<span class="di-sub">Active label space</span></li>
+        <li style="--i:4"><span class="di-num">5</span>Generate feed<span class="di-sub">Ordered batch of snippets</span></li>
+        <li style="--i:5"><span class="di-num">6</span>Annotate<span class="di-sub">Annotations and feedback</span></li>
+        <li style="--i:6"><span class="di-num">7</span>Train / retrain<span class="di-sub">Active-learning checkpoint</span></li>
+        <li style="--i:7"><span class="di-num">8</span>Export<span class="di-sub">JSON or CSV</span></li>
+      </ol>
+      <figcaption>The eight stages and what each produces.</figcaption>
+    </figure>
+
+    <h2>Asynchronous execution</h2>
+
+    <p>
+      Steps 2, 3, and 7 run on Celery workers rather than in the request. The
+      API returns immediately with a task or job identifier, and the client polls
+      for status. Queues are separated so that heavy training does not block
+      interactive work:
+    </p>
+
+    <ul>
+      <li><code>processing</code> — dataset scanning and snippet creation.</li>
+      <li><code>embeddings</code> — audio embedding generation.</li>
+      <li><code>exports</code> — export and report generation.</li>
+      <li><code>pam_al</code> — active-learning training and retraining.</li>
+      <li><code>default</code> — general fallback tasks.</li>
+    </ul>
+
+    <figure class="docs-infographic" aria-label="Asynchronous execution: the client sends a request, the API returns a task or job ID, a Celery worker runs the task, and the client polls for status.">
+      <ol class="di-flow di-animate di-n4">
+        <li style="--i:0">Client sends a request</li>
+        <li style="--i:1">API replies at once<span class="di-sub">with a task or job ID</span></li>
+        <li style="--i:2">Celery worker runs the task<span class="di-sub">queues: processing, embeddings, exports, pam_al, default</span></li>
+        <li style="--i:3">Client polls for status<span class="di-sub">until the task finishes</span></li>
+      </ol>
+      <figcaption>Steps 2, 3, and 7 follow this pattern.</figcaption>
+    </figure>
+
+    <h2>Iteration</h2>
+
+    <p>
+      Steps 5, 6, and 7 form a loop: annotate a batch, let the annotations
+      accumulate, retrain, and generate a new batch ranked by the updated model.
+      Random, similarity, and filter feeds do not depend on a trained model and
+      can be used at any point.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Start here.</strong> For a concrete first pass, see
+      <a href="../../getting-started/first-workflow/">First Workflow</a>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

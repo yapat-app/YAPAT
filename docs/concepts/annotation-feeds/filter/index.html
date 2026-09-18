@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The filter feed narrows snippets by annotation status, location, or species.">
+  <title>Filter — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Filter</h1>
+
+    <p class="lede">
+      The filter feed restricts snippets by explicit criteria — annotation
+      status, recording location, and species — so you can target a specific
+      slice of the dataset.
+    </p>
+
+    <h2>Available filters</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Filter</th>
+          <th>Values</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>annotation_status</code></td>
+          <td><code>any</code>, <code>annotated</code>, or <code>unannotated</code>.</td>
+        </tr>
+        <tr>
+          <td><code>location</code></td>
+          <td>One or more recording locations, comma-separated.</td>
+        </tr>
+        <tr>
+          <td><code>species</code></td>
+          <td>One or more species, comma-separated.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Requesting a filter feed</h2>
+
+    <pre><code>GET /api/feed/?method=filter&amp;dataset_id={dataset_id}
+    &amp;annotation_status=unannotated
+    &amp;location=site-a,site-b
+    &amp;limit=50</code></pre>
+
+    <h2>When to use it</h2>
+
+    <ul>
+      <li>Reviewing only what is still unannotated.</li>
+      <li>Auditing everything already labelled with a species.</li>
+      <li>Working through one recording site at a time.</li>
+    </ul>
+
+    <p>
+      A recording's location is its <code>location</code> metadata value or, when that is missing, the part of its file name before the first underscore. Locations can
+      be listed for a dataset through the recording-locations endpoint. Filter
+      feeds are snapshotted like the other methods, so a configuration can be
+      reopened from <a href="../../../guides/feed-history/">Feed History</a>.
+    </p>
+
+  </main>
+
+  <script src="../../../js/docs-config.js"></script>
+  <script src="../../../js/docs-framework.js"></script>
+</body>
+</html>

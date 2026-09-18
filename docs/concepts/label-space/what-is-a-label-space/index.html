@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="What a label space is in YAPAT: the concepts annotators choose from, how they are stored, and the statuses a version can have.">
+  <title>What is a Label Space? — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>What is a Label Space?</h1>
+
+    <p class="lede">
+      A label space is the set of concepts that annotators choose labels from. In
+      YAPAT its entries carry identifiers and source details, so a label is more
+      than a free-text name.
+    </p>
+
+    <h2>Labels versus concepts</h2>
+
+    <p>
+      A plain label list holds only names. An entry in a YAPAT label space is a
+      <strong>concept</strong>. It stores an identifier such as
+      <code>gbif:2420576</code>, a display name, a scientific name, taxonomic
+      details such as rank, family, and kingdom where the source provides them, the
+      metadata returned by the lookup that found it, and who added it and when.
+      Identifiers from a shared resource make it possible to tell whether two
+      datasets that use the same word, or different words, mean the same thing.
+    </p>
+
+    <p>
+      The stored label space is a flat list of such entries. YAPAT does not
+      currently store relations between them.
+    </p>
+
+    <h2>Taxonomies in YAPAT</h2>
+
+    <p>
+      YAPAT draws concepts from two kinds of taxonomy:
+    </p>
+
+    <ul>
+      <li>
+        <strong>External taxonomies</strong> — read-only reference vocabularies
+        such as <strong>GBIF</strong> for species. They are searched and resolved
+        through the taxonomy API.
+      </li>
+      <li>
+        <strong>Custom taxonomies</strong> — team- or dataset-specific label
+        spaces built through the label-space chat and stored in YAPAT as versions.
+      </li>
+    </ul>
+
+    <p>
+      The taxonomy API covers both:
+      <code>GET /api/taxonomy/available</code> lists GBIF and the active custom
+      taxonomies, <code>/suggest</code> and <code>/search</code> find concepts, and
+      <code>/resolve</code> resolves concept IDs.
+    </p>
+
+    <h2>The active label space</h2>
+
+    <p>
+      Each team has at most one <strong>active label-space version</strong>. Only an
+      active version can be used for annotation, and it is what annotators see when
+      they choose labels. A custom taxonomy can have one of four statuses:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>draft</code></td>
+          <td>Defined in the code but not assigned by the current backend. While a chat session is open, its concepts are held in the conversation, not in a taxonomy.</td>
+        </tr>
+        <tr>
+          <td><code>submitted</code></td>
+          <td>Created when a member submits a label space. It waits for a team owner to promote it.</td>
+        </tr>
+        <tr>
+          <td><code>active</code></td>
+          <td>Promoted by a team owner, or created directly by the older freeze endpoint. Usable for annotation.</td>
+        </tr>
+        <tr>
+          <td><code>archived</code></td>
+          <td>Retired with the archive action. The record stays in the database.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Research background</h2>
+
+    <p>
+      The papers summarised under
+      <a href="../../../about/research-context/">Research Context</a> argue that
+      flat, ungrounded label sets limit reuse and interoperability, and that
+      ontology-linked label spaces could carry hierarchy and relations. That is a
+      research argument. The current software keeps identifiers and source details
+      for each concept but does not model hierarchy or relations between them.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Next.</strong> See <a href="../grounding/">Grounding</a> for how
+      concepts are found, and <a href="../managing-versions/">Managing versions</a>
+      for submission and promotion.
+    </div>
+
+  </main>
+
+  <script src="../../../js/docs-config.js"></script>
+  <script src="../../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -1,0 +1,1475 @@
+/* --------------------------------
+   Documentation page framework
+   Layout, sidebar, breadcrumbs,
+   on-this-page toc, prev/next,
+   content typography.
+-------------------------------- */
+
+/* ---------- Page shell ---------- */
+
+/* Pages ship as a bare <main data-docs-content>; docs-framework.js replaces
+   <body> with the full shell. Keep that raw pre-shell markup out of the first
+   paint. The rule stops matching as soon as the shell exists. */
+html.docs-js body:not(.docs-page) > [data-docs-content] {
+  visibility: hidden;
+}
+
+.docs-page {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;            /* the document never scrolls; .docs-scroll does */
+  overscroll-behavior: none;
+  background: var(--background);
+  --page-width: 1520px;
+  --docs-gutter: 5.5vw;   /* horizontal page gutter (header + body) */
+  --docs-sidebar-w: 240px;
+  --docs-toc-w: 200px;
+  --docs-col-gap: 48px;
+  --docs-body-pt: 48px;   /* space between header and body; also the sidebar's resting offset */
+}
+
+/* Only this area scrolls (main content, toc, footer). The header above it and
+   the fixed sidebar never take part in page scroll or rubber-band overscroll. */
+.docs-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+.docs-scroll:focus {
+  outline: none;
+}
+
+.docs-header {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--header-height);
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 var(--docs-gutter);
+}
+
+.docs-header-inner .logo-sub {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.docs-header .header-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.docs-header .github {
+  white-space: nowrap;
+}
+
+/* ---------- Header search ---------- */
+
+.docs-search {
+  position: relative;
+  flex: 1 1 320px;
+  max-width: 520px;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.docs-search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 40px 0 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.docs-search-input:focus {
+  border-color: var(--focus-border);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.docs-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.docs-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  display: flex;
+}
+
+.docs-search-kbd {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.docs-search-drop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  display: none;
+}
+
+.docs-search[data-open="true"] .docs-search-drop {
+  display: block;
+}
+
+.docs-search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  transition: background var(--transition-fast);
+}
+
+.docs-search-result:hover,
+.docs-search-result.is-active {
+  background: var(--primary-soft);
+}
+
+.docs-search-result-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.docs-search-result-path {
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+.docs-search-empty {
+  padding: 10px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
+.docs-nav-toggle {
+  display: none;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 0 0 0 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.docs-nav-toggle:hover {
+  border-color: var(--border-strong);
+  background: var(--primary-soft);
+}
+
+.docs-nav-toggle:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 2px;
+}
+
+/* Compact two-line glyph; becomes a close cross (same strokes) while open. */
+.docs-nav-toggle-bar {
+  display: block;
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transition:
+    transform var(--transition-fast),
+    width var(--transition-fast);
+}
+
+.docs-nav-toggle-bar:nth-child(2) {
+  width: 9px;
+}
+
+.docs-nav-toggle[aria-expanded="true"] .docs-nav-toggle-bar:nth-child(1) {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+.docs-nav-toggle[aria-expanded="true"] .docs-nav-toggle-bar:nth-child(2) {
+  width: 14px;
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+.docs-body {
+  display: grid;
+  grid-template-columns: minmax(0, var(--docs-sidebar-w)) minmax(0, 1fr) minmax(0, var(--docs-toc-w));
+  column-gap: var(--docs-col-gap);
+  row-gap: 0;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: var(--docs-body-pt) var(--docs-gutter) 56px;
+}
+
+/* Sidebar / content divider: one full-height rule in the middle of the column
+   gap, continuing from the header border. Not part of the sidebar box, so it
+   meets the sidebar's scrollbar at its right edge. Hidden in the mobile drawer layout. */
+.docs-body {
+  position: relative;
+}
+
+.docs-body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--docs-gutter) + var(--docs-sidebar-w) + var(--docs-col-gap) / 2);
+  width: 1px;
+  background: var(--border);
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .docs-body::before {
+    display: none;
+  }
+}
+
+.docs-sidebar-outer {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  /* Desktop/tablet: the sidebar is its own fixed, self-scrolling panel. Being
+     fixed, it is independent of the page's scroll position and of where the
+     content or footer ends; only its own overflow scrolls. It occupies the
+     first grid column visually (left = the body's content edge). The box
+     extends to the divider (extra right padding) so the scrollbar sits against
+     it while the links keep the column width. The mobile block below turns
+     this into the off-canvas drawer. */
+  position: fixed;
+  top: calc(var(--header-height) + 1px + var(--docs-body-pt));
+  bottom: 24px;
+  left: calc((100% - min(100%, var(--page-width))) / 2 + var(--docs-gutter));
+  width: calc(var(--docs-sidebar-w) + var(--docs-col-gap) / 2);
+  padding-right: calc(var(--docs-col-gap) / 2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Internal scrollbars (sidebar/drawer, TOC, tables, code) — thin, minimal,
+   theme-adaptive. Track transparent; thumb uses the neutral --border token
+   so it stays subtle gray in both light and dark, never blue. */
+.docs-sidebar-outer,
+.docs-toc-outer,
+.docs-table-scroll,
+.docs-content pre {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.docs-sidebar-outer::-webkit-scrollbar,
+.docs-toc-outer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.docs-table-scroll::-webkit-scrollbar,
+.docs-content pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.docs-sidebar-outer::-webkit-scrollbar-track,
+.docs-toc-outer::-webkit-scrollbar-track,
+.docs-table-scroll::-webkit-scrollbar-track,
+.docs-content pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.docs-sidebar-outer::-webkit-scrollbar-thumb,
+.docs-toc-outer::-webkit-scrollbar-thumb,
+.docs-table-scroll::-webkit-scrollbar-thumb,
+.docs-content pre::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 999px;
+}
+
+.docs-sidebar-outer::-webkit-scrollbar-thumb:hover,
+.docs-toc-outer::-webkit-scrollbar-thumb:hover,
+.docs-table-scroll::-webkit-scrollbar-thumb:hover,
+.docs-content pre::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-strong);
+}
+
+
+.docs-main {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Sidebar navigation ---------- */
+
+.docs-nav-section + .docs-nav-section {
+  margin-top: 26px;
+}
+
+.docs-nav-section-title {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.docs-nav-link {
+  display: block;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  transition:
+    color var(--transition-fast),
+    font-weight var(--transition-fast);
+}
+
+/* Hover: accent text and weight only, no background, so it cannot be
+   mistaken for the selected item. */
+a.docs-nav-link:hover {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.docs-nav-link.is-active,
+a.docs-nav-link.is-active:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-weight: 600;
+}
+
+.docs-nav-link.is-planned {
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.75;
+}
+
+.docs-nav-link.is-planned::after {
+  content: "· soon";
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+.docs-nav-group {
+  margin: 4px 0;
+}
+
+.docs-nav-summary {
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  list-style: none;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.docs-nav-summary:hover {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.docs-nav-summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-nav-summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 14px;
+  margin-right: 2px;
+  color: var(--text-muted);
+  font-size: 11px;
+  transition: transform var(--transition-fast);
+}
+
+.docs-nav-group[open] > .docs-nav-summary::before {
+  transform: rotate(90deg);
+}
+
+.docs-nav-sub {
+  margin-left: 16px;
+  border-left: 1px solid var(--border);
+  padding-left: 6px;
+}
+
+/* ---------- Breadcrumbs ---------- */
+
+.docs-breadcrumbs {
+  margin-bottom: 18px;
+}
+
+.docs-breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-crumb {
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.docs-crumb + .docs-crumb::before {
+  content: "/";
+  margin-right: 6px;
+  color: var(--border);
+}
+
+.docs-crumb a {
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.docs-crumb a:hover {
+  color: var(--primary);
+}
+
+.docs-crumb.is-current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- Content ---------- */
+
+.docs-content {
+  max-width: 740px;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.docs-content > :first-child {
+  margin-top: 0;
+}
+
+.docs-content .eyebrow {
+  margin-bottom: 14px;
+}
+
+.docs-content h1 {
+  margin: 0 0 10px;
+  font-family: var(--font-mono), monospace;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--text);
+  scroll-margin-top: 24px;
+}
+
+.docs-content h2 {
+  margin: 52px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono), monospace;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  scroll-margin-top: 24px;
+}
+
+.docs-content h3 {
+  margin: 36px 0 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  scroll-margin-top: 24px;
+}
+
+.docs-content p {
+  margin: 0 0 18px;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  line-height: 1.8;
+}
+
+.docs-content .lede {
+  margin-bottom: 28px;
+  color: var(--text);
+  font-size: 16.5px;
+  line-height: 1.7;
+}
+
+.docs-content a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+
+.docs-content a:hover {
+  color: var(--primary-hover);
+}
+
+.docs-content ul,
+.docs-content ol {
+  margin: 0 0 18px;
+  padding-left: 24px;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  line-height: 1.8;
+}
+
+.docs-content li {
+  margin: 6px 0;
+}
+
+.docs-content li > ul,
+.docs-content li > ol {
+  margin: 6px 0 12px;
+}
+
+.docs-content strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.docs-table-scroll {
+  max-width: 100%;
+  margin: 0 0 24px;
+  overflow-x: auto;
+}
+
+.docs-table-scroll > table {
+  margin: 0;
+}
+
+/* Inside a table, keep identifiers intact and let the wrapper scroll instead. */
+.docs-table-scroll code {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.docs-content table {
+  width: 100%;
+  margin: 0 0 24px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.docs-content th,
+.docs-content td {
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.docs-content th {
+  background: var(--surface-soft);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.docs-content td {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.docs-content code {
+  overflow-wrap: anywhere;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+}
+
+.docs-content pre {
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.docs-content pre code {
+  overflow-wrap: normal;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.docs-content blockquote {
+  margin: 0 0 24px;
+  padding: 16px 20px;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--primary-soft);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.docs-content img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.docs-content figure {
+  margin: 0 0 24px;
+}
+
+.docs-content figure img {
+  display: block;
+}
+
+.docs-content figcaption {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+}
+
+.docs-content .callout {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.docs-content .callout strong {
+  color: var(--text);
+}
+
+.docs-content .callout--tip {
+  border-left: 3px solid var(--green);
+  background: var(--green-soft);
+}
+
+/* ---------- Infographics ----------
+   Small explanatory diagrams: <figure class="docs-infographic">. Sequences use
+   .di-flow (an <ol>), architecture uses .di-cols, relationships use .di-tree.
+   Colours come from the shared tokens, so both themes work unchanged. Motion
+   is a slow highlight that steps through the nodes; it is optional
+   (.di-animate + .di-n{count}) and disabled under reduced motion. */
+
+.docs-content .docs-infographic {
+  margin: 0 0 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.docs-content .docs-infographic figcaption {
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+.docs-content .di-flow {
+  --di-gap: 24px;
+  display: flex;
+  align-items: stretch;
+  gap: var(--di-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-content .di-flow--grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  row-gap: 22px;
+}
+
+.docs-content .di-flow > li,
+.docs-content .di-node {
+  position: relative;
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.docs-content .di-flow > li {
+  flex: 1 1 0;
+}
+
+.docs-content .di-sub {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.docs-content .di-num {
+  color: var(--text-muted);
+  margin-right: 6px;
+}
+
+.docs-content .di-opt {
+  border-style: dashed;
+}
+
+/* Arrow between consecutive nodes. */
+.docs-content .di-flow > li:not(:last-child)::after {
+  content: "\2192";
+  content: "\2192" / "";
+  position: absolute;
+  top: 50%;
+  right: calc(var(--di-gap) / -2 - 7px);
+  transform: translateY(-50%);
+  width: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1;
+  text-align: center;
+}
+
+.docs-content .di-flow--grid > li:nth-child(4n)::after {
+  display: none;
+}
+
+/* Architecture: three columns joined by arrows. */
+.docs-content .di-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr) 22px minmax(0, 1.25fr);
+  align-items: center;
+  gap: 0;
+}
+
+.docs-content .di-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.docs-content .di-arrow {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Relationships: nested tree. */
+.docs-content .di-tree,
+.docs-content .di-tree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-content .di-tree ul {
+  margin: 6px 0 0 14px;
+  padding-left: 18px;
+  border-left: 1px solid var(--border);
+}
+
+.docs-content .di-tree li {
+  position: relative;
+  margin: 8px 0;
+}
+
+.docs-content .di-tree ul > li::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: -18px;
+  width: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.docs-content .di-tree .di-node {
+  display: inline-block;
+}
+
+.docs-content .di-tree .di-note {
+  margin-left: 8px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  .docs-content .di-animate > li {
+    animation-duration: calc((var(--di-n) + 1) * 1.8s);
+    animation-delay: calc(var(--i) * 1.8s);
+    animation-iteration-count: infinite;
+    animation-fill-mode: backwards;
+    animation-timing-function: ease-in-out;
+  }
+
+  .docs-content .di-n3 > li { --di-n: 3; animation-name: di-hl-3; }
+  .docs-content .di-n4 > li { --di-n: 4; animation-name: di-hl-4; }
+  .docs-content .di-n5 > li { --di-n: 5; animation-name: di-hl-5; }
+  .docs-content .di-n6 > li { --di-n: 6; animation-name: di-hl-6; }
+  .docs-content .di-n7 > li { --di-n: 7; animation-name: di-hl-7; }
+  .docs-content .di-n8 > li { --di-n: 8; animation-name: di-hl-8; }
+
+  @keyframes di-hl-3 {
+    0% { border-color: var(--border); background-color: var(--surface); }
+    3.75%, 21.25% { border-color: var(--primary); background-color: var(--primary-soft); }
+    25.00%, 100% { border-color: var(--border); background-color: var(--surface); }
+  }
+  @keyframes di-hl-4 {
+    0% { border-color: var(--border); background-color: var(--surface); }
+    3.00%, 17.00% { border-color: var(--primary); background-color: var(--primary-soft); }
+    20.00%, 100% { border-color: var(--border); background-color: var(--surface); }
+  }
+  @keyframes di-hl-5 {
+    0% { border-color: var(--border); background-color: var(--surface); }
+    2.50%, 14.17% { border-color: var(--primary); background-color: var(--primary-soft); }
+    16.67%, 100% { border-color: var(--border); background-color: var(--surface); }
+  }
+  @keyframes di-hl-6 {
+    0% { border-color: var(--border); background-color: var(--surface); }
+    2.14%, 12.14% { border-color: var(--primary); background-color: var(--primary-soft); }
+    14.29%, 100% { border-color: var(--border); background-color: var(--surface); }
+  }
+  @keyframes di-hl-7 {
+    0% { border-color: var(--border); background-color: var(--surface); }
+    1.88%, 10.62% { border-color: var(--primary); background-color: var(--primary-soft); }
+    12.50%, 100% { border-color: var(--border); background-color: var(--surface); }
+  }
+  @keyframes di-hl-8 {
+    0% { border-color: var(--border); background-color: var(--surface); }
+    1.67%, 9.44% { border-color: var(--primary); background-color: var(--primary-soft); }
+    11.11%, 100% { border-color: var(--border); background-color: var(--surface); }
+  }
+}
+
+@media (max-width: 767px) {
+
+  .docs-content .di-flow {
+    --di-gap: 22px;
+    flex-direction: column;
+  }
+
+  .docs-content .di-flow--grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+    row-gap: 12px;
+  }
+
+  .docs-content .di-flow--grid > li::after {
+    display: none;
+  }
+
+  .docs-content .di-flow:not(.di-flow--grid) > li:not(:last-child)::after {
+    content: "\2193";
+    content: "\2193" / "";
+    top: auto;
+    right: auto;
+    bottom: calc(var(--di-gap) / -2 - 7px);
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: auto;
+  }
+
+  .docs-content .di-cols {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+
+  .docs-content .di-cols .di-arrow {
+    padding: 4px 0;
+    transform: rotate(90deg);
+  }
+}
+
+/* ---------- On-this-page toc ---------- */
+
+.docs-toc-outer {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - var(--header-height) - 40px);
+  overflow-y: auto;
+  padding-top: 2px;
+}
+
+.docs-toc-title {
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.docs-toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--border);
+}
+
+.docs-toc-item a {
+  display: block;
+  padding: 5px 12px;
+  border-left: 1px solid transparent;
+  margin-left: -1px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.docs-toc-item a:hover {
+  color: var(--primary);
+}
+
+.docs-toc-item a.is-active {
+  border-left-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.docs-toc-level-3 {
+  padding-left: 6px;
+}
+
+.docs-toc-level-3 a {
+  font-size: 11.5px;
+}
+
+/* ---------- Mobile on-this-page ---------- */
+
+.docs-toc-mobile {
+  display: none;
+  margin-bottom: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.docs-toc-mobile summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.docs-toc-mobile ol {
+  margin: 0;
+  padding: 0 0 10px;
+  list-style: none;
+}
+
+.docs-toc-mobile .docs-toc-item {
+  padding: 0 14px;
+}
+
+/* ---------- Previous / next ---------- */
+
+.docs-prevnext {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 56px;
+  padding: 40px 0 44px;
+}
+
+.docs-pn-side {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.docs-pn-side.is-next {
+  margin-left: auto;
+}
+
+.docs-pn {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: min(320px, 100%);
+  min-width: 0;
+  color: var(--text);
+  transition: color var(--transition-fast);
+}
+
+.docs-pn:hover {
+  color: var(--primary);
+}
+
+.docs-pn-arrow {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  line-height: 1.5;
+  transition: color var(--transition-fast);
+}
+
+.docs-pn:hover .docs-pn-arrow {
+  color: var(--primary);
+}
+
+.docs-pn-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.docs-pn.is-next .docs-pn-text {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.docs-pn-label {
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.docs-pn-title {
+  color: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---------- Documentation footer ---------- */
+
+.docs-footer {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  background: transparent; /* page background - was --surface, which reads as a lifted panel in dark */
+  border-top: 1px solid var(--border);
+}
+
+.docs-footer-inner {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 88px 0 72px;
+}
+
+.docs-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 48px;
+}
+
+.docs-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.docs-footer-logo {
+  display: block;
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+.docs-footer-divider {
+  align-self: center;
+  flex: 0 0 auto;
+  width: 1px;
+  height: 2.3rem;
+  background: var(--border);
+}
+
+
+.docs-footer-name {
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.docs-footer-sub {
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.docs-footer-copy {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.docs-footer-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+  transition: color var(--transition-fast);
+}
+
+.docs-footer-github span {
+  color: var(--text-muted);
+}
+
+.docs-footer-github:hover {
+  color: var(--primary);
+}
+
+/* ---------- Responsive ----------------------------------------------------
+   One strategy, three states. Breakpoints only swap layout tokens / switch
+   the sidebar mode; component rules above are not duplicated per width.
+
+   Desktop  >= 1200px  sidebar | article | on-this-page   (base rules)
+   Tablet   768-1199   narrower sidebar | article; the right-hand TOC folds
+                       into the "On this page" disclosure above the article
+   Mobile   < 768      single column; sidebar becomes an off-canvas drawer
+------------------------------------------------------------------------- */
+
+/* The drawer backdrop only exists in the mobile state. */
+.docs-backdrop {
+  display: none;
+}
+
+/* ---------- Tablet and below ---------- */
+
+@media (max-width: 1199px) {
+
+  .docs-page {
+    --docs-sidebar-w: 208px;
+    --docs-col-gap: 32px;
+    --docs-body-pt: 36px;
+  }
+
+  .docs-body {
+    grid-template-columns: minmax(0, var(--docs-sidebar-w)) minmax(0, 1fr);
+  }
+
+  .docs-toc-outer {
+    display: none;
+  }
+
+  .docs-toc-mobile {
+    display: block;
+  }
+
+  /* Footer stacks so brand / copyright / link never fight for one row. */
+  .docs-footer-inner {
+    padding: 64px 0 48px;
+  }
+
+  .docs-footer-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .docs-footer-copy {
+    text-align: left;
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 767px) {
+
+  .docs-page {
+    --docs-gutter: clamp(16px, 4.5vw, 28px);
+  }
+
+  /* Header becomes a two-row bar:
+     [menu] YAPAT | DOCUMENTATION ......... [theme] [GitHub] [DFKI]
+     [ search ........................................................ ] */
+  .docs-header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .docs-nav-toggle {
+    display: inline-flex;
+  }
+
+  .docs-header-inner .logo {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .docs-header .header-actions {
+    gap: 12px;
+  }
+
+  .docs-search {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .docs-search-kbd {
+    display: none;
+  }
+
+  /* Single column; anchored headings clear the taller sticky header. */
+  .docs-body {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 28px;
+    padding-bottom: 40px;
+  }
+
+  .docs-main {
+    grid-column: 1;
+  }
+
+  .docs-footer {
+    grid-column: 1;
+  }
+
+  .docs-content h1,
+  .docs-content h2,
+  .docs-content h3 {
+    scroll-margin-top: 16px;
+  }
+
+  /* Off-canvas drawer: fixed under the header, never in the page flow, so
+     opening it cannot change the page width. --docs-header-h is measured in
+     docs-framework.js. */
+  .docs-sidebar-outer {
+    position: fixed;
+    top: var(--docs-header-h, 96px);
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: min(86vw, 320px);
+    max-height: none;
+    margin-right: 0;
+    padding: 20px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    box-shadow: var(--shadow-card-hover);
+    overscroll-behavior: contain;
+    transform: translateX(-100%);
+    visibility: hidden; /* closed drawer links are not focusable / announced */
+    /* Slide over the page. (Explicit durations: --transition-med carries its own
+       easing, which made the two-part declaration invalid and skipped the slide.) */
+    transition:
+      transform 260ms cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0s linear 260ms;
+  }
+
+  .docs-page.docs-nav-open .docs-sidebar-outer {
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .docs-backdrop {
+    display: block;
+    position: fixed;
+    top: var(--docs-header-h, 96px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 55;
+    background: var(--scrim);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .docs-page.docs-nav-open .docs-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Stop the page scrolling behind the open drawer. */
+  .docs-page.docs-nav-open {
+    overflow: hidden;
+  }
+
+  /* Comfortable touch targets. */
+  .docs-nav-link,
+  .docs-nav-summary {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .docs-prevnext {
+    margin-top: 40px;
+    padding: 32px 0 36px;
+    gap: 18px;
+  }
+
+  .docs-footer-inner {
+    padding: 48px 0 40px;
+  }
+}
+
+/* ---------- Small phones ---------- */
+
+@media (max-width: 519px) {
+
+  /* Keep the bar to menu + brand + theme control; GitHub and the DFKI logo
+     are still in the footer. */
+  .docs-header .github,
+  .docs-header .dfki-logo {
+    display: none;
+  }
+
+  .docs-content h1 {
+    font-size: 26px;
+  }
+
+  .docs-content h2 {
+    font-size: 18px;
+  }
+
+  .docs-search-input::placeholder {
+    font-size: 12px;
+  }
+
+  .docs-footer-brand {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .docs-footer-sub {
+    flex: 1 0 100%;
+  }
+}
+
+@media (max-width: 359px) {
+
+  .docs-content h1 {
+    font-size: 23px;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html,
+  .docs-scroll {
+    scroll-behavior: auto;
+  }
+
+  .docs-sidebar-outer,
+  .docs-backdrop,
+  .docs-nav-toggle,
+  .docs-nav-toggle-bar,
+  .docs-pn,
+  .docs-search-result {
+    transition: none !important;
+  }
+}
