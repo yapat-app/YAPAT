@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About the YAPAT project: the repositories that make up the system, the license statement, and what these docs were checked against.">
+  <title>Project — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Project</h1>
+
+    <p class="lede">
+      YAPAT is an annotation tool for passive acoustic monitoring audio. It uses
+      machine-learning models to decide which samples an expert labels next, with
+      the aim of reducing the labelling effort needed to collect training data.
+    </p>
+
+    <h2>Repository structure</h2>
+
+    <p>
+      The main repository links the components as Git submodules:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Directory</th>
+          <th>Repository</th>
+          <th>Contents</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>frontend/</code></td>
+          <td>yapat-frontend</td>
+          <td>The annotation interface, built with React, TypeScript, and Vite.</td>
+        </tr>
+        <tr>
+          <td><code>backend/</code></td>
+          <td>yapat-backend</td>
+          <td>The FastAPI application, Celery workers, and the machine-learning code for embeddings and active learning.</td>
+        </tr>
+        <tr>
+          <td><code>oe_yapat/</code></td>
+          <td>oe_yapat</td>
+          <td>An MCP tool server for looking up concepts in GBIF, ENVO (through OLS), and Wikipedia, plus an ontology tool for locally defined concepts, and a command-line client.</td>
+        </tr>
+        <tr>
+          <td><code>WSSED/</code></td>
+          <td>WSSED-YAPAT</td>
+          <td>A FastAPI server for training and running weakly supervised sound event detection models on GPU hardware.</td>
+        </tr>
+        <tr>
+          <td><code>docs/</code></td>
+          <td>—</td>
+          <td>The static site you are reading.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Hosted instance</h2>
+
+    <p>
+      The repository's benchmark scripts use https://yapat.ni.dfki.de as the
+      address of the project's hosted instance. The backend serves its REST API
+      under the <code>/api</code> prefix; see the
+      <a href="../../reference/rest-api/">REST API</a> reference.
+    </p>
+
+    <h2>Background</h2>
+
+    <p>
+      The two papers summarised under
+      <a href="../research-context/">Research Context</a> come from the German
+      Research Center for Artificial Intelligence (DFKI) in Oldenburg and the
+      University of Oldenburg, and were written within the DFKI project area
+      Computational Sustainability &amp; Technology.
+    </p>
+
+    <h2>License</h2>
+
+    <p>
+      The top-level README states that the YAPAT source code is available under
+      the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+      International license (CC BY-NC-SA 4.0). None of the repositories includes
+      a separate license file, so check each repository before reusing its code.
+    </p>
+
+    <h2>Documentation basis</h2>
+
+    <p>
+      These pages were checked against the public <code>main</code> branches as
+      of September 2026: yapat-backend at commit <code>959cdbc</code> (3 September),
+      yapat-frontend at <code>3917ed2</code> (11 September), oe_yapat at
+      <code>2b1d300</code>, and WSSED-YAPAT at <code>b89375a</code>. Later changes
+      to those repositories may not be reflected here.
+    </p>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

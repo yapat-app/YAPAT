@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Active learning trains a classifier on your labels and ranks the remaining snippets, and how feedback triggers retraining.">
+  <title>Active Learning — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Active Learning</h1>
+
+    <p class="lede">
+      Active learning builds a model from the labels collected so far, scores
+      every remaining snippet, and presents the most useful ones first. It turns
+      annotation into a loop that improves with each confirmed label.
+    </p>
+
+    <h2>Model checkpoints and families</h2>
+
+    <p>
+      An active-learning model is stored as a <strong>checkpoint</strong>
+      belonging to a <strong>model family</strong>. For a given dataset and
+      family, one checkpoint can be active at a time. Checkpoints are registered
+      and activated through <code>/api/pam-al/checkpoints</code>.
+    </p>
+
+    <p>
+      If no checkpoint exists yet, the first run is a
+      <strong>cold start</strong>: a new model is trained from scratch using
+      ground-truth labels (available to administrators and team owners), an
+      embedding model, and optionally an explicit label configuration and
+      metadata file.
+    </p>
+
+    <h2>Sampling strategies</h2>
+
+    <p>
+      Predictions can be ordered by several strategies:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>What it prioritises</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>uncertainty</code></td><td>Snippets the model is least sure about.</td></tr>
+        <tr><td><code>diversity</code></td><td>Snippets that are spread out in embedding space.</td></tr>
+        <tr><td><code>density</code></td><td>Snippets in densely populated regions.</td></tr>
+        <tr><td><code>confidence</code></td><td>Snippets the model is most sure about.</td></tr>
+        <tr><td><code>random</code></td><td>A uniform sample.</td></tr>
+        <tr><td><code>composite</code></td><td>A weighted blend (the default), tuned with <code>composite_wu</code>, <code>composite_wd</code>, and <code>composite_wr</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Each returned snippet carries its uncertainty, diversity, density, and
+      composite scores next to the predicted labels. The interface also uses
+      other per-snippet properties, such as year and day cycle, sound type
+      (<code>Bio</code>, <code>Anthro</code>, or <code>Geo</code>), and the BirdNET
+      and YAMNet labels, to colour or filter the projection.
+    </p>
+
+    <h2>Getting predictions</h2>
+
+    <pre><code>POST /api/pam-al/inference/get-or-create
+{
+  "dataset_id": 1,
+  "snippet_set_id": 1,
+  "model_family_name": "cold_start_base",
+  "sample_suggestion": true,
+  "suggestion_strategy": "composite",
+  "k": 20
+}</code></pre>
+
+    <p>
+      If stored predictions exist they are returned; otherwise exactly one
+      inference job is enqueued. Requests are serialised with a database lock so
+      concurrent clients cannot start duplicate jobs. The <code>k</code>
+      parameter, and the option to return only the top-K suggestions, bound how
+      many snippets are proposed.
+    </p>
+
+    <h2>Feedback loop</h2>
+
+    <p>
+      For each presented snippet the annotator submits feedback:
+    </p>
+
+    <ul>
+      <li><strong>Accept</strong> — the model's suggestion is correct.</li>
+      <li><strong>Reject</strong> — it is wrong.</li>
+      <li><strong>Modify</strong> — correct or replace the labels.</li>
+    </ul>
+
+    <pre><code>POST /api/pam-al/feedback
+{ "dataset_id": 1, "model_family_name": "cold_start_base",
+  "snippet_id": 42, "action": "ACCEPT" }</code></pre>
+
+    <p>
+      Feedback is counted per dataset and model family. Once the count reaches
+      the auto-retrain threshold, a retrain job starts automatically. The
+      threshold is <code>PAM_AUTO_RETRAIN_THRESHOLD</code> (default 5), unless the
+      dataset has its own <code>retrain_after_threshold</code>, which an
+      administrator or team owner can set and which takes precedence. Retraining
+      can also be started manually, and its progress is polled through
+      <code>/api/pam-al/retrain/jobs</code>.
+    </p>
+
+    <figure class="docs-infographic" aria-label="Active-learning loop: ranked snippets, annotator feedback, retrain threshold, retrain job.">
+      <ol class="di-flow di-animate di-n4">
+        <li style="--i:0">Ranked snippets<span class="di-sub">from inference</span></li>
+        <li style="--i:1">Feedback<span class="di-sub">Accept, Reject, or Modify</span></li>
+        <li style="--i:2">Threshold reached<span class="di-sub">feedback count per dataset and model family</span></li>
+        <li style="--i:3">Retrain job<span class="di-sub">starts automatically or manually</span></li>
+      </ol>
+      <figcaption>After retraining, new predictions rank the next snippets and the loop repeats.</figcaption>
+    </figure>
+
+    <h2>In the interface</h2>
+
+    <p>
+      The Annotation Hub shows active-learning snippets with a
+      <strong>ProjectionView</strong> beside the prediction feed. The projection is
+      two-dimensional, using PCA, UMAP, t-SNE, or Isomap, and its points can be
+      coloured by properties such as the predicted label, uncertainty, diversity,
+      density, or the composite score.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Related.</strong> Cold-start runs require ground-truth labels;
+      these are the labels with source <code>ground_truth</code> described under
+      <a href="../../pam-and-annotations/">PAM and Annotations</a>.
+    </div>
+
+  </main>
+
+  <script src="../../../js/docs-config.js"></script>
+  <script src="../../../js/docs-framework.js"></script>
+</body>
+</html>

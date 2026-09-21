@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How datasets are registered from the data volume and how annotations are exported as JSON or CSV.">
+  <title>Import &amp; Export — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Import &amp; Export</h1>
+
+    <p class="lede">
+      Audio is registered by reference rather than uploaded, and annotations are
+      exported as JSON or CSV.
+    </p>
+
+    <h2>Importing a dataset</h2>
+
+    <p>
+      YAPAT does not copy audio into the database. A dataset stores a
+      <code>source_uri</code> that points at a directory on the mounted data
+      volume. In the web interface, an administrator browses that volume and picks
+      the folder when adding the dataset; the API offers
+      <code>GET /api/datasets/available-paths</code> for this, restricted to
+      administrators.
+    </p>
+
+    <pre><code>POST /api/datasets/
+{
+  "name": "Forest 2026",
+  "dataset_type": "PAM",
+  "source_uri": "/data/forest-2026",
+  "team_id": 1
+}</code></pre>
+
+    <p>
+      The path must exist and be a directory. A dataset with the same team and
+      source folder is rejected as a duplicate (HTTP 409), and non-administrators
+      must supply a <code>team_id</code>. Creating a dataset schedules a
+      background processing task that scans the folder, discovers audio files, and
+      creates recording entries. A scan can be triggered again later, and progress
+      is available from the task-status endpoint. The data volume is mounted
+      read-only, so processing never modifies the original files.
+    </p>
+
+    <h2>Exporting annotations</h2>
+
+    <p>
+      Annotation export returns the user labels of a dataset together with
+      recording and snippet metadata:
+    </p>
+
+    <pre><code>GET /api/datasets/{dataset_id}/annotations/export?format=csv</code></pre>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>format</code></td><td><code>json</code> (default) or <code>csv</code>.</td></tr>
+        <tr><td><code>labels</code></td><td>Comma-separated labels. Only annotations carrying one of them are exported. A label can be given as an active-learning label string, a taxon ID, or a resolved species name.</td></tr>
+        <tr><td><code>taxon_id</code></td><td>A single label; an alias for <code>labels</code>. Supplying both is rejected.</td></tr>
+        <tr><td><code>include_co_occurring</code></td><td>When <code>true</code>, a snippet that matches the label filter is exported with all of its annotations, including other labels. Ignored without a label filter.</td></tr>
+        <tr><td><code>user_id</code></td><td>Restrict to one annotator.</td></tr>
+        <tr><td><code>created_after</code>, <code>created_before</code></td><td>Restrict by creation time.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The columns are <code>annotation_id</code>, <code>dataset_id</code>,
+      <code>snippet_id</code>, <code>label</code>, <code>created_at</code>,
+      <code>created_by</code>, <code>recording_file_name</code>,
+      <code>snippet_start_time</code>, <code>snippet_end_time</code>, and
+      <code>snippet_duration</code>. Administrators also receive a
+      <code>source_table</code> column. The export combines labels from the
+      active-learning label store and the canonical annotation table, removes
+      duplicates per snippet, label, and user, and includes user-source labels
+      only, so ground-truth labels are left out.
+    </p>
+
+    <p>
+      To list the labels that actually occur in a dataset, for example to build a
+      label filter, call
+      <code>GET /api/datasets/{dataset_id}/annotation-labels</code>.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Traceability.</strong> Every exported row names the recording and
+      gives the snippet's start time, end time, and duration, so a label can be
+      traced back to the audio window it describes.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Review and reopen previously generated feeds from Feed History.">
+  <title>Feed History — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Feed History</h1>
+
+    <p class="lede">
+      Every classic feed you generate is saved as a snapshot. Feed History lets
+      you review those snapshots and reopen a previous configuration instead of
+      rebuilding it from scratch.
+    </p>
+
+    <h2>What is stored</h2>
+
+    <p>
+      Generating a feed records the request that produced it — the method, the
+      dataset, and the parameters such as limit and filters. Snapshots are kept
+      per user and per method, and up to <strong>five</strong> are retained for
+      each method. When a new one is created, the oldest is dropped.
+    </p>
+
+    <p>
+      The history endpoint returns these snapshots newest first:
+    </p>
+
+    <pre><code>GET /api/feed/history?method=random&amp;dataset_id=1</code></pre>
+
+    <p>
+      Both filters are optional. Filtering by dataset matches against the stored
+      request parameters, so you can narrow the list to the dataset you are
+      working on.
+    </p>
+
+    <h2>In the interface</h2>
+
+    <p>
+      The Feed History page lists the stored snapshots. Each entry shows the
+      method, the number of snippets, and the creation time, with an Open button
+      that returns to the annotation workflow for that feed
+      (<code>/annotate?feed_id=</code>).
+    </p>
+
+    <h2>Why it helps</h2>
+
+    <ul>
+      <li>Resume annotation on a batch you were partway through.</li>
+      <li>Reuse a carefully tuned similarity or filter configuration.</li>
+      <li>Compare how a dataset was sampled across sessions.</li>
+    </ul>
+
+    <div class="callout callout--tip">
+      <strong>Note.</strong> Feed History covers the classic methods (random,
+      similarity, and filter). Active-learning and validate sessions are
+      configured per model checkpoint rather than stored as classic snapshots.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

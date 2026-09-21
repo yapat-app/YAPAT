@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Feed methods, their parameters, and snapshot behaviour.">
+  <title>Feed Methods — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Feed Methods</h1>
+
+    <p class="lede">
+      The <code>GET /api/feed/</code> endpoint is the single entry point for
+      classic feeds. The <code>method</code> parameter selects the behaviour and
+      controls which additional parameters are accepted.
+    </p>
+
+    <h2>Common parameters</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Applies to</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>dataset_id</code></td><td>All</td><td>Target dataset.</td></tr>
+        <tr><td><code>snippet_set_id</code></td><td>All</td><td>Optional; resolves the dataset default when omitted.</td></tr>
+        <tr><td><code>recording_id</code></td><td>All</td><td>Optional; restrict to one recording.</td></tr>
+        <tr><td><code>limit</code></td><td>All</td><td>Maximum snippets to return; up to 1000.</td></tr>
+        <tr><td><code>skip</code></td><td>All</td><td>Offset for paging.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Random</h2>
+
+    <pre><code>GET /api/feed/?method=random&amp;dataset_id=1&amp;limit=50</code></pre>
+
+    <p>
+      Returns a randomly ordered sample from the snippet set. No additional filter
+      parameters are required.
+    </p>
+
+    <h2>Similarity</h2>
+
+    <p>
+      Two inputs are possible.
+    </p>
+
+    <p><strong>From an existing snippet:</strong></p>
+
+    <pre><code>GET /api/feed/?method=similarity
+    &amp;dataset_id=1&amp;query_snippet_id=42&amp;embedding_model_id=1
+    &amp;crop_start_sec=0.5&amp;crop_end_sec=2.5&amp;limit=50</code></pre>
+
+    <p><strong>From an uploaded audio region:</strong></p>
+
+    <pre><code>POST /api/feed/similarity-search
+multipart/form-data fields:
+  audio_file        Audio clip (WAV/MP3/FLAC/OGG/M4A/AAC, ≤ 100 MB)
+  start_time        Reference start (seconds)
+  end_time          Reference end (seconds)
+  dataset_id        Target dataset
+  embedding_model_id  Model used for the dataset's snippet set
+  limit             Result cap (≤ 100)
+  skip              Offset</code></pre>
+
+    <p>
+      Snippets are ranked by cosine distance between embeddings, so
+      <code>embedding_model_id</code> must match the model used for the target
+      snippet set.
+    </p>
+
+    <h2>Filter</h2>
+
+    <pre><code>GET /api/feed/?method=filter&amp;dataset_id=1
+    &amp;annotation_status=annotated
+    &amp;location=site-a,site-b
+    &amp;species=Turdus%20merula
+    &amp;limit=50</code></pre>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Values</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>annotation_status</code></td><td><code>any</code>, <code>annotated</code>, or <code>unannotated</code>.</td></tr>
+        <tr><td><code>location</code></td><td>Comma-separated location strings.</td></tr>
+        <tr><td><code>species</code></td><td>Comma-separated species.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Snapshots</h2>
+
+    <p>
+      Every successful random, similarity, or filter request is persisted as a
+      snapshot for the requesting user. Up to <strong>five snapshots</strong>
+      per method are retained; older ones are silently dropped. The snapshot
+      stores the full request parameters and the resulting snippet list so that
+      the same feed can be reopened from
+      <a href="../../guides/feed-history/">Feed History</a>.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Active-learning feeds</strong> are driven by
+      <code>/api/pam-al/inference/get-or-create</code> rather than the classic
+      feed endpoint. See <a href="../../concepts/annotation-feeds/active-learning/">Active Learning</a>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Building, grounding, submitting, and promoting label spaces in YAPAT.">
+  <title>Label Management — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Label Management</h1>
+
+    <p class="lede">
+      The label-management workspace builds a label space through a guided
+      conversation. It is opened from the Taxonomies page (route
+      <code>/pre-annotation</code>), where a team and an optional dataset scope
+      are selected first.
+    </p>
+
+    <h2>The workspace</h2>
+
+    <p>
+      Two panels work together:
+    </p>
+
+    <ul>
+      <li><strong>Taxonomy chatbot</strong> — you describe the concepts you need in natural language; the assistant retrieves candidate matches from reference resources and discusses them.</li>
+      <li><strong>Label space</strong> — the growing list of confirmed concepts, with the source information attached to each.</li>
+    </ul>
+
+    <h2>A session, step by step</h2>
+
+    <ol>
+      <li>
+        <strong>Start a conversation.</strong> A session is created for the
+        selected team and dataset. It can be seeded from the team's current
+        active label space (<code>seed_from_active</code>).
+      </li>
+      <li>
+        <strong>Elicit concepts.</strong> Each message is sent to the taxonomy
+        assistant, which proposes grounded concepts. Candidates can be inspected
+        and added to the label space, either in bulk or individually.
+      </li>
+      <li>
+        <strong>Refine.</strong> Items can be removed from the label space while
+        it is still editable; concepts that do not fit an external resource are
+        kept as local representations.
+      </li>
+      <li>
+        <strong>Submit.</strong> Submitting turns the session's concept list
+        into a custom taxonomy stored as a numbered version in
+        <code>submitted</code> status for the team owner to review.
+      </li>
+    </ol>
+
+    <p>
+      A conversation can also be cancelled without producing a taxonomy.
+    </p>
+
+    <h2>Reviewing and activating versions</h2>
+
+    <p>
+      Team owners (and administrators) see the submitted versions for their team
+      and can promote one to be the team's active label space; the previously
+      active version returns to <code>submitted</code>. Only one version is active at a time;
+      the active version is the one a new session can be seeded from. Removing a custom
+      taxonomy through the API archives it rather than deleting it.
+    </p>
+
+    <h2>Where grounding comes from</h2>
+
+    <p>
+      Species concepts are matched against GBIF, environmental concepts against
+      ENVO through OLS, and unmatched concepts fall back to Wikipedia or a local
+      ontology representation. The details are covered under
+      <a href="../../concepts/label-space/grounding/">Grounding</a>.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Dependency.</strong> The chatbot requires the
+      ontology service (<strong>oe_yapat</strong>) to be running. See
+      <a href="../../getting-started/installation/">Installation</a>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

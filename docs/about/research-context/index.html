@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Two related research papers on grounded label spaces, what each reports, and which of their ideas the current YAPAT software implements.">
+  <title>Research Context — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Research Context</h1>
+
+    <p class="lede">
+      YAPAT's label-space workflow relates to two papers by researchers at DFKI
+      and the University of Oldenburg. This page summarises what each paper
+      reports and states which of its ideas the current software implements. The
+      papers describe research directions and a demonstration system; they are not
+      a specification of YAPAT.
+    </p>
+
+    <h2>Grounded Label Space Engineering for Knowledge-Centric Annotation Workflows</h2>
+
+    <p>
+      P. Sitapara, T. S. Gouvêa, and D. Sonntag. A challenge paper.
+    </p>
+
+    <p>
+      The paper starts from the observation that annotation tools usually expect
+      the label set to be fixed before labelling begins, and that such label sets
+      tend to be flat lists with no links to shared knowledge resources. It argues
+      that experts often refine concepts or meet new phenomena while annotating.
+      When the label set cannot follow, that knowledge is either squeezed into
+      ill-fitting labels or kept in free-text comments that software cannot use.
+      The authors call this loss of knowledge <em>epistemic loss</em>.
+    </p>
+
+    <p>
+      As a response, the paper proposes <strong>Grounded Label Space Engineering
+      (GLSE)</strong> as a problem formulation and research direction. In GLSE, a
+      label space is treated as a semantic object linked to ontologies, one that
+      experts can build up, ground, revise, and stabilise, so that annotation and
+      knowledge engineering develop together under governance rules. The paper
+      names three operations: introducing new concepts during annotation, aligning
+      concepts with existing resources where possible, and stabilising concepts
+      through validation and reuse. Language models may assist with candidate
+      retrieval or suggestions, but the paper keeps final authority with the
+      human expert.
+    </p>
+
+    <p>
+      As a challenge paper, it presents a proof-of-concept in
+      bioacoustic monitoring only briefly and reports no evaluation. It lists open problems,
+      including incorrect language-model suggestions, fragmentation of concepts
+      across annotators, and the effort that grounding places on experts who are
+      not trained in ontology engineering, and it proposes evaluating GLSE in
+      future work at the workflow, knowledge, and downstream levels.
+    </p>
+
+    <h2>Structuring Annotation Label Spaces by Natural Language Concept Elicitation and Ontology Grounding</h2>
+
+    <p>
+      P. Sitapara, P. Doddanawar, T. S. Gouvêa, and D. Sonntag. A demonstration
+      paper for the GenAIK-NORA 2026 workshop (Joint Workshop on Generative AI and
+      Knowledge Graphs and Knowledge Graphs &amp; Agentic Systems Interplay),
+      co-located with IJCAI-ECAI 2026, 17 August 2026, Bremen.
+    </p>
+
+    <p>
+      This paper describes a demonstration system in which an expert names the
+      concepts to annotate in plain language before annotation starts. A language
+      model, reached through an MCP server, calls tools that look up candidate
+      concepts. Species names are looked up in GBIF and environmental terms in
+      ENVO and OLS, with Wikipedia as a lower-priority source. Candidates are shown
+      to the expert, and only confirmed ones join the label space. If no resource
+      has a suitable entry, the system builds a local OWL ontology module for the
+      concept and records where it came from. The confirmed concepts form a
+      session ontology that is frozen before annotation and then constrains the
+      labels. The paper works through a bird-annotation example and lists its own
+      limitations: it is a demonstration rather than an empirical study, the local
+      concepts are not yet aligned with external ontologies, and the set of
+      supported ontologies is small. The paper links to a demonstration video at
+      <a href="https://cst.dfki.de/projects-grounded-label-space-demo" target="_blank" rel="noopener noreferrer">cst.dfki.de/projects-grounded-label-space-demo</a>
+      and names the <a href="https://github.com/yapat-app/oe_yapat" target="_blank" rel="noopener noreferrer">oe_yapat</a>
+      repository as its code.
+    </p>
+
+    <h2>What the software implements</h2>
+
+    <p>
+      The table compares ideas from the papers with the public repositories. The
+      right-hand column describes the code, not the papers.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Idea in the papers</th>
+          <th>In the current repositories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Naming concepts in natural language</td>
+          <td>Implemented as the label-space chat, which forwards prompts to the oe_yapat service.</td>
+        </tr>
+        <tr>
+          <td>Tool-based lookup in GBIF, ENVO/OLS, and Wikipedia</td>
+          <td>Implemented as MCP tools in oe_yapat.</td>
+        </tr>
+        <tr>
+          <td>Expert confirmation before a concept enters the label space</td>
+          <td>Implemented: returned candidates are added to the label space by the user, all at once or one by one, and can be removed again before submission.</td>
+        </tr>
+        <tr>
+          <td>Local OWL modules for concepts without an external match</td>
+          <td>oe_yapat can write such a module as a Turtle file. The YAPAT backend keeps only the concept entry the service returns.</td>
+        </tr>
+        <tr>
+          <td>Explicit grounding-status categories</td>
+          <td>Not found in the backend or frontend. Each entry keeps the identifier and the source details the service returned.</td>
+        </tr>
+        <tr>
+          <td>Provenance of label-space construction</td>
+          <td>Partly: the backend stores the chat history and records who added each concept and when.</td>
+        </tr>
+        <tr>
+          <td>A frozen session ontology exported as OWL or JSON-LD</td>
+          <td>Not found. Label-space versions are stored as JSON in the database.</td>
+        </tr>
+        <tr>
+          <td>Governance of the label space as it evolves</td>
+          <td>YAPAT has a submit-and-promote step: a member submits a version and a team owner activates one. The papers describe governance in general terms and do not specify this mechanism.</td>
+        </tr>
+        <tr>
+          <td>Evaluation at workflow, knowledge, and downstream levels</td>
+          <td>Proposed in the papers as future work; the repositories contain no such evaluation.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout--tip">
+      <strong>Related pages.</strong>
+      <a href="../../concepts/label-space/what-is-a-label-space/">What is a Label Space?</a>,
+      <a href="../../concepts/label-space/grounding/">Grounding</a>, and
+      <a href="../../concepts/label-space/managing-versions/">Managing versions</a>
+      describe the implemented workflow.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

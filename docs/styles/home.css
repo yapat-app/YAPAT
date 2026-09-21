@@ -1,0 +1,290 @@
+/* --------------------------------
+   Homepage layout
+-------------------------------- */
+
+/* The header sits outside the padded scroll area; give it the same content width. */
+.page > .header {
+  flex: 0 0 auto;
+  width: calc(100% - 2 * var(--page-gutter));
+}
+
+.hero {
+  width: 100%;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 56px 0 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-copy {
+  max-width: 540px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 18px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(44px, 4.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.intro {
+  max-width: 480px;
+  margin: 22px 0 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.actions {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* ---------- Hero visual (inline SVG, themed via tokens) ---------- */
+
+.hero-svg {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  font-family: var(--font-mono), monospace;
+}
+
+.hero-svg .v-panel { fill: var(--surface); stroke: var(--border); }
+.hero-svg .v-rule,
+.hero-svg .v-axis { stroke: var(--border); stroke-width: 1; }
+.hero-svg .v-plot { fill: var(--surface-soft); stroke: var(--border); }
+.hero-svg .v-dot { fill: var(--border-strong); opacity: 0.6; }
+
+.hero-svg .v-title,
+.hero-svg .v-label { fill: var(--text-muted); font-size: 9.5px; letter-spacing: 0.12em; }
+.hero-svg .v-title { letter-spacing: 0.04em; font-size: 10.5px; }
+
+.hero-svg .s1,
+.hero-svg .s2,
+.hero-svg .s3 { fill: var(--primary); }
+.hero-svg .s1 { opacity: 0.14; }
+.hero-svg .s2 { opacity: 0.38; }
+.hero-svg .s3 { opacity: 0.7; }
+
+.hero-svg .v-box { fill: none; stroke: var(--primary); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.hero-svg .v-tag { fill: var(--primary); }
+.hero-svg .v-tagtext { fill: var(--on-primary); font-size: 9.5px; font-weight: 500; }
+
+.hero-svg .c1 { fill: var(--primary); opacity: 0.85; }
+.hero-svg .c2 { fill: var(--green); opacity: 0.85; }
+.hero-svg .c3 { fill: var(--yellow); opacity: 0.85; }
+.hero-svg .c4 { fill: var(--text-muted); opacity: 0.6; }
+.hero-svg .v-sel { fill: none; stroke: var(--primary); stroke-width: 1.2; }
+
+.hero-svg .h1 { fill: var(--text-muted); opacity: 0.45; }
+.hero-svg .h2 { fill: var(--primary); opacity: 0.75; }
+
+.hero-svg .v-feedtext { fill: var(--text-secondary); font-size: 10.5px; }
+.hero-svg .v-feedmuted { fill: var(--text-muted); font-size: 9.5px; }
+.hero-svg .v-tagtext.t1,
+.hero-svg .v-tagtext.t2 { opacity: 0; }
+.hero-svg .halo { fill: none; stroke: var(--primary); stroke-width: 1.2; opacity: 0; }
+.hero-svg[data-state="0"] .hl0 .halo,
+.hero-svg[data-state="1"] .hl1 .halo,
+.hero-svg[data-state="2"] .hl2 .halo { opacity: 1; }
+.hero-svg .hb { transform-box: fill-box; transform-origin: 50% 100%; }
+.hero-svg .hb.hot.h1 { opacity: 0.7; }
+.hero-svg .hb.hot.h2 { opacity: 0.95; }
+
+/* Audio row: static state is a paused playhead at ~45% (reduced motion). */
+.hero-svg .v-sig-ring { fill: none; stroke: var(--border); stroke-width: 1; }
+.hero-svg .v-sig-bars { fill: none; stroke: var(--text-muted); stroke-width: 2; stroke-linecap: butt; opacity: 0.6; }
+.hero-svg .v-wave,
+.hero-svg .v-wave-on path { fill: none; stroke-width: 1.6; stroke-linecap: round; }
+.hero-svg .v-wave { stroke: var(--text-muted); opacity: 0.5; }
+.hero-svg .v-wave-on path { stroke: var(--primary); }
+.hero-svg .v-playhead {
+  stroke: var(--primary);
+  stroke-width: 1.2;
+  transform: translateX(calc(var(--ph, 0.45) * 328px));
+}
+.hero-svg .v-progress {
+  transform-origin: 52px 0;
+  transform: scaleX(var(--ph, 0.45));
+}
+.hero-svg .v-time-now { fill: var(--text-secondary); }
+
+.hero-svg .v-chip { fill: var(--surface); stroke: var(--border); }
+.hero-svg .v-chiptext { fill: var(--text-secondary); font-size: 10.5px; }
+
+/* Illustrative workspace motion. One controller (js/site.js) beats once a
+   second and sets data-state / custom properties / classes; the rules below
+   make each change smooth. Skipped entirely under reduced motion. */
+
+.hero-svg[data-state="1"] .v-tagtext.t0,
+.hero-svg[data-state="2"] .v-tagtext.t0 { opacity: 0; }
+.hero-svg[data-state="1"] .v-tagtext.t1,
+.hero-svg[data-state="2"] .v-tagtext.t2 { opacity: 1; }
+
+/* Spectrogram cells lit by the controller. */
+.hero-svg .s1.lit { opacity: 0.5; }
+.hero-svg .s2.lit { opacity: 0.7; }
+.hero-svg .s3.lit { opacity: 0.95; }
+
+/* Feature points dimmed by the controller. */
+.hero-svg .pt.dim { opacity: 0.45; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  .hero-svg .v-boxg {
+    transform: translateX(var(--box-x, 0px));
+    transition: transform 1.9s ease-in-out;
+  }
+
+  /* Playhead advances one beat per second, linearly, so it reads as
+     continuous. It fades out at the end of a pass and back in on restart. */
+  .hero-svg .v-playhead,
+  .hero-svg .v-progress {
+    transition: transform 1s linear, opacity 0.4s ease;
+  }
+  .hero-svg .v-wave-on { transition: opacity 0.4s ease; }
+  .hero-svg.ph-end .v-playhead { opacity: 0; transition-delay: 0s, 0.6s; }
+  .hero-svg.ph-end .v-wave-on { opacity: 0; transition-delay: 0.6s; }
+  .hero-svg.ph-reset .v-playhead,
+  .hero-svg.ph-reset .v-progress,
+  .hero-svg.ph-reset .v-wave-on { transition: none; }
+
+  .hero-svg .v-tagtext { transition: opacity 0.5s ease; }
+  .hero-svg .halo { transition: opacity 0.8s ease; }
+
+  .hero-svg .v-feed {
+    transform: translateY(var(--feed-y, 0px));
+    transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero-svg .hb {
+    transform: scaleY(var(--s, 1));
+    transition:
+      transform 0.7s ease-in-out 0.2s,
+      opacity 0.7s ease;
+  }
+
+  .hero-svg .s1,
+  .hero-svg .s2,
+  .hero-svg .s3 { transition: opacity 0.8s ease; }
+
+  .hero-svg .s1 { animation: v-s 7s ease-in-out infinite; }
+  .hero-svg .s2 { animation: v-s 9s ease-in-out infinite; }
+  .hero-svg .s3 { animation: v-s 8s ease-in-out infinite; }
+
+  .hero-svg .pt {
+    transition: opacity 1.2s ease;
+    animation: v-drift 6s ease-in-out infinite alternate;
+  }
+
+  .hero-svg .v-pz {
+    transform-origin: 384px 134px;
+    transform: translate(var(--pz-x, 0px), var(--pz-y, 0px)) scale(var(--pz-s, 1));
+    transition: transform 2.4s ease-in-out;
+  }
+
+  @keyframes v-s { 50% { fill-opacity: 0.55; } }
+
+  @keyframes v-drift {
+    to { transform: translate(var(--dx), var(--dy)); }
+  }
+}
+
+/* Wide desktops: nudge the workspace toward the copy without ever shrinking it. */
+@media (min-width: 1181px) {
+
+  .hero-svg {
+    margin-right: clamp(0px, calc(100% - 520px), 32px);
+  }
+}
+
+@media (max-width: 1180px) {
+
+  .hero-visual {
+    max-width: 560px;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 950px) {
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 56px 0 44px;
+  }
+
+  .hero-copy {
+    max-width: 640px;
+  }
+
+  .hero-visual {
+    justify-content: center;
+    margin: 44px auto 0;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 700px) {
+
+  .hero {
+    padding: 44px 0 32px;
+  }
+
+  .hero h1 {
+    font-size: 39px;
+  }
+
+  .intro {
+    font-size: 14px;
+  }
+
+  .actions {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .hero-visual {
+    margin-top: 36px;
+    max-width: 440px;
+  }
+
+  .cards-section {
+    padding: 36px 0 48px;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .hero {
+    padding: 36px 0 28px;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+
+  .hero h1 br {
+    display: none;
+  }
+
+  .hero-visual {
+    max-width: 360px;
+  }
+
+  .cards-section {
+    padding: 32px 0 40px;
+  }
+}

@@ -2,11 +2,513 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YAPAT Documentation</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="YAPAT Documentation — Yet Another PAM Annotation Tool"
+  >
+
+  <title>YAPAT Documentation — Yet Another PAM Annotation Tool</title>
+  <link rel="icon" type="image/svg+xml" href="assets/yapat-icon.svg">
+
+  <script>
+    /* Apply the saved / OS theme before first paint (same key as the docs pages). */
+    (function () {
+      var d = document.documentElement, t = null;
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <!-- YAPAT uses IBM Plex Sans / IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/home.css">
 </head>
-<body>
-  <h1>YAPAT Documentation</h1>
-  <p>GitHub Pages is working.</p>
+
+<body class="home">
+
+  <div class="page">
+
+    <!-- Header -->
+
+    <header class="header">
+
+      <a href="./" class="logo">
+        YAPAT
+      </a>
+
+      <div class="header-actions">
+
+        <button
+          class="docs-theme-toggle"
+          type="button"
+          aria-label="Switch to dark theme"
+          aria-pressed="false"
+        >
+          <svg class="docs-theme-icon icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="docs-theme-icon icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <a
+          href="https://github.com/yapat-app/YAPAT"
+          class="github"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub <span>↗</span>
+        </a>
+
+        <img
+          src="assets/img/dfki_Logo.jpg"
+          alt="DFKI logo"
+          class="dfki-logo"
+        >
+
+      </div>
+
+    </header>
+
+
+    <!-- Scrolling content: everything below the header scrolls in here, so the
+         header never takes part in page scroll / overscroll. -->
+    <div class="page-scroll" tabindex="-1">
+
+    <main>
+
+      <!-- Hero -->
+
+      <section class="hero">
+
+        <div class="hero-copy">
+
+          <div class="eyebrow">
+            AI-POWERED PAM ANNOTATION
+          </div>
+
+          <h1>
+            YAPAT
+            <br>
+            Documentation
+          </h1>
+
+          <p class="intro">
+            The documentation hub for YAPAT — a human-in-the-loop
+            annotation system for Passive Acoustic Monitoring data.
+            Guides for datasets, label spaces, annotation workflows,
+            and active learning.
+          </p>
+
+          <div class="actions">
+
+            <a
+              href="#cards"
+              class="primary-link"
+              data-cta="getting-started"
+            >
+              Get started
+              <span>→</span>
+            </a>
+
+            <a
+              href="#cards"
+              class="secondary-link"
+              data-cta="concepts"
+            >
+              Explore concepts
+              <span>→</span>
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- Hero workflow visual -->
+
+        <div class="hero-visual">
+
+          <svg
+          class="hero-svg"
+          data-state="0"
+          viewBox="0 0 520 350"
+          role="img"
+          aria-labelledby="hero-svg-title"
+        >
+          <title id="hero-svg-title">YAPAT workspace: audio, spectrogram, feature projection, distribution and annotation feed.</title>
+          <defs>
+            <clipPath id="hero-clip-proj"><rect x="272" y="72" width="224" height="115" rx="6"/></clipPath>
+            <clipPath id="hero-clip-feed"><rect x="0" y="290" width="520" height="52"/></clipPath>
+            <clipPath id="hero-clip-progress"><rect class="v-progress" x="52" y="-2" width="328" height="24"/></clipPath>
+          </defs>
+
+          <rect class="v-panel" x="0.5" y="0.5" width="519" height="349" rx="10"/>
+          <line class="v-rule" x1="0" y1="34" x2="520" y2="34"/>
+          <text class="v-title" x="20" y="22">yapat / workspace</text>
+          <circle class="v-dot" cx="482" cy="17" r="3"/>
+          <circle class="v-dot" cx="494" cy="17" r="3"/>
+          <circle class="v-dot" cx="506" cy="17" r="3"/>
+
+          <g transform="translate(0 -6)">
+          <!-- 01 Spectrogram -->
+          <text class="v-label" x="24" y="64">01 SPECTROGRAM</text>
+          <rect class="v-plot" x="16" y="72" width="240" height="180" rx="6"/>
+          <rect class="s1" style="animation-delay:-0.55s" x="38" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.65s" x="66" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-3.30s" x="108" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-4.40s" x="136" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-5.50s" x="164" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-6.05s" x="178" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-7.70s" x="220" y="78" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.95s" x="94" y="92" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-4.60s" x="136" y="92" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-5.15s" x="150" y="92" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-6.80s" x="192" y="92" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-0.95s" x="38" y="106" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.50s" x="52" y="106" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.05s" x="66" y="106" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.25s" x="66" y="120" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-3.90s" x="108" y="120" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-5.00s" x="136" y="120" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-4.10s" x="108" y="134" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-0.50s" x="220" y="134" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.00s" x="24" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.55s" x="38" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.10s" x="52" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-3.20s" x="80" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-5.40s" x="136" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-5.95s" x="150" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-0.70s" x="220" y="148" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-3.95s" x="94" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-4.50s" x="108" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-5.05s" x="122" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-5.60s" x="136" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-7.80s" x="192" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-0.35s" x="206" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-0.90s" x="220" y="162" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.95s" x="38" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-4.70s" x="108" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-5.25s" x="122" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-7.45s" x="178" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-0.00s" x="192" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-0.55s" x="206" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.65s" x="234" y="176" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-4.35s" x="94" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-4.90s" x="108" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-6.00s" x="136" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-6.55s" x="150" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-7.10s" x="164" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-7.65s" x="178" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-0.20s" x="192" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.30s" x="220" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.85s" x="234" y="190" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.80s" x="24" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.35s" x="38" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-3.45s" x="66" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-4.00s" x="80" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-4.55s" x="94" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-5.10s" x="108" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-5.65s" x="122" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-6.20s" x="136" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-6.75s" x="150" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-7.30s" x="164" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-0.40s" x="192" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.05s" x="234" y="204" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s3" style="animation-delay:-3.65s" x="66" y="218" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-4.20s" x="80" y="218" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-4.75s" x="94" y="218" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s2" style="animation-delay:-6.95s" x="150" y="218" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-0.05s" x="178" y="218" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-0.60s" x="192" y="218" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.20s" x="24" y="232" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-2.75s" x="38" y="232" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-3.85s" x="66" y="232" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-4.40s" x="80" y="232" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-6.60s" x="136" y="232" width="11.5" height="11.5" rx="1.5"/>
+          <rect class="s1" style="animation-delay:-1.90s" x="220" y="232" width="11.5" height="11.5" rx="1.5"/>
+          <g class="v-boxg">
+            <rect class="v-box" x="49" y="117" width="86" height="114" rx="3"/>
+            <rect class="v-tag" x="49" y="101" width="58" height="15" rx="3"/>
+            <text class="v-tagtext t0" x="55" y="112">call_A</text>
+            <text class="v-tagtext t1" x="55" y="112">call_B</text>
+            <text class="v-tagtext t2" x="55" y="112">call_C</text>
+          </g>
+
+          <!-- 02 Feature projection -->
+          <text class="v-label" x="272" y="64">02 FEATURE PROJECTION</text>
+          <rect class="v-plot" x="272" y="72" width="224" height="115" rx="6"/>
+          <g clip-path="url(#hero-clip-proj)">
+          <g class="v-pz">
+            <circle class="pt c1" style="--dx:1.6px;--dy:-1.0px;animation-duration:5.9s;animation-delay:-5.3s" cx="324" cy="109" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.7px;--dy:2.8px;animation-duration:7.2s;animation-delay:-4.7s" cx="309" cy="119" r="2.4"/>
+            <circle class="pt c1" style="--dx:0.9px;--dy:-0.8px;animation-duration:7.9s;animation-delay:-1.9s" cx="334" cy="138" r="2.4"/>
+            <g class="pt hl0" style="--dx:-0.6px;--dy:-0.6px;animation-duration:6.3s;animation-delay:-4.2s"><circle class="halo" cx="317" cy="117" r="6.5"/><circle class="c1" cx="317" cy="117" r="2.4"/></g>
+            <circle class="pt c1" style="--dx:-1.7px;--dy:1.0px;animation-duration:7.5s;animation-delay:-2.9s" cx="306" cy="98" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.5px;--dy:-0.2px;animation-duration:6.2s;animation-delay:-6.8s" cx="320" cy="125" r="2.4"/>
+            <circle class="pt c1" style="--dx:0.0px;--dy:-2.7px;animation-duration:4.7s;animation-delay:-2.1s" cx="323" cy="119" r="2.4"/>
+            <circle class="pt c1" style="--dx:-0.0px;--dy:1.2px;animation-duration:4.9s;animation-delay:-1.0s" cx="353" cy="98" r="2.4"/>
+            <circle class="pt c1" style="--dx:1.3px;--dy:-1.0px;animation-duration:6.3s;animation-delay:-3.3s" cx="333" cy="131" r="2.4"/>
+            <circle class="pt c1" style="--dx:-0.0px;--dy:-1.0px;animation-duration:4.9s;animation-delay:-0.6s" cx="315" cy="111" r="2.4"/>
+            <circle class="pt c1" style="--dx:-0.9px;--dy:0.1px;animation-duration:5.5s;animation-delay:-6.8s" cx="332" cy="110" r="2.4"/>
+            <circle class="pt c1" style="--dx:2.3px;--dy:-0.7px;animation-duration:5.8s;animation-delay:-0.3s" cx="292" cy="133" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.5px;--dy:2.0px;animation-duration:4.3s;animation-delay:-5.3s" cx="334" cy="116" r="2.4"/>
+            <circle class="pt c1" style="--dx:2.5px;--dy:0.6px;animation-duration:5.3s;animation-delay:-0.4s" cx="342" cy="119" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.8px;--dy:-0.9px;animation-duration:4.5s;animation-delay:-1.6s" cx="288" cy="111" r="2.4"/>
+            <circle class="pt c1" style="--dx:2.1px;--dy:-2.4px;animation-duration:6.1s;animation-delay:-0.9s" cx="324" cy="134" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.6px;--dy:-0.7px;animation-duration:6.1s;animation-delay:-3.4s" cx="333" cy="102" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.0px;--dy:-1.0px;animation-duration:5.2s;animation-delay:-2.1s" cx="301" cy="116" r="2.4"/>
+            <circle class="pt c1" style="--dx:2.6px;--dy:-1.9px;animation-duration:5.2s;animation-delay:-5.3s" cx="308" cy="139" r="2.4"/>
+            <circle class="pt c1" style="--dx:0.6px;--dy:2.2px;animation-duration:7.2s;animation-delay:-2.2s" cx="346" cy="127" r="2.4"/>
+            <circle class="pt c1" style="--dx:-2.6px;--dy:1.3px;animation-duration:5.7s;animation-delay:-6.4s" cx="301" cy="129" r="2.4"/>
+            <circle class="pt c1" style="--dx:-1.7px;--dy:-0.6px;animation-duration:4.8s;animation-delay:-0.3s" cx="290" cy="120" r="2.4"/>
+            <circle class="pt c1" style="--dx:-2.1px;--dy:1.0px;animation-duration:5.5s;animation-delay:-3.9s" cx="314" cy="99" r="2.4"/>
+            <circle class="pt c1" style="--dx:-0.7px;--dy:-1.1px;animation-duration:4.7s;animation-delay:-1.4s" cx="313" cy="133" r="2.4"/>
+            <circle class="pt c2" style="--dx:0.4px;--dy:-0.6px;animation-duration:7.2s;animation-delay:-1.5s" cx="419" cy="105" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.0px;--dy:-0.8px;animation-duration:6.2s;animation-delay:-2.0s" cx="405" cy="144" r="2.4"/>
+            <circle class="pt c2" style="--dx:-1.3px;--dy:1.4px;animation-duration:5.7s;animation-delay:-4.1s" cx="422" cy="115" r="2.4"/>
+            <circle class="pt c2" style="--dx:-1.0px;--dy:2.7px;animation-duration:5.6s;animation-delay:-4.7s" cx="429" cy="102" r="2.4"/>
+            <circle class="pt c2" style="--dx:1.5px;--dy:0.5px;animation-duration:5.9s;animation-delay:-0.6s" cx="418" cy="96" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.1px;--dy:2.3px;animation-duration:4.3s;animation-delay:-4.2s" cx="447" cy="122" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.1px;--dy:0.0px;animation-duration:8.0s;animation-delay:-6.3s" cx="404" cy="101" r="2.4"/>
+            <circle class="pt c2" style="--dx:0.3px;--dy:-0.4px;animation-duration:5.5s;animation-delay:-5.8s" cx="454" cy="101" r="2.4"/>
+            <g class="pt hl1" style="--dx:-2.5px;--dy:1.8px;animation-duration:4.9s;animation-delay:-4.7s"><circle class="halo" cx="437" cy="111" r="6.5"/><circle class="c2" cx="437" cy="111" r="2.4"/></g>
+            <circle class="pt c2" style="--dx:2.3px;--dy:2.2px;animation-duration:7.3s;animation-delay:-2.2s" cx="444" cy="106" r="2.4"/>
+            <circle class="pt c2" style="--dx:0.4px;--dy:1.7px;animation-duration:7.5s;animation-delay:-2.4s" cx="440" cy="131" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.0px;--dy:-1.2px;animation-duration:5.6s;animation-delay:-0.1s" cx="431" cy="95" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.1px;--dy:-1.5px;animation-duration:5.9s;animation-delay:-5.3s" cx="419" cy="134" r="2.4"/>
+            <circle class="pt c2" style="--dx:-1.7px;--dy:-1.0px;animation-duration:7.7s;animation-delay:-4.8s" cx="437" cy="100" r="2.4"/>
+            <circle class="pt c2" style="--dx:-0.7px;--dy:1.1px;animation-duration:4.4s;animation-delay:-3.4s" cx="451" cy="111" r="2.4"/>
+            <circle class="pt c2" style="--dx:1.5px;--dy:0.2px;animation-duration:6.4s;animation-delay:-4.1s" cx="432" cy="116" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.1px;--dy:-2.6px;animation-duration:4.7s;animation-delay:-3.7s" cx="427" cy="121" r="2.4"/>
+            <circle class="pt c2" style="--dx:-2.0px;--dy:0.1px;animation-duration:6.6s;animation-delay:-3.6s" cx="427" cy="109" r="2.4"/>
+            <circle class="pt c2" style="--dx:-2.5px;--dy:-1.4px;animation-duration:7.0s;animation-delay:-7.0s" cx="439" cy="125" r="2.4"/>
+            <circle class="pt c2" style="--dx:-0.7px;--dy:1.7px;animation-duration:4.8s;animation-delay:-5.2s" cx="415" cy="129" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.1px;--dy:1.8px;animation-duration:5.2s;animation-delay:-1.3s" cx="419" cy="124" r="2.4"/>
+            <circle class="pt c2" style="--dx:2.0px;--dy:-1.9px;animation-duration:6.1s;animation-delay:-2.7s" cx="440" cy="93" r="2.4"/>
+            <circle class="pt c3" style="--dx:0.5px;--dy:-1.1px;animation-duration:7.5s;animation-delay:-2.2s" cx="387" cy="149" r="2.4"/>
+            <circle class="pt c3" style="--dx:-2.6px;--dy:-2.3px;animation-duration:4.6s;animation-delay:-0.1s" cx="403" cy="161" r="2.4"/>
+            <circle class="pt c3" style="--dx:-2.5px;--dy:-1.2px;animation-duration:5.2s;animation-delay:-5.6s" cx="410" cy="162" r="2.4"/>
+            <circle class="pt c3" style="--dx:1.0px;--dy:0.7px;animation-duration:6.8s;animation-delay:-4.6s" cx="393" cy="169" r="2.4"/>
+            <circle class="pt c3" style="--dx:2.5px;--dy:-1.7px;animation-duration:7.9s;animation-delay:-4.4s" cx="377" cy="156" r="2.4"/>
+            <circle class="pt c3" style="--dx:0.4px;--dy:1.0px;animation-duration:7.6s;animation-delay:-3.7s" cx="370" cy="159" r="2.4"/>
+            <circle class="pt c3" style="--dx:-0.3px;--dy:-2.7px;animation-duration:7.0s;animation-delay:-1.1s" cx="392" cy="158" r="2.4"/>
+            <circle class="pt c3" style="--dx:1.5px;--dy:-1.8px;animation-duration:5.8s;animation-delay:-5.7s" cx="351" cy="163" r="2.4"/>
+            <circle class="pt c3" style="--dx:-1.6px;--dy:2.4px;animation-duration:4.4s;animation-delay:-3.2s" cx="388" cy="174" r="2.4"/>
+            <circle class="pt c3" style="--dx:0.9px;--dy:0.7px;animation-duration:7.7s;animation-delay:-6.7s" cx="414" cy="171" r="2.4"/>
+            <circle class="pt c3" style="--dx:-0.0px;--dy:-0.4px;animation-duration:5.9s;animation-delay:-2.2s" cx="368" cy="170" r="2.4"/>
+            <g class="pt hl2" style="--dx:1.2px;--dy:-0.7px;animation-duration:6.7s;animation-delay:-1.4s"><circle class="halo" cx="385" cy="167" r="6.5"/><circle class="c3" cx="385" cy="167" r="2.4"/></g>
+            <circle class="pt c3" style="--dx:-0.3px;--dy:-2.6px;animation-duration:7.9s;animation-delay:-3.9s" cx="377" cy="169" r="2.4"/>
+            <circle class="pt c3" style="--dx:-0.5px;--dy:-1.9px;animation-duration:5.5s;animation-delay:-1.4s" cx="398" cy="145" r="2.4"/>
+            <circle class="pt c3" style="--dx:-0.8px;--dy:1.7px;animation-duration:5.2s;animation-delay:-0.2s" cx="386" cy="157" r="2.4"/>
+            <circle class="pt c3" style="--dx:-2.3px;--dy:0.2px;animation-duration:5.0s;animation-delay:-4.8s" cx="351" cy="148" r="2.4"/>
+            <circle class="pt c3" style="--dx:-2.7px;--dy:2.7px;animation-duration:5.1s;animation-delay:-0.5s" cx="418" cy="166" r="2.4"/>
+            <circle class="pt c1" style="--dx:0.7px;--dy:-2.3px;animation-duration:5.7s;animation-delay:-2.1s" cx="364" cy="112" r="2.4"/>
+            <circle class="pt c2" style="--dx:-1.7px;--dy:-0.1px;animation-duration:5.8s;animation-delay:-6.6s" cx="392" cy="118" r="2.4"/>
+            <circle class="pt c3" style="--dx:1.2px;--dy:-0.2px;animation-duration:7.1s;animation-delay:-1.4s" cx="338" cy="148" r="2.4"/>
+            <circle class="pt c1" style="--dx:-0.1px;--dy:1.5px;animation-duration:6.3s;animation-delay:-0.6s" cx="350" cy="132" r="2.4"/>
+            <circle class="pt c2" style="--dx:-2.7px;--dy:2.6px;animation-duration:7.6s;animation-delay:-2.0s" cx="412" cy="140" r="2.4"/>
+            <circle class="pt c3" style="--dx:0.2px;--dy:-0.7px;animation-duration:4.4s;animation-delay:-3.0s" cx="430" cy="152" r="2.4"/>
+            <circle class="pt c4" style="--dx:-0.7px;--dy:0.6px;animation-duration:6.0s;animation-delay:-2.8s" cx="296" cy="168" r="2.4"/>
+            <circle class="pt c4" style="--dx:-1.1px;--dy:-2.0px;animation-duration:4.7s;animation-delay:-5.6s" cx="468" cy="176" r="2.4"/>
+            <circle class="pt c4" style="--dx:-1.0px;--dy:-1.1px;animation-duration:7.2s;animation-delay:-6.5s" cx="476" cy="92" r="2.4"/>
+            <circle class="pt c4" style="--dx:2.6px;--dy:-2.3px;animation-duration:7.2s;animation-delay:-4.2s" cx="352" cy="92" r="2.4"/>
+            <circle class="pt c4" style="--dx:-1.1px;--dy:-1.5px;animation-duration:7.9s;animation-delay:-4.7s" cx="372" cy="134" r="2.4"/>
+            <circle class="pt c4" style="--dx:1.0px;--dy:0.6px;animation-duration:7.1s;animation-delay:-2.1s" cx="440" cy="170" r="2.4"/>
+            <circle class="pt c4" style="--dx:-2.7px;--dy:1.6px;animation-duration:7.1s;animation-delay:-3.9s" cx="324" cy="176" r="2.4"/>
+            <circle class="pt c4" style="--dx:1.4px;--dy:1.0px;animation-duration:6.1s;animation-delay:-4.4s" cx="404" cy="176" r="2.4"/>
+            <circle class="pt c4" style="--dx:1.9px;--dy:2.4px;animation-duration:5.2s;animation-delay:-0.5s" cx="300" cy="96" r="2.4"/>
+            <circle class="pt c4" style="--dx:-1.8px;--dy:2.8px;animation-duration:5.2s;animation-delay:-1.7s" cx="462" cy="140" r="2.4"/>
+            <circle class="pt c4" style="--dx:1.6px;--dy:1.3px;animation-duration:6.8s;animation-delay:-1.8s" cx="360" cy="180" r="2.4"/>
+          </g>
+          </g>
+
+          <!-- 03 Distribution -->
+          <text class="v-label" x="272" y="204">03 DISTRIBUTION</text>
+          <line class="v-axis" x1="272" y1="254" x2="496" y2="254"/>
+          <rect class="hb h1" style="--i:0" x="273" y="251.9" width="12" height="2.1" rx="1.5"/>
+          <rect class="hb h1" style="--i:1" x="287.4" y="249.8" width="12" height="4.2" rx="1.5"/>
+          <rect class="hb h1" style="--i:2" x="301.8" y="246.6" width="12" height="7.4" rx="1.5"/>
+          <rect class="hb h1" style="--i:3" x="316.2" y="241.4" width="12" height="12.6" rx="1.5"/>
+          <rect class="hb h1" style="--i:4" x="330.6" y="234.1" width="12" height="19.9" rx="1.5"/>
+          <rect class="hb h1" style="--i:5" x="345" y="225.7" width="12" height="28.4" rx="1.5"/>
+          <rect class="hb h1" style="--i:6" x="359.4" y="218.3" width="12" height="35.7" rx="1.5"/>
+          <rect class="hb h1" style="--i:7" x="373.8" y="222.5" width="12" height="31.5" rx="1.5"/>
+          <rect class="hb h1" style="--i:8" x="388.2" y="230.9" width="12" height="23.1" rx="1.5"/>
+          <rect class="hb h1" style="--i:9" x="402.6" y="238.2" width="12" height="15.8" rx="1.5"/>
+          <rect class="hb h1" style="--i:10" x="417" y="244.6" width="12" height="9.5" rx="1.5"/>
+          <rect class="hb h2" style="--i:11" x="431.4" y="240.3" width="12" height="13.7" rx="1.5"/>
+          <rect class="hb h2" style="--i:12" x="445.8" y="245.6" width="12" height="8.4" rx="1.5"/>
+          <rect class="hb h1" style="--i:13" x="460.2" y="249.8" width="12" height="4.2" rx="1.5"/>
+          <rect class="hb h1" style="--i:14" x="474.6" y="251.9" width="12" height="2.1" rx="1.5"/>
+          <rect class="hb h1" style="--i:15" x="489" y="252.9" width="12" height="1.1" rx="1.5"/>
+
+          </g>
+
+          <line class="v-rule" x1="0" y1="262" x2="520" y2="262"/>
+          <!-- Audio source -->
+          <g transform="translate(0 267)">
+            <circle class="v-sig-ring" cx="30" cy="10" r="9"/>
+            <path class="v-sig-bars" d="M27.5 5.5v9M32.5 5.5v9"/>
+            <path class="v-wave" d="M52.0 8.8V11.2 M57.6 8.8V11.2 M63.1 8.6V11.4 M68.7 8.8V11.2 M74.2 8.8V11.2 M79.8 8.8V11.2 M85.4 8.8V11.2 M90.9 8.8V11.2 M96.5 8.8V11.2 M102.0 8.7V11.3 M107.6 8.8V11.2 M113.2 7.1V12.9 M118.7 6.9V13.1 M124.3 4.8V15.2 M129.8 4.4V15.6 M135.4 5.7V14.3 M140.9 2.5V17.5 M146.5 2.1V17.9 M152.1 2.8V17.2 M157.6 2.8V17.2 M163.2 4.3V15.7 M168.7 4.9V15.1 M174.3 3.3V16.7 M179.9 5.1V14.9 M185.4 5.0V15.0 M191.0 5.3V14.7 M196.5 6.3V13.7 M202.1 5.9V14.1 M207.7 6.6V13.4 M213.2 6.6V13.4 M218.8 8.8V11.2 M224.3 8.8V11.2 M229.9 8.8V11.2 M235.5 8.8V11.2 M241.0 6.9V13.1 M246.6 6.6V13.4 M252.1 4.4V15.6 M257.7 3.7V16.3 M263.3 3.5V16.5 M268.8 3.4V16.6 M274.4 4.2V15.8 M279.9 4.3V15.7 M285.5 3.9V16.1 M291.1 4.6V15.4 M296.6 2.3V17.7 M302.2 3.7V16.3 M307.7 2.5V17.5 M313.3 4.3V15.7 M318.8 3.1V16.9 M324.4 4.0V16.0 M330.0 6.6V13.4 M335.5 6.7V13.3 M341.1 6.1V13.9 M346.6 7.5V12.5 M352.2 8.6V11.4 M357.8 8.8V11.2 M363.3 8.8V11.2 M368.9 8.8V11.2 M374.4 8.7V11.3 M380.0 8.8V11.2"/>
+            <g class="v-wave-on" clip-path="url(#hero-clip-progress)"><path d="M52.0 8.8V11.2 M57.6 8.8V11.2 M63.1 8.6V11.4 M68.7 8.8V11.2 M74.2 8.8V11.2 M79.8 8.8V11.2 M85.4 8.8V11.2 M90.9 8.8V11.2 M96.5 8.8V11.2 M102.0 8.7V11.3 M107.6 8.8V11.2 M113.2 7.1V12.9 M118.7 6.9V13.1 M124.3 4.8V15.2 M129.8 4.4V15.6 M135.4 5.7V14.3 M140.9 2.5V17.5 M146.5 2.1V17.9 M152.1 2.8V17.2 M157.6 2.8V17.2 M163.2 4.3V15.7 M168.7 4.9V15.1 M174.3 3.3V16.7 M179.9 5.1V14.9 M185.4 5.0V15.0 M191.0 5.3V14.7 M196.5 6.3V13.7 M202.1 5.9V14.1 M207.7 6.6V13.4 M213.2 6.6V13.4 M218.8 8.8V11.2 M224.3 8.8V11.2 M229.9 8.8V11.2 M235.5 8.8V11.2 M241.0 6.9V13.1 M246.6 6.6V13.4 M252.1 4.4V15.6 M257.7 3.7V16.3 M263.3 3.5V16.5 M268.8 3.4V16.6 M274.4 4.2V15.8 M279.9 4.3V15.7 M285.5 3.9V16.1 M291.1 4.6V15.4 M296.6 2.3V17.7 M302.2 3.7V16.3 M307.7 2.5V17.5 M313.3 4.3V15.7 M318.8 3.1V16.9 M324.4 4.0V16.0 M330.0 6.6V13.4 M335.5 6.7V13.3 M341.1 6.1V13.9 M346.6 7.5V12.5 M352.2 8.6V11.4 M357.8 8.8V11.2 M363.3 8.8V11.2 M368.9 8.8V11.2 M374.4 8.7V11.3 M380.0 8.8V11.2"/></g>
+            <line class="v-playhead" x1="52" y1="-1" x2="52" y2="21"/>
+            <text class="v-feedmuted" x="496" y="13.5" text-anchor="end"><tspan class="v-time-now">00:01.4</tspan> / 00:03.0</text>
+          </g>
+
+          <!-- Annotation feed -->
+          <g clip-path="url(#hero-clip-feed)">
+            <g transform="translate(0 293)"><g class="v-feed">
+            <g transform="translate(0 0)">
+              <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
+              <circle class="c1" cx="34" cy="11" r="4"/>
+              <text class="v-chiptext" x="46" y="15">species</text>
+              <text class="v-feedtext" x="116" y="15">call_A</text>
+              <text class="v-feedmuted" x="176" y="15">00:03.2</text>
+              <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.94</text>
+            </g>
+            <g transform="translate(0 26)">
+              <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
+              <circle class="c2" cx="34" cy="11" r="4"/>
+              <text class="v-chiptext" x="46" y="15">call</text>
+              <text class="v-feedtext" x="116" y="15">call_B</text>
+              <text class="v-feedmuted" x="176" y="15">00:04.6</text>
+              <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.88</text>
+            </g>
+            <g transform="translate(0 52)">
+              <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
+              <circle class="c3" cx="34" cy="11" r="4"/>
+              <text class="v-chiptext" x="46" y="15">noise</text>
+              <text class="v-feedtext" x="116" y="15">call_C</text>
+              <text class="v-feedmuted" x="176" y="15">00:06.1</text>
+              <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.71</text>
+            </g>
+            <g transform="translate(0 78)">
+              <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
+              <circle class="c1" cx="34" cy="11" r="4"/>
+              <text class="v-chiptext" x="46" y="15">species</text>
+              <text class="v-feedtext" x="116" y="15">call_A</text>
+              <text class="v-feedmuted" x="176" y="15">00:03.2</text>
+              <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.94</text>
+            </g>
+            <g transform="translate(0 104)">
+              <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
+              <circle class="c2" cx="34" cy="11" r="4"/>
+              <text class="v-chiptext" x="46" y="15">call</text>
+              <text class="v-feedtext" x="116" y="15">call_B</text>
+              <text class="v-feedmuted" x="176" y="15">00:04.6</text>
+              <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.88</text>
+            </g>
+            </g>
+            </g>
+          </g>
+        </svg>
+
+        </div>
+
+      </section>
+
+
+      <!-- Documentation entry cards -->
+
+      <section
+        class="cards-section"
+        id="cards"
+      >
+
+        <div class="cards-head">
+          <span class="eyebrow">DOCUMENTATION</span>
+        </div>
+
+        <div class="cards" data-doc-cards></div>
+
+      </section>
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <footer class="footer">
+
+      <div class="footer-left">
+
+        <img
+          src="assets/img/dfki_Logo.jpg"
+          alt="DFKI"
+          class="footer-logo"
+        >
+
+        <span class="footer-divider" aria-hidden="true"></span>
+
+        <div class="footer-brand">
+
+          <span class="footer-brand-name">
+            YAPAT
+          </span>
+
+          <span class="footer-sub">
+            Yet Another PAM Annotation Tool
+          </span>
+
+        </div>
+
+      </div>
+
+      <p class="footer-copy">
+        &copy; 2026 DFKI &mdash; German Research Center for Artificial Intelligence
+      </p>
+
+      <nav class="footer-links">
+
+        <a
+          href="https://github.com/yapat-app/YAPAT"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-link"
+        >
+          GitHub <span>↗</span>
+        </a>
+
+      </nav>
+
+    </footer>
+
+    </div>
+
+  </div>
+
+
+  <script src="js/docs-config.js"></script>
+  <script src="js/site.js"></script>
+
 </body>
 </html>

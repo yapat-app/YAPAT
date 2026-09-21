@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Endpoint reference for the YAPAT backend, grouped by area, with the access rule each route enforces.">
+  <title>REST API — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>REST API</h1>
+
+    <p class="lede">
+      The YAPAT backend is a FastAPI application. Every route is mounted under
+      the <code>/api</code> prefix; the only exceptions are <code>GET /</code>
+      and <code>GET /health</code>.
+    </p>
+
+    <h2>Authentication</h2>
+
+    <p>
+      Protected routes expect an HTTP <code>Authorization: Bearer &lt;token&gt;</code>
+      header. Tokens are obtained from the login endpoint and are self-contained
+      JWTs; the default lifetime is seven days (<code>ACCESS_TOKEN_EXPIRE_MINUTES</code>). Status conventions are:
+    </p>
+
+    <ul>
+      <li><code>401</code> — missing, expired, or invalid credentials.</li>
+      <li><code>400</code> — the authenticated user is inactive.</li>
+      <li><code>403</code> — the user lacks the required admin, team, or dataset permission.</li>
+    </ul>
+
+    <h2>Auth</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /api/auth/register</code></td><td>Create an account, optionally consuming an invitation token.</td><td>Public</td></tr>
+        <tr><td><code>POST /api/auth/login</code></td><td>Exchange username and password for a bearer token.</td><td>Public</td></tr>
+        <tr><td><code>POST /api/auth/logout</code></td><td>Stateless logout; the client discards the token.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/auth/me</code></td><td>Return the current user.</td><td>Authenticated</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Teams and invitations</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /api/teams/</code></td><td>Create a team and optionally assign datasets.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/teams/</code></td><td>List teams visible to the caller.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/teams/available-datasets</code></td><td>List datasets assignable to a team.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/teams/{team_id}/datasets</code></td><td>Datasets belonging to a team.</td><td>Team member</td></tr>
+        <tr><td><code>GET /api/teams/{team_id}/members</code></td><td>Team members and roles.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/teams/{team_id}/label-space/submissions</code></td><td>List label-space versions by status.</td><td>Team owner</td></tr>
+        <tr><td><code>GET /api/teams/{team_id}/active-label-space</code></td><td>Return the active label-space version.</td><td>Team member</td></tr>
+        <tr><td><code>PUT /api/teams/{team_id}/active-label-space</code></td><td>Promote a submitted version to active.</td><td>Team owner</td></tr>
+        <tr><td><code>POST /api/teams/{team_id}/invitations</code></td><td>Create a team invitation link.</td><td>Team owner</td></tr>
+        <tr><td><code>DELETE /api/teams/{team_id}/invitations/{invitation_id}</code></td><td>Delete a team invitation.</td><td>Team owner</td></tr>
+        <tr><td><code>DELETE /api/teams/{team_id}</code></td><td>Delete a team, unassigning its datasets.</td><td>Team owner / admin</td></tr>
+        <tr><td><code>POST /api/invitations/</code></td><td>Create a dataset invitation link.</td><td>Admin</td></tr>
+        <tr><td><code>GET /api/invitations/</code></td><td>List dataset invitation links.</td><td>Admin</td></tr>
+        <tr><td><code>DELETE /api/invitations/{invitation_id}</code></td><td>Delete a dataset invitation.</td><td>Admin</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Datasets</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /api/datasets/</code></td><td>Create a dataset and dispatch processing.</td><td>Authenticated<sup>*</sup></td></tr>
+        <tr><td><code>GET /api/datasets/</code></td><td>List accessible datasets.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/available-paths</code></td><td>Browse folders on the data volume.</td><td>Admin</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}</code></td><td>Dataset detail with readiness state.</td><td>Authenticated</td></tr>
+        <tr><td><code>PATCH /api/datasets/{dataset_id}</code></td><td>Update metadata.</td><td>Team owner / admin</td></tr>
+        <tr><td><code>DELETE /api/datasets/{dataset_id}</code></td><td>Delete a dataset.</td><td>Team owner / admin</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/explorer</code></td><td>Folder and file structure on disk.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/recording-locations</code></td><td>Distinct recording locations.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/quick-labels</code></td><td>Quick-label list for the dataset.</td><td>Authenticated</td></tr>
+        <tr><td><code>PUT /api/datasets/{dataset_id}/quick-labels</code></td><td>Replace the quick-label list.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/annotation-labels</code></td><td>Labels present on the dataset's annotations, for scoping an export.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/annotations/export</code></td><td>Export annotations as JSON or CSV.</td><td>Authenticated</td></tr>
+      </tbody>
+    </table>
+
+    <p><sup>*</sup> Non-administrators must supply a <code>team_id</code>.</p>
+
+    <h2>Recordings and snippets</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /api/recordings/</code></td><td>Create a recording row.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/recordings/?dataset_id=</code></td><td>List a dataset's recordings.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/recordings/{recording_id}</code></td><td>Single recording.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/snippets/?dataset_id=&amp;snippet_set_id=</code></td><td>Paginated snippets; supports <code>recording_id</code>, ID-prefix <code>q</code>.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/snippets/{snippet_id}</code></td><td>Single snippet.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/snippets/{snippet_id}/audio</code></td><td>Extracted audio as WAV.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/snippets/{snippet_id}/spectrogram</code></td><td>Mel spectrogram as PNG.</td><td>Authenticated</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Annotations</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /api/annotations/</code></td><td>Create an annotation for a snippet.</td><td>Dataset access</td></tr>
+        <tr><td><code>POST /api/annotations/batch</code></td><td>Create several labels for one snippet.</td><td>Dataset access</td></tr>
+        <tr><td><code>GET /api/annotations/</code></td><td>Filter by snippet, taxon, user, or dataset.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/annotations/{annotation_id}</code></td><td>Single annotation.</td><td>Authenticated</td></tr>
+        <tr><td><code>DELETE /api/annotations/{annotation_id}</code></td><td>Delete an annotation.</td><td>Owner / dataset access</td></tr>
+        <tr><td><code>GET /api/annotations/datasets/stats</code></td><td>Per-dataset annotation counts.</td><td>Authenticated</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Feeds</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/feed/</code></td><td>Generate a random, similarity, or filter feed.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/feed/history</code></td><td>Stored classic feed snapshots.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/feed/similarity-search</code></td><td>Similarity search from an uploaded audio region.</td><td>Authenticated</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Taxonomy and label spaces</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/taxonomy/available</code></td><td>List GBIF and active custom taxonomies.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/taxonomy/{taxonomy_id}/labels</code></td><td>Paginated labels for a custom taxonomy.</td><td>Team member</td></tr>
+        <tr><td><code>GET /api/taxonomy/suggest</code></td><td>Autocomplete taxon names.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/taxonomy/search</code></td><td>Full-text taxon search.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET|POST /api/taxonomy/resolve</code></td><td>Resolve one or many taxon IDs.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/taxonomy/match</code></td><td>Fuzzy-match a species name.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/taxonomy/validate</code></td><td>Check that a taxon ID resolves.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/taxonomy/envo/suggest</code></td><td>Search ENVO environment terms via OLS.</td><td>Public</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/start</code></td><td>Start a label-space conversation.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/{id}/message</code></td><td>Send a prompt to the taxonomy assistant.</td><td>Conversation access</td></tr>
+        <tr><td><code>GET /api/taxonomy/chat/{id}</code></td><td>Conversation detail and history.</td><td>Conversation access</td></tr>
+        <tr><td><code>GET /api/taxonomy/chat/{id}/label-space</code></td><td>Label-space items for a conversation.</td><td>Conversation access</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/{id}/add</code></td><td>Add suggested concepts to the label space.</td><td>Conversation access</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/{id}/freeze</code></td><td>Create an <code>active</code> custom taxonomy directly from the label space (older path; the interface uses submit).</td><td>Conversation access</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/{id}/submit</code></td><td>Store the label space as a <code>submitted</code> version for owner review.</td><td>Conversation access</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/{id}/cancel</code></td><td>Cancel without creating a taxonomy.</td><td>Conversation access</td></tr>
+        <tr><td><code>DELETE /api/taxonomy/chat/{id}/item/{item_id}</code></td><td>Remove a label-space item.</td><td>Conversation access</td></tr>
+        <tr><td><code>GET /api/taxonomy/custom</code></td><td>List custom taxonomies.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/taxonomy/custom/{taxonomy_id}</code></td><td>Custom taxonomy detail.</td><td>Team member</td></tr>
+        <tr><td><code>PUT /api/taxonomy/custom/{id}</code></td><td>Update name, description, or status.</td><td>Creator / owner / admin</td></tr>
+        <tr><td><code>DELETE /api/taxonomy/custom/{id}</code></td><td>Archive a custom taxonomy.</td><td>Creator / owner / admin</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Embeddings and snippet sets</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/embedding-models</code></td><td>List embedding models.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/embedding-models/{model_id}</code></td><td>Single embedding model.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/datasets/{dataset_id}/embeddings</code></td><td>Create an embedding job (the interface restricts this to administrators and team owners).</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/embeddings</code></td><td>List embedding jobs.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/embeddings/{job_id}</code></td><td>Embedding job status.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/snippet-sets</code></td><td>List snippet sets.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/snippet-sets/{snippet_set_id}</code></td><td>Snippet set with annotation stats.</td><td>Authenticated</td></tr>
+        <tr><td><code>DELETE /api/snippet-sets/{snippet_set_id}</code></td><td>Delete a snippet set, guarding annotation loss.</td><td>Authenticated</td></tr>
+      </tbody>
+    </table>
+
+    <h2>PAM Active Learning</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /api/pam-al/checkpoints</code></td><td>Register or update a checkpoint.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/checkpoints</code></td><td>Active checkpoints, one per family.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/checkpoints/all</code></td><td>All checkpoints, including inactive.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/checkpoints/{id}</code></td><td>Single checkpoint.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/checkpoints/{id}/species</code></td><td>Species from the checkpoint's label config.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/pam-al/checkpoints/{id}/activate</code></td><td>Activate a checkpoint for its family.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/species-default</code></td><td>Default species list from the labels file.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/pam-al/inference/get-or-create</code></td><td>Return stored predictions or enqueue one inference job.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/feedback-count</code></td><td>Feedback counter for auto-retrain gating.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/pam-al/feedback</code></td><td>Submit Accept / Reject / Modify feedback.</td><td>Dataset access</td></tr>
+        <tr><td><code>POST /api/pam-al/train-from-scratch</code></td><td>Cold-start training run.</td><td>Team owner / admin</td></tr>
+        <tr><td><code>POST /api/pam-al/retrain/manual</code></td><td>Trigger a manual retrain.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/retrain/jobs</code></td><td>List retrain jobs.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/retrain/jobs/{job_id}</code></td><td>Poll a retrain job.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/labeled-snippets</code></td><td>Snippet IDs with at least one label.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/snippet-labels</code></td><td>Per-snippet ground-truth and user labels.</td><td>Dataset access</td></tr>
+        <tr><td><code>DELETE /api/pam-al/snippet-labels</code></td><td>Remove a persisted snippet label.</td><td>Dataset access<sup>†</sup></td></tr>
+      </tbody>
+    </table>
+
+    <p><sup>†</sup> Deleting a <code>ground_truth</code> label additionally requires administrator or team-owner rights.</p>
+
+    <h2>Visualisations</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST|GET /api/visualisations/fpv</code></td><td>Feature-projection view for a model family.</td><td>None enforced</td></tr>
+        <tr><td><code>POST /api/visualisations/fpv-dataset</code></td><td>Enqueue dataset-level projection generation.</td><td>None enforced</td></tr>
+        <tr><td><code>GET /api/visualisations/fpv-dataset</code></td><td>Fetch pre-computed dataset projections.</td><td>None enforced</td></tr>
+        <tr><td><code>GET /api/visualisations/fpv_vis_range</code></td><td>Range for a visibility filter field.</td><td>None enforced</td></tr>
+      </tbody>
+    </table>
+
+    <h2>WSSED (focal recordings)</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/wssed/access</code></td><td>Whether the caller can use the WSSED flow.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/wssed/training-jobs</code></td><td>Create and enqueue a remote training job.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/training-jobs</code></td><td>List training jobs for a dataset.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>POST /api/wssed/training-jobs/{id}/dispatch</code></td><td>Re-enqueue a pending job.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/datasets/{id}/artifacts</code></td><td>Existing embeddings and checkpoints on the GPU server.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/training-jobs/latest</code></td><td>Most recent job for a dataset.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/training-jobs/{id}/status</code></td><td>Training job status.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>POST /api/wssed/training-jobs/{id}/register-al</code></td><td>Sync a completed job into an AL model family.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/suggestions</code></td><td>Unlabeled snippets above a confidence threshold.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>POST /api/wssed/label</code></td><td>Record accept/reject feedback for a snippet.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>POST /api/wssed/retrain</code></td><td>Start a species-scoped retrain.</td><td>WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/histogram</code></td><td>Confidence histogram over a snippet set.</td><td>WSSED access</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Tasks and system</h2>
+
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/tasks/status/{task_id}</code></td><td>Celery task status and metadata.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/tasks/datasets/{id}/scan</code></td><td>Trigger a dataset scan.</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/tasks/datasets/{id}/process</code></td><td>Trigger the dataset pipeline.</td><td>Authenticated</td></tr>
+        <tr><td><code>DELETE /api/tasks/cancel/{task_id}</code></td><td>Revoke a running task.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /</code></td><td>Service banner and version.</td><td>Public</td></tr>
+        <tr><td><code>GET /health</code></td><td>Liveness check.</td><td>Public</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout--tip">
+      <strong>Interactive schema.</strong> When <code>ENABLE_DOCS=true</code>,
+      the generated OpenAPI schema is available at
+      <code>/api/openapi.json</code>, with Swagger UI at <code>/docs</code>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

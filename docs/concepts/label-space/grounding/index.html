@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How concepts are matched to GBIF, ENVO/OLS, Wikipedia, or a local ontology in the label-space chat, and what is recorded for each.">
+  <title>Grounding — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../../styles/tokens.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Grounding</h1>
+
+    <p class="lede">
+      Grounding links a concept described in natural language to an entry in a
+      reference resource, and keeps the identifier and source details that were
+      found.
+    </p>
+
+    <h2>The workflow</h2>
+
+    <p>
+      In the label-space chat, an expert describes the concepts they need in
+      ordinary language. For each message the backend asks the ontology service for
+      candidate matches and shows the reply together with the candidates. The
+      expert then adds candidates to the label space, either all at once or one at
+      a time, and can send further messages to refine the search. An added concept
+      can be removed again until the label space is submitted. The papers call this
+      approach <em>grounding-first</em>: alignment with authoritative resources is
+      attempted before a locally defined concept is created.
+    </p>
+
+    <figure class="docs-infographic" aria-label="Grounding flow: expert message, backend, ontology service, candidates, label space.">
+      <ol class="di-flow di-animate di-n5">
+        <li style="--i:0">Expert message<span class="di-sub">in ordinary language</span></li>
+        <li style="--i:1">Backend<span class="di-sub">sends the prompt to the ontology service</span></li>
+        <li style="--i:2">Ontology service (oe_yapat)<span class="di-sub">GBIF, ENVO/OLS, Wikipedia, local ontology</span></li>
+        <li style="--i:3">Candidates<span class="di-sub">shown with the reply</span></li>
+        <li style="--i:4">Label space<span class="di-sub">expert adds selected concepts</span></li>
+      </ol>
+      <figcaption>The concept list stays editable until the label space is submitted.</figcaption>
+    </figure>
+
+    <h2>Reference resources</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Resource</th>
+          <th>Used for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GBIF</td>
+          <td>Species and other taxa: name matching, search, details, and occurrence checks.</td>
+        </tr>
+        <tr>
+          <td>ENVO through OLS</td>
+          <td>Environmental concepts, looked up in the Environment Ontology through the Ontology Lookup Service.</td>
+        </tr>
+        <tr>
+          <td>Wikipedia</td>
+          <td>A fallback that supplies a page reference when no ontology term fits.</td>
+        </tr>
+        <tr>
+          <td>Local ontology</td>
+          <td>For a concept with no external match, a tool that builds a small OWL module in Turtle from the expert's description.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>How it is implemented</h2>
+
+    <p>
+      The lookups are carried out by the separate oe_yapat project, whose MCP
+      server exposes tools for GBIF, ENVO/OLS, Wikipedia, and local ontology
+      construction. The YAPAT backend sends each chat prompt to
+      <code>POST {OE_YAPAT_SERVICE_URL}/api/generate-taxonomy</code>, stores the
+      reply in the conversation, and copies the concepts the user selects into the
+      label space, skipping duplicates. The chat endpoints are under
+      <code>/api/taxonomy/chat</code>; for example,
+      <code>POST /api/taxonomy/chat/{conversation_id}/message</code> sends a prompt.
+    </p>
+
+    <p>
+      Two lookups do not go through oe_yapat. <code>GET /api/taxonomy/match</code>
+      and <code>GET /api/taxonomy/envo/suggest</code> are answered by the backend
+      itself, which contacts the GBIF match service and the EBI OLS search API
+      directly. Annotating with a <code>species_name</code> uses the same GBIF
+      match, so the backend needs outbound access to those services.
+    </p>
+
+    <h2>Provenance</h2>
+
+    <p>
+      Each label-space entry keeps the identifier and the metadata returned by the
+      lookup, such as rank, family, kingdom, and the tool or source that produced
+      it, together with who added it and when. The chat history is stored with the
+      conversation. The backend has no separate grounding-status field, so whether
+      an entry came from GBIF, a fallback, or a locally defined concept has to be
+      read from its identifier and metadata.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Research background.</strong> One of the papers defines explicit
+      grounding-status categories and a provenance log for this process. The
+      comparison in
+      <a href="../../../about/research-context/">Research Context</a> shows which
+      of those ideas the software implements.
+    </div>
+
+  </main>
+
+  <script src="../../../js/docs-config.js"></script>
+  <script src="../../../js/docs-framework.js"></script>
+</body>
+</html>

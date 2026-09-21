@@ -1,0 +1,565 @@
+/* --------------------------------
+   Reusable documentation components
+-------------------------------- */
+
+/* ---------- Header ---------- */
+
+.header {
+  width: 100%;
+  max-width: var(--page-width);
+  height: var(--header-height);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Opaque full-bleed backdrop so scrolled content never shows through. */
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--background);
+  box-shadow: 0 0 0 100vmax var(--background);
+  clip-path: inset(0 -100vmax);
+  pointer-events: none;
+}
+
+/* Full-bleed divider: box-shadow spread extends the line to the viewport
+   edges without adding scrollable overflow; clip-path trims it to one row. */
+.header::after,
+.footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+  box-shadow: 0 0 0 100vmax var(--border);
+  clip-path: inset(0 -100vmax);
+  pointer-events: none;
+}
+
+.header::after {
+  bottom: 0;
+}
+
+.logo {
+  font-family: var(--font-mono), monospace;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.github {
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  transition: color var(--transition-fast);
+}
+
+.github span {
+  color: var(--text-muted);
+  margin-left: 3px;
+}
+
+.github:hover {
+  color: var(--primary);
+}
+
+.dfki-logo {
+  display: block;
+  height: 2.5rem;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Dark theme: swap in the transparent white DFKI logo. Follows the existing
+   [data-theme="dark"] attribute (set before first paint), so no flash. All
+   DFKI logo instances (home + docs shell, header + footer) share this rule. */
+[data-theme="dark"] .dfki-logo,
+[data-theme="dark"] .footer-logo,
+[data-theme="dark"] .docs-footer-logo {
+  content: url("../assets/img/dfki_Logo_dark_transparent.png");
+  /* Same ratio as both assets, so the box never collapses while the PNG loads. */
+  aspect-ratio: 3741 / 3178;
+}
+
+/* ---------- Theme toggle ---------- */
+
+.docs-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.docs-theme-toggle:hover {
+  color: var(--primary);
+  border-color: var(--border-strong);
+}
+
+.docs-theme-icon {
+  display: block;
+}
+
+.docs-theme-toggle .icon-sun {
+  display: block;
+}
+
+.docs-theme-toggle .icon-moon {
+  display: none;
+}
+
+html[data-theme="dark"] .docs-theme-toggle .icon-sun {
+  display: none;
+}
+
+html[data-theme="dark"] .docs-theme-toggle .icon-moon {
+  display: block;
+}
+
+.docs-theme-toggle:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 2px;
+}
+
+/* ---------- Buttons / links ---------- */
+
+.primary-link,
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.primary-link {
+  padding: 11px 20px;
+  color: var(--on-primary);
+  background: var(--primary);
+  border-radius: var(--radius-sm);
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.primary-link span,
+.secondary-link span {
+  margin-left: 8px;
+}
+
+.primary-link:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.secondary-link {
+  color: var(--primary);
+  padding: 11px 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition-fast);
+}
+
+.secondary-link:hover {
+  border-bottom-color: var(--primary);
+}
+
+/* ---------- Eyebrow label ---------- */
+
+.eyebrow {
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+}
+
+/* ---------- Hero workflow visual ---------- */
+
+.hero-visual {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- Documentation entry cards ---------- */
+
+.cards-section {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 48px 0 64px;
+  border-top: 1px solid var(--border);
+}
+
+.cards-head {
+  margin-bottom: 24px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 22px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--transition-med),
+    box-shadow var(--transition-med),
+    border-color var(--transition-med);
+}
+
+a.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--border-strong);
+}
+
+.card.is-coming {
+  opacity: 0.92;
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-index {
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+}
+
+.card-icon {
+  --tone: var(--primary);
+  --tint: 10%;
+  --icon-bg: color-mix(in srgb, var(--tone) var(--tint), var(--surface-soft));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  color: var(--tone);
+  background: var(--icon-bg);
+  border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--border));
+  border-radius: var(--radius-md);
+}
+
+html[data-theme="dark"] .card-icon {
+  --tint: 16%;
+}
+
+.card-icon svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card-icon .fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.card-icon .knock {
+  fill: var(--icon-bg);
+}
+
+.tone-violet { --tone: var(--violet); }
+.tone-blue { --tone: var(--primary); }
+.tone-green { --tone: var(--green); }
+.tone-amber { --tone: var(--yellow); }
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card-desc {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.card-cta {
+  margin-top: auto;
+  padding-top: 18px;
+  color: var(--primary);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.card-cta span {
+  margin-left: 6px;
+  transition: transform var(--transition-fast);
+}
+
+a.card:hover .card-cta {
+  color: var(--primary-hover);
+}
+
+a.card:hover .card-cta span {
+  transform: translateX(3px);
+}
+
+.coming-badge {
+  margin-top: auto;
+  padding-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+.coming-badge::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.5;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  width: 100%;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 28px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  position: relative;
+}
+
+.footer::before {
+  top: 0;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 0;
+}
+
+.footer-logo {
+  display: block;
+  height: 2.3rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 2.3rem;
+  background: var(--border);
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-brand-name {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.footer-sub {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 1 0;
+}
+
+/* Same treatment as .docs-footer-copy. */
+.footer-copy {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  transition: color var(--transition-fast);
+}
+
+.footer-link span {
+  margin-left: 4px;
+  color: var(--text-muted);
+}
+
+.footer-link:hover {
+  color: var(--primary);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 950px) {
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dfki-logo {
+    height: 2rem;
+  }
+
+  .header-actions {
+    gap: 14px;
+  }
+
+  .footer {
+    gap: 24px;
+  }
+}
+
+/* Stack before brand / copyright / link can collide (docs footer pattern). */
+@media (max-width: 950px) {
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .footer-left,
+  .footer-links {
+    flex: 0 0 auto;
+  }
+
+  .footer-copy {
+    text-align: left;
+  }
+}
+
+@media (max-width: 700px) {
+
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 0;
+  }
+
+  .footer-links {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .footer-logo {
+    height: 1.9rem;
+  }
+
+  .footer-divider {
+    height: 1.9rem;
+  }
+
+  .footer-brand-name {
+    font-size: 12px;
+  }
+
+  .footer-sub {
+    font-size: 10px;
+  }
+
+  .footer-link {
+    font-size: 11px;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html,
+  .page-scroll {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

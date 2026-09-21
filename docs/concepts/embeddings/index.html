@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Embeddings are fixed-length vectors computed per snippet; how jobs create snippet sets and what the vectors are used for.">
+  <title>Embeddings — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Embeddings</h1>
+
+    <p class="lede">
+      An embedding is a fixed-length vector computed from a snippet's audio. YAPAT
+      computes embeddings once per snippet set and reuses them for similarity
+      search, active learning, and projection views.
+    </p>
+
+    <h2>Why embeddings</h2>
+
+    <p>
+      Comparing raw audio directly is costly. With one vector per snippet, YAPAT
+      can find the snippets closest to a reference using pgvector's cosine
+      distance, and it can give a classifier compact features to learn from.
+    </p>
+
+    <h2>Embedding models</h2>
+
+    <p>
+      <code>GET /api/embedding-models</code> lists the registered models. Each
+      record holds the window size, step size, and overlap the model works with,
+      so the same model has to be used when snippets are compared. The initial
+      database migration registers one model, BirdNET version 2.4, described as
+      using 3-second windows at 48 kHz, with a window of 3.0 seconds, a step of
+      3.0 seconds, and no overlap. Its vectors have 1024 dimensions.
+    </p>
+
+    <h2>Snippet sets</h2>
+
+    <p>
+      Running an embedding job produces a <strong>snippet set</strong>: a
+      collection of snippets cut with a specific window and step, together with the
+      embeddings from one model. A dataset can have several snippet sets. It is
+      ready for feeds only when it has a snippet set with status
+      <code>ready</code>.
+    </p>
+
+    <figure class="docs-infographic" aria-label="From recordings to snippets to embeddings, which feed similarity feeds, active learning, and projections.">
+      <ol class="di-flow di-animate di-n4">
+        <li style="--i:0">Recordings</li>
+        <li style="--i:1">Snippets<span class="di-sub">cut with a fixed window and step</span></li>
+        <li style="--i:2">Embeddings<span class="di-sub">one vector per snippet; 1024 dimensions for BirdNET v2.4</span></li>
+        <li style="--i:3">Used for<span class="di-sub">similarity, active learning, projections</span></li>
+      </ol>
+      <figcaption>A snippet set holds the snippets and the embeddings of one model.</figcaption>
+    </figure>
+
+    <h2>Job lifecycle</h2>
+
+    <p>
+      Embedding generation runs asynchronously. The client requests a job and a
+      Celery worker processes the recordings in chunks:
+    </p>
+
+    <pre><code>POST /api/datasets/{dataset_id}/embeddings
+GET  /api/datasets/{dataset_id}/embeddings
+GET  /api/embeddings/{job_id}</code></pre>
+
+    <p>
+      A repeated request for the same configuration returns a conflict (HTTP 409)
+      instead of starting a second job. A snippet set that already has annotations
+      can be deleted only if the request explicitly sets
+      <code>acknowledge_annotation_loss</code> to <code>true</code>.
+    </p>
+
+    <h2>What embeddings are used for</h2>
+
+    <ul>
+      <li><strong>Similarity feeds</strong> — find snippets near a reference snippet or an uploaded sound.</li>
+      <li><strong>Active learning</strong> — train and score a classifier on embedding vectors; a cold-start run needs an embedding model.</li>
+      <li><strong>Projections</strong> — the Annotation Hub shows a 2D projection of the snippets (PCA, UMAP, t-SNE, or Isomap). The API can also compute 3D projections; the current interface requests 2D only.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Operational note.</strong> Embedding jobs run on the Celery
+      <code>embeddings</code> queue. See
+      <a href="../../operations/deployment/">Deployment</a> for worker settings.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

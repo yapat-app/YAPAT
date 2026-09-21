@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Install and run YAPAT locally: the backend with Docker Compose, the React frontend, and the optional oe_yapat and WSSED services.">
+  <title>Installation — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+
+    <h1>Installation</h1>
+
+    <p class="lede">
+      YAPAT is spread over several repositories that the main repository links as
+      Git submodules: the FastAPI backend, the React frontend, the oe_yapat
+      ontology service, and the WSSED GPU training server. This page covers a
+      local setup of the backend and the frontend.
+    </p>
+
+    <h2>Prerequisites</h2>
+
+    <ul>
+      <li><strong>Docker</strong> and <strong>Docker Compose</strong> — for the backend stack.</li>
+      <li><strong>Node.js 20.19 or newer</strong> — for the frontend dev server. The frontend uses Vite 7, which requires it; the frontend Dockerfile builds with Node 20.</li>
+      <li>Optional: an NVIDIA GPU and the GPU compose override, used by the embedding and active-learning workers.</li>
+    </ul>
+
+    <h2>Clone the repository</h2>
+
+    <p>
+      The components are linked as submodules, so clone recursively:
+    </p>
+
+    <pre><code>git clone --recurse-submodules https://github.com/yapat-app/YAPAT.git</code></pre>
+
+    <p>If you already cloned without submodules:</p>
+
+    <pre><code>git submodule update --init --recursive</code></pre>
+
+    <h2>Start the backend</h2>
+
+    <p>
+      The backend ships a Docker Compose stack that runs the API, database,
+      Redis, Celery workers, and Flower.
+    </p>
+
+    <pre><code>cd backend
+cp .env.example .env
+# Edit .env — at minimum set HOST_DATA_ROOT to the folder holding your audio
+docker compose up</code></pre>
+
+    <p>This starts:</p>
+
+    <ul>
+      <li>PostgreSQL (pgvector) on port <code>5432</code></li>
+      <li>Redis on port <code>6380</code> (mapped to container port 6379)</li>
+      <li>FastAPI on port <code>8000</code></li>
+      <li>A general Celery worker (embeddings, processing, exports, default queues)</li>
+      <li>A dedicated PAM Active Learning Celery worker</li>
+      <li>Celery beat for periodic tasks</li>
+      <li>Flower monitoring dashboard on port <code>5555</code></li>
+    </ul>
+
+    <p>
+      Database migrations run automatically on startup. The API is available at
+      <code>http://localhost:8000</code>, and the interaction is served under
+      the <code>/api</code> prefix.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Interactive docs.</strong> The generated OpenAPI docs
+      (<code>/docs</code>, <code>/redoc</code>) are disabled by default. Set
+      <code>ENABLE_DOCS=true</code> in the backend environment to serve them.
+    </div>
+
+    <p>To run detached, stop, or reset the stack:</p>
+
+    <pre><code>docker compose up -d      # background
+docker compose down       # stop
+docker compose down -v    # stop and remove data volumes</code></pre>
+
+    <h2>Start the frontend</h2>
+
+    <pre><code>cd frontend
+npm install
+cp .env.example .env
+# Edit .env — at minimum set VITE_YAPAT_BACKEND_URL
+npm run dev</code></pre>
+
+    <p>
+      The dev server runs at <code>http://localhost:3000</code>. The only
+      required frontend variable is <code>VITE_YAPAT_BACKEND_URL</code>; set
+      <code>VITE_YAPAT_FRONTEND_URL</code> when invitation links must point at a
+      public address.
+    </p>
+
+    <h2>Optional services</h2>
+
+    <h3>Ontology service (oe_yapat)</h3>
+
+    <p>
+      The label-space chat sends its prompts to a separate ontology service. The
+      backend reads the service address from <code>OE_YAPAT_SERVICE_URL</code>
+      (default <code>http://localhost:8002</code>; the Compose file sets
+      <code>http://host.docker.internal:8002</code>) and posts to its
+      <code>/api/generate-taxonomy</code> route. Only the label-space chat needs
+      this service; the rest of YAPAT runs without it.
+    </p>
+
+    <div class="callout">
+      <strong>Setup note.</strong> The public oe_yapat repository contains the
+      MCP tool server and a command-line client, but no README and no code for the
+      HTTP route the backend calls. Ask the project maintainers how that service
+      is deployed.
+    </div>
+
+    <h3>WSSED GPU server</h3>
+
+    <p>
+      Species models for <code>FOCAL_RECORDINGS</code> datasets can be trained
+      on a separate GPU server, WSSED-YAPAT, which is a FastAPI service. The
+      backend reaches it through <code>WSSED_GPU_SERVER_URL</code> (default
+      <code>http://localhost:8003</code>). When the backend runs in Docker, set
+      this to an address the containers can reach; <code>.env.example</code>
+      suggests <code>http://host.docker.internal:8003</code> for a server on the
+      same host. This flow is optional.
+    </p>
+
+    <h2>Hosted instance</h2>
+
+    <p>
+      The repository's benchmark scripts use
+      <a href="https://yapat.ni.dfki.de/" target="_blank" rel="noopener noreferrer">yapat.ni.dfki.de</a>
+      as the address of the project's hosted instance. Who may use it is decided
+      by its operators. The software itself supports account creation on a
+      sign-up page and through invitation links, described in
+      <a href="../first-workflow/">First Workflow</a>.
+    </p>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

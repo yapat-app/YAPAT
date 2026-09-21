@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="What YAPAT is: a web application for annotating passive acoustic monitoring audio, with model-assisted sampling of snippets.">
+  <title>What is YAPAT? — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>What is YAPAT?</h1>
+
+    <p class="lede">
+      YAPAT (<strong>Y</strong>et <strong>A</strong>nother <strong>P</strong>AM
+      <strong>A</strong>nnotation <strong>T</strong>ool) is a web application for
+      labelling audio recorded in <strong>passive acoustic monitoring (PAM)</strong>.
+      A model helps decide which short audio segments an annotator sees next, and
+      the annotator decides which labels are stored.
+    </p>
+
+    <h2>Purpose</h2>
+
+    <p>
+      Collecting labelled audio for machine-learning models takes a lot of expert
+      time. The project's stated aim is to reduce that effort by letting a model
+      prioritise which samples are worth an expert's attention, instead of having
+      the expert work through recordings in order.
+    </p>
+
+    <h2>What YAPAT provides</h2>
+
+    <ul>
+      <li>
+        <strong>Datasets</strong> — folders of audio files on a data volume.
+        YAPAT reads the files in place and never modifies them.
+      </li>
+      <li>
+        <strong>Snippets</strong> — short, fixed-length segments cut from the
+        recordings. A snippet is the unit that receives labels. With the BirdNET
+        embedding model, which is the model registered by default, a snippet is
+        3 seconds long.
+      </li>
+      <li>
+        <strong>Embeddings</strong> — numeric vectors computed for each snippet.
+        They power similarity search and the classifier used for active learning.
+      </li>
+      <li>
+        <strong>Feeds</strong> — batches of snippets chosen by a sampling
+        method: random, similarity, filter, active learning, or validate.
+      </li>
+      <li>
+        <strong>Label spaces</strong> — the lists of concepts that labels are
+        chosen from. They can be built through a chat that looks up candidate
+        concepts in GBIF, ENVO, and Wikipedia.
+      </li>
+      <li>
+        <strong>Teams</strong> — groups that share datasets and a label space.
+        Access depends on the user's role.
+      </li>
+    </ul>
+
+    <h2>Architecture</h2>
+
+    <p>
+      YAPAT consists of several components that live in separate repositories.
+      The backend exposes a REST API; long-running work such as dataset scanning,
+      embedding generation, and model training runs in Celery workers.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Technology</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Backend</td>
+          <td>FastAPI, Celery, PostgreSQL (pgvector), Redis</td>
+          <td>REST API, background jobs, and storage for datasets, snippets, embeddings, and annotations.</td>
+        </tr>
+        <tr>
+          <td>Frontend</td>
+          <td>React, TypeScript, Vite</td>
+          <td>The annotation interface, including the Annotation Hub, and the pages for datasets, teams, and label spaces.</td>
+        </tr>
+        <tr>
+          <td>Ontology service (oe_yapat)</td>
+          <td>MCP tool server</td>
+          <td>Looks up candidate concepts in GBIF, ENVO (through OLS), and Wikipedia for the label-space chat. Optional.</td>
+        </tr>
+        <tr>
+          <td>GPU training server (WSSED)</td>
+          <td>FastAPI</td>
+          <td>Trains weakly supervised sound event detection models for FOCAL_RECORDINGS datasets. Optional.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <figure class="docs-infographic" aria-label="How the YAPAT components connect: the frontend calls the backend REST API, which uses PostgreSQL, Redis with Celery workers, and the optional ontology and GPU services.">
+      <div class="di-cols">
+        <div class="di-node">Frontend<span class="di-sub">React, TypeScript, Vite</span></div>
+        <span class="di-arrow" aria-hidden="true">&rarr;</span>
+        <div class="di-node">Backend API<span class="di-sub">FastAPI, served under /api</span></div>
+        <span class="di-arrow" aria-hidden="true">&rarr;</span>
+        <div class="di-stack">
+          <div class="di-node">PostgreSQL (pgvector)<span class="di-sub">datasets, snippets, embeddings, annotations</span></div>
+          <div class="di-node">Redis and Celery workers<span class="di-sub">scanning, embeddings, training</span></div>
+          <div class="di-node di-opt">Ontology service (oe_yapat)<span class="di-sub">optional &middot; label-space chat</span></div>
+          <div class="di-node di-opt">GPU training server (WSSED)<span class="di-sub">optional &middot; FOCAL_RECORDINGS</span></div>
+        </div>
+      </div>
+      <figcaption>Component overview. Dashed boxes are optional.</figcaption>
+    </figure>
+
+    <h2>How annotation works</h2>
+
+    <p>
+      Annotation happens in the Annotation Hub. A typical session looks like this:
+    </p>
+
+    <ol>
+      <li>Choose a dataset and a mode.</li>
+      <li>Review each snippet's spectrogram and audio, and assign labels from the active label space.</li>
+      <li>In the model-assisted modes, accept, reject, or modify the label a model proposes.</li>
+      <li>The labels are saved in the backend database and can be exported as JSON or CSV.</li>
+    </ol>
+
+    <div class="callout callout--tip">
+      <strong>Who decides.</strong> Models rank snippets and, in active-learning and
+      validate modes, propose labels. A label is stored only when an annotator
+      accepts, edits, or enters it.
+    </div>
+
+    <h2>Annotation modes</h2>
+
+    <ul>
+      <li><strong>Random</strong> — a sample of snippets without model ordering.</li>
+      <li><strong>Similarity</strong> — snippets whose embeddings are close to a reference snippet or an uploaded audio region.</li>
+      <li><strong>Active Learning</strong> — snippets ranked by a trained model, using strategies such as uncertainty, diversity, density, or a composite of them.</li>
+      <li><strong>Filter</strong> — snippets narrowed by annotation status, recording location, or species.</li>
+      <li><strong>Validate</strong> — unannotated snippets ordered by the model's confidence, for confirming or correcting suggestions.</li>
+    </ul>
+
+    <h2>Getting data out of the API</h2>
+
+    <p>
+      Every endpoint is served under the <code>/api</code> prefix. A feed
+      retrieval call looks like this:
+    </p>
+
+    <pre><code>GET /api/feed/?method=random&amp;dataset_id=1&amp;limit=20</code></pre>
+
+    <p>
+      See the <a href="../../reference/rest-api/">REST API</a> reference for the
+      full list of endpoints.
+    </p>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

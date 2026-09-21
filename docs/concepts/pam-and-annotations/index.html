@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The recording-to-snippet data model in YAPAT and how annotations and ground-truth labels are stored.">
+  <title>PAM and Annotations — YAPAT Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>PAM and Annotations</h1>
+
+    <p class="lede">
+      YAPAT cuts long recordings into short segments and stores expert labels
+      against those segments. This page describes that data model.
+    </p>
+
+    <h2>Passive acoustic monitoring</h2>
+
+    <p>
+      In passive acoustic monitoring, recorders capture audio over long periods.
+      Experts later annotate what can be heard in it, for example species
+      vocalisations and environmental sounds such as wind or rain. Both associated
+      papers use examples of this kind. YAPAT does not fix a particular set of
+      labels; the label space defines which concepts are available.
+    </p>
+
+    <h2>Datasets and recordings</h2>
+
+    <p>
+      A <strong>dataset</strong> is the top-level container. YAPAT supports two
+      dataset types:
+    </p>
+
+    <ul>
+      <li><code>PAM</code> — the default type, for soundscape recordings.</li>
+      <li><code>FOCAL_RECORDINGS</code> — recordings used with the WSSED species-model workflow.</li>
+    </ul>
+
+    <p>
+      A dataset's <code>source_uri</code> points at a folder on the mounted data
+      volume. Registering the dataset schedules a background scan that creates one
+      recording entry per audio file. Recording locations are taken from a
+      <code>location</code> value in the recording's metadata when there is one,
+      and otherwise from the part of the file name before the first underscore.
+    </p>
+
+    <h2>Snippets</h2>
+
+    <p>
+      A <strong>snippet</strong> is a short window of a recording and is the unit
+      of annotation. Snippets are created when embeddings are generated: the
+      embedding model determines the window length and step. For BirdNET, the
+      model registered by default, the window is 3 seconds with no overlap.
+      Snippets belong to a <strong>snippet set</strong>, which records the window
+      configuration and the model that produced the embeddings.
+    </p>
+
+    <p>
+      Each snippet stores its recording, its start and end time, and its duration.
+      The sample rate belongs to the recording. The API serves the snippet's audio
+      as WAV, with the sample rate in a response header, and renders a mel
+      spectrogram as a PNG for the annotation feed.
+    </p>
+
+    <h2>Annotations</h2>
+
+    <p>
+      An <strong>annotation</strong> links a snippet to a label. When creating one,
+      the client supplies either a namespaced <code>taxon_id</code> (for example
+      <code>gbif:2420576</code>, <code>custom:&lt;id&gt;</code>,
+      <code>wiki:65091</code>, or <code>local:vesperis_iridescentis</code>) or a
+      <code>species_name</code>, but not both. A species name is resolved to a
+      taxon ID by the taxonomy service, and the resolved name is stored with the
+      annotation.
+    </p>
+
+    <ul>
+      <li>A snippet can carry several annotations, and they can be created in one batch call.</li>
+      <li>The database allows at most one annotation per snippet and taxon ID, regardless of which user created it.</li>
+      <li>A user can delete their own annotations, and so can any user with access to the snippet's dataset.</li>
+      <li>Annotations created through the API are also mirrored into the active-learning label store as user labels.</li>
+    </ul>
+
+    <h2>Ground truth and user labels</h2>
+
+    <p>
+      The active-learning label store keeps a <code>source</code> for each label,
+      either <code>user</code> or <code>ground_truth</code>. Only administrators
+      and team owners can edit <code>ground_truth</code> labels, and those labels
+      are what a cold-start model is trained on. When a model is retrained, the
+      collected labels serve as its training data.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Where labels come from.</strong> The active label space determines
+      which concepts annotators can choose. See
+      <a href="../label-space/what-is-a-label-space/">What is a Label Space?</a>
+      for how it is built.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>
