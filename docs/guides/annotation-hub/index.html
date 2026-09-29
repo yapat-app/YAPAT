@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Using the YAPAT Annotation Hub: modes, configuration, the workspace, and feedback.">
+  <meta name="description" content="How to use the Annotation Hub in the user-study version of YAPAT: study phases, the workspace, feed configuration, and blind labelling.">
   <title>Annotation Hub — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
@@ -35,99 +35,214 @@
     <h1>Annotation Hub</h1>
 
     <p class="lede">
-      The Annotation Hub is where annotation happens. One workspace handles every
-      sampling mode; the mode is selected with a URL parameter and the dataset
-      with another.
+      The Annotation Hub is where annotation happens. In the user-study version it
+      runs one active-learning workflow per dataset, and the selected study phase
+      decides which parts of the workspace are shown.
     </p>
 
-    <h2>Opening a mode</h2>
+    <h2>Opening the hub</h2>
 
-    <pre><code>/annotate?mode=al&amp;dataset_id=1
-/annotate?mode=validate&amp;dataset_id=1</code></pre>
+    <pre><code>/annotate?dataset_id=1</code></pre>
 
     <p>
-      Supported modes are <code>al</code> (active learning),
-      <code>validate</code>, <code>similarity</code>, and <code>filter</code>.
-      When no mode is given, the hub opens a random feed. If no dataset is
-      specified, the hub restores the dataset you last annotated with, which the
-      browser remembers per user.
+      The hub requires a signed-in user. If no dataset is specified, it restores
+      the dataset you last used, which the browser remembers per user, or selects
+      the only dataset when exactly one is available. The older routes
+      <code>/v2AnnotationHub</code> and <code>/active-learning</code> redirect to
+      <code>/annotate</code>.
     </p>
-
-    <h2>The workspace</h2>
 
     <p>
-      The classic workspace is a resizable split view:
+      The toolbar holds a dataset selector and a phase selector. The phase is
+      taken from the <code>phase</code> URL parameter, from the browser's stored
+      choice, or from the deployment's default (<code>VITE_STUDY_PHASE</code>,
+      otherwise <code>P1</code>). A deployment can lock the phase, in which case
+      the URL and the stored choice are ignored; see
+      <a href="../../operations/environment/">Environment Setup</a>.
     </p>
 
-    <ul>
-      <li><strong>ProjectionView</strong> — a spatial view of the snippets, useful for seeing clusters and where the current snippet sits.</li>
-      <li><strong>PredictionFeed</strong> — the stack of snippet cards to review, each with its spectrogram, player, and labels.</li>
-    </ul>
-
-    <p>
-      In active-learning mode, the projection can be coloured by model prediction,
-      by uncertainty, or by taxon. The projection is shown in two dimensions.
-    </p>
-
-    <h2>Configuring a feed</h2>
-
-    <p>
-      Each mode opens its own configuration dialog:
-    </p>
+    <h2>Study phases</h2>
 
     <table>
       <thead>
         <tr>
-          <th>Mode</th>
-          <th>Options</th>
+          <th>Phase</th>
+          <th>What the workspace shows</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Random</td>
-          <td>Feed limit.</td>
+          <td>Phase 1</td>
+          <td>The feed only, without projection or sidebar.</td>
         </tr>
         <tr>
-          <td>Similarity</td>
-          <td>Upload a reference audio clip, choose its start and end seconds, and set the limit.</td>
+          <td>Phase 2</td>
+          <td>The feed and the projection of the whole dataset.</td>
         </tr>
         <tr>
-          <td>Filter</td>
-          <td>Annotation status, locations, species, and limit.</td>
+          <td>Phase 3</td>
+          <td>Adds the sidebar with the status filter (including a species selection for labelled snippets) and the location and date and time filters.</td>
         </tr>
         <tr>
-          <td>Active learning / Validate</td>
-          <td>Model checkpoint (or a cold-start configuration), top-K, and label scope. Validate adds a minimum-confidence threshold.</td>
+          <td>Phase 4</td>
+          <td>Adds the model-derived score histograms, and sorting by model scores and by date and time.</td>
+        </tr>
+        <tr>
+          <td>Phase 5</td>
+          <td>As phase 4; points in the projection can also be clicked to select a snippet.</td>
         </tr>
       </tbody>
     </table>
 
     <p>
-      In a cold-start active-learning configuration, the expert supplies the
-      model family name, an embedding model, and optionally a ground-truth
-      metadata file and a label-config file, and may run training before
-      inference.
+      The phase selector lists the phases a deployment allows
+      (<code>VITE_STUDY_PHASE_ALLOWED</code>, otherwise all five).
+    </p>
+
+    <h2>Guided study flow</h2>
+
+    <p>
+      When the guided study flow is on (<code>VITE_STUDY_FLOW_ENABLED</code>, on
+      by default when the phase is locked), each phase goes through these steps:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Instructions.</strong> A dialog titled "Welcome to Phase N"
+        explains what is new in that phase — the feed in phase 1, the feature
+        projection in phase 2, the metadata filters in phase 3, the model-derived
+        filters and feed sorting in phase 4, and clickable projection points in
+        phase 5 — and waits for the participant to begin.
+      </li>
+      <li>
+        <strong>Guided tour.</strong> Cards highlight the parts of the screen that
+        are new: the clip, choosing a label, moving to the next sample, and a tip
+        in phase 1; the projection and zooming in phase 2; the metadata filters in
+        phase 3; the model-derived scores, each with an animated explainer, and
+        sorting in phase 4; and clicking projection points in phase 5. A card
+        already shown in an earlier phase is not repeated. Every phase ends with
+        a task card that lists the target species, which are defined in the
+        frontend code.
+      </li>
+      <li>
+        <strong>Annotating.</strong> A message confirms that the annotation
+        session has started, and the participant works in the Hub.
+      </li>
+    </ol>
+
+    <div class="callout">
+      <strong>No countdown in this version.</strong> The instructions text
+      mentions 15 minutes per phase (40 in phase 5), but the flow's countdown is
+      switched off in the user-study frontend (<code>TIMER_ENABLED = false</code>
+      in <code>StudyFlowProvider.tsx</code>), and no timer is displayed. Phases
+      therefore do not advance on their own, and the completion screen that
+      would follow the last phase is not reached. Participants move between
+      phases with the phase selector, which restarts the chosen phase at its
+      instructions.
+    </div>
+
+    <p>
+      The flow's progress — the step each phase has reached and the tour cards
+      already seen — is stored in the browser, so reloading the page resumes
+      where the participant left off. Opening
+      <code>/annotate?study_reset=1</code> clears that stored progress and
+      returns to the first allowed phase.
+    </p>
+
+    <h2>The workspace</h2>
+
+    <p>
+      The workspace is a resizable split view:
+    </p>
+
+    <ul>
+      <li><strong>ProjectionView</strong> — a two-dimensional view of the dataset's snippets, useful for seeing clusters and where the current snippet sits. Buttons above it switch between PCA (the default), UMAP, and t-SNE.</li>
+      <li><strong>PredictionFeed</strong> — the scrollable list of snippet cards to review, each with its spectrogram, player, and labels.</li>
+    </ul>
+
+    <p>
+      The sidebar filters and the model-score thresholds narrow both the
+      projection and the feed; see <a href="../../concepts/annotation-feeds/filter/">Filters and Model Scores</a>.
+    </p>
+
+    <h2>Configuring a feed</h2>
+
+    <p>
+      <strong>Generate Feed</strong> (or <strong>Edit Feed</strong> once a feed
+      exists) opens one configuration dialog:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Situation</th>
+          <th>Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>No model checkpoint yet</td>
+          <td>Model family name, and whether ground-truth metadata is available. With it, a cold start asks for the embedding model, the metadata and label-config paths, the device, and whether to run inference after training. Without it, the session starts in bootstrap mode with random snippets.</td>
+        </tr>
+        <tr>
+          <td>All feeds</td>
+          <td>Top-K (1 to 500) and whether to return only the Top-K suggestions.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The dataset needs a ready snippet set; otherwise the dialog warns that
+      embeddings must be generated first.
     </p>
 
     <h2>Reviewing and labelling</h2>
 
     <p>
-      For model-assisted modes, each card presents an Accept / Reject / Modify
-      prompt. Accept confirms the suggestion, Reject marks it wrong, and Modify
-      lets you edit the labels before confirming. In the classic modes, labels
-      are chosen directly from the active label space.
+      Labelling is blind: the model's predicted labels are not shown. On each
+      card you select one or more labels from the quick-label list, or search
+      GBIF for a species, which also pins it to your personal quick labels.
+      Changes are saved automatically after a short pause.
     </p>
 
     <p>
-      Confirmed labels are saved to the backend. In active-learning mode the
-      same action also records feedback, which counts toward the auto-retrain
-      threshold.
+      Each labelled snippet is recorded as active-learning feedback and counts
+      toward the auto-retrain threshold. When a retrain finishes, the feed is
+      refreshed with the new model's ranking.
     </p>
 
+    <h2>Study logging</h2>
+
+    <p>
+      When a deployment enables study logging
+      (<code>VITE_STUDY_LOGGING_ENABLED</code>; off by default), the Hub records
+      a timestamped stream of the participant's interactions — for example label
+      selections, audio playback, filter and sort changes, projection-method
+      changes, and study-flow events. A logging session starts when the Hub page
+      opens and ends when it is left. Events are sent to the backend in batches
+      (every <code>VITE_STUDY_LOGGING_FLUSH_SECONDS</code>, 10 by default) and
+      once more when the page is closed. The backend attributes each batch to
+      the signed-in user.
+    </p>
+
+    <h2>Study Logs viewer</h2>
+
+    <p>
+      Administrators open the <strong>Study Logs</strong> card on the Dashboard
+      (<code>/study-logs</code>); other roles are redirected to the Dashboard.
+      The viewer has three levels:
+    </p>
+
+    <ul>
+      <li><strong>Participants</strong> — each user with recorded events: sessions, total events, and when they were last seen.</li>
+      <li><strong>Sessions</strong> — one participant's sessions: number of events, start time, duration, and the phases visited.</li>
+      <li><strong>Events</strong> — one session's event timeline, which can be downloaded as CSV.</li>
+    </ul>
+
     <div class="callout callout--tip">
-      <strong>Remember.</strong> Feeds are snapshotted.
-      <a href="../feed-history/">Feed History</a> lets you reopen a previous
-      configuration instead of rebuilding it.
+      <strong>Remember.</strong> The model ranks snippets but never proposes a
+      label on the card. See <a href="../../concepts/annotation-feeds/active-learning/">Active
+      Learning</a> for how the ranking and retraining work.
     </div>
 
   </main>

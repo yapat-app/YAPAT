@@ -47,7 +47,7 @@
       candidate matches and shows the reply together with the candidates. The
       expert then adds candidates to the label space, either all at once or one at
       a time, and can send further messages to refine the search. An added concept
-      can be removed again until the label space is submitted. The papers call this
+      can be removed again until the label space is frozen. The papers call this
       approach <em>grounding-first</em>: alignment with authoritative resources is
       attempted before a locally defined concept is created.
     </p>
@@ -60,7 +60,7 @@
         <li style="--i:3">Candidates<span class="di-sub">shown with the reply</span></li>
         <li style="--i:4">Label space<span class="di-sub">expert adds selected concepts</span></li>
       </ol>
-      <figcaption>The concept list stays editable until the label space is submitted.</figcaption>
+      <figcaption>The concept list stays editable until the label space is frozen.</figcaption>
     </figure>
 
     <h2>Reference resources</h2>
@@ -109,8 +109,10 @@
       Two lookups do not go through oe_yapat. <code>GET /api/taxonomy/match</code>
       and <code>GET /api/taxonomy/envo/suggest</code> are answered by the backend
       itself, which contacts the GBIF match service and the EBI OLS search API
-      directly. Annotating with a <code>species_name</code> uses the same GBIF
-      match, so the backend needs outbound access to those services.
+      directly. When a label given in the Annotation Hub is a species name, the
+      backend resolves it with the same GBIF match before writing it to the
+      annotation table, so the backend needs outbound access to those services.
+      The Hub's own species search queries the GBIF API from the browser.
     </p>
 
     <h2>Provenance</h2>
@@ -118,7 +120,7 @@
     <p>
       Each label-space entry keeps the identifier and the metadata returned by the
       lookup, such as rank, family, kingdom, and the tool or source that produced
-      it, together with who added it and when. The chat history is stored with the
+      it, together with the time it was added. The chat history is stored with the
       conversation. The backend has no separate grounding-status field, so whether
       an entry came from GBIF, a fallback, or a locally defined concept has to be
       read from its identifier and metadata.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="What a label space is in YAPAT: the concepts annotators choose from, how they are stored, and the statuses a version can have.">
+  <meta name="description" content="What a label space is in YAPAT: the concepts annotators choose from, how they are stored, and the statuses a custom taxonomy can have.">
   <title>What is a Label Space? — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
@@ -34,9 +34,11 @@
     <h1>What is a Label Space?</h1>
 
     <p class="lede">
-      A label space is the set of concepts that annotators choose labels from. In
-      YAPAT its entries carry identifiers and source details, so a label is more
-      than a free-text name.
+      A label space is a team's list of concepts, built in the label-space chat
+      and then frozen. Its entries carry identifiers and source details, so a
+      label is more than a free-text name. In the Annotation Hub, the concepts of
+      the team's most recently frozen label space are one of the sources of the
+      quick-label list annotators choose from.
     </p>
 
     <h2>Labels versus concepts</h2>
@@ -46,7 +48,7 @@
       <strong>concept</strong>. It stores an identifier such as
       <code>gbif:2420576</code>, a display name, a scientific name, taxonomic
       details such as rank, family, and kingdom where the source provides them, the
-      metadata returned by the lookup that found it, and who added it and when.
+      metadata returned by the lookup that found it, and when it was added.
       Identifiers from a shared resource make it possible to tell whether two
       datasets that use the same word, or different words, mean the same thing.
     </p>
@@ -69,8 +71,8 @@
         through the taxonomy API.
       </li>
       <li>
-        <strong>Custom taxonomies</strong> — team- or dataset-specific label
-        spaces built through the label-space chat and stored in YAPAT as versions.
+        <strong>Custom taxonomies</strong> — team-specific label spaces built
+        through the label-space chat and frozen into a taxonomy stored in YAPAT.
       </li>
     </ul>
 
@@ -81,12 +83,15 @@
       <code>/resolve</code> resolves concept IDs.
     </p>
 
-    <h2>The active label space</h2>
+    <h2>Frozen label spaces</h2>
 
     <p>
-      Each team has at most one <strong>active label-space version</strong>. Only an
-      active version can be used for annotation, and it is what annotators see when
-      they choose labels. A custom taxonomy can have one of four statuses:
+      Freezing a label space in the label-space chat turns its concept list into
+      a <strong>custom taxonomy</strong> with status <code>active</code>. There is
+      no review or promotion step, and freezing again creates a further taxonomy
+      rather than replacing the previous one. The Annotation Hub adds the concepts
+      of the team's most recently frozen label space to the list of labels
+      annotators can choose from. A custom taxonomy can have one of three statuses:
     </p>
 
     <table>
@@ -102,16 +107,12 @@
           <td>Defined in the code but not assigned by the current backend. While a chat session is open, its concepts are held in the conversation, not in a taxonomy.</td>
         </tr>
         <tr>
-          <td><code>submitted</code></td>
-          <td>Created when a member submits a label space. It waits for a team owner to promote it.</td>
-        </tr>
-        <tr>
           <td><code>active</code></td>
-          <td>Promoted by a team owner, or created directly by the older freeze endpoint. Usable for annotation.</td>
+          <td>Created by freezing a label space. Usable for annotation.</td>
         </tr>
         <tr>
           <td><code>archived</code></td>
-          <td>Retired with the archive action. The record stays in the database.</td>
+          <td>Set when a custom taxonomy is archived through the API; the user-study interface has no archive action. The record stays in the database and is hidden from listings.</td>
         </tr>
       </tbody>
     </table>
@@ -129,8 +130,8 @@
 
     <div class="callout callout--tip">
       <strong>Next.</strong> See <a href="../grounding/">Grounding</a> for how
-      concepts are found, and <a href="../managing-versions/">Managing versions</a>
-      for submission and promotion.
+      concepts are found, and <a href="../managing-versions/">Freezing a Label
+      Space</a> for how a label space is finalised.
     </div>
 
   </main>

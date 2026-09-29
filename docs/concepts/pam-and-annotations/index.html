@@ -43,9 +43,10 @@
     <p>
       In passive acoustic monitoring, recorders capture audio over long periods.
       Experts later annotate what can be heard in it, for example species
-      vocalisations and environmental sounds such as wind or rain. Both associated
-      papers use examples of this kind. YAPAT does not fix a particular set of
-      labels; the label space defines which concepts are available.
+      vocalisations and environmental sounds such as wind or rain. YAPAT does not
+      fix a particular set of labels: in the Annotation Hub, annotators choose from
+      a quick-label list and a GBIF species search, described at the end of this
+      page.
     </p>
 
     <h2>Datasets and recordings</h2>
@@ -63,9 +64,12 @@
     <p>
       A dataset's <code>source_uri</code> points at a folder on the mounted data
       volume. Registering the dataset schedules a background scan that creates one
-      recording entry per audio file. Recording locations are taken from a
-      <code>location</code> value in the recording's metadata when there is one,
-      and otherwise from the part of the file name before the first underscore.
+      recording entry per audio file. A recording's location is the
+      <code>location</code> value in its metadata. That value is parsed from file
+      names that follow a recognised convention (the site code in
+      <code>SITE_YYYYMMDD_HHMMSS</code>, or the locality in FNJV focal-recording
+      names) and can also be set by importing a recording-metadata CSV on the
+      Datasets page.
     </p>
 
     <h2>Snippets</h2>
@@ -82,27 +86,30 @@
     <p>
       Each snippet stores its recording, its start and end time, and its duration.
       The sample rate belongs to the recording. The API serves the snippet's audio
-      as WAV, with the sample rate in a response header, and renders a mel
-      spectrogram as a PNG for the annotation feed.
+      as WAV, with the sample rate in a response header, and the Annotation Hub
+      draws each snippet's spectrogram in the browser from that audio.
     </p>
 
     <h2>Annotations</h2>
 
     <p>
-      An <strong>annotation</strong> links a snippet to a label. When creating one,
-      the client supplies either a namespaced <code>taxon_id</code> (for example
+      An <strong>annotation</strong> links a snippet to a label. Labels given in
+      the Annotation Hub are stored first in the active-learning label store as
+      feedback. They are also written to the annotation table when they resolve
+      to a taxon ID or a species name; a species name is resolved by the
+      taxonomy service, and the resolved name is stored with the annotation.
+    </p>
+
+    <p>
+      An annotation stores a namespaced <code>taxon_id</code>, for example
       <code>gbif:2420576</code>, <code>custom:&lt;id&gt;</code>,
-      <code>wiki:65091</code>, or <code>local:vesperis_iridescentis</code>) or a
-      <code>species_name</code>, but not both. A species name is resolved to a
-      taxon ID by the taxonomy service, and the resolved name is stored with the
-      annotation.
+      <code>wiki:65091</code>, or <code>local:vesperis_iridescentis</code>.
     </p>
 
     <ul>
-      <li>A snippet can carry several annotations, and they can be created in one batch call.</li>
+      <li>A snippet can carry several annotations.</li>
       <li>The database allows at most one annotation per snippet and taxon ID, regardless of which user created it.</li>
-      <li>A user can delete their own annotations, and so can any user with access to the snippet's dataset.</li>
-      <li>Annotations created through the API are also mirrored into the active-learning label store as user labels.</li>
+      <li>The REST API can also create annotations directly, from a <code>taxon_id</code> or a <code>species_name</code>; these are mirrored into the active-learning label store as user labels. The user-study interface does not use this path.</li>
     </ul>
 
     <h2>Ground truth and user labels</h2>
@@ -111,15 +118,19 @@
       The active-learning label store keeps a <code>source</code> for each label,
       either <code>user</code> or <code>ground_truth</code>. Only administrators
       and team owners can edit <code>ground_truth</code> labels, and those labels
-      are what a cold-start model is trained on. When a model is retrained, the
-      collected labels serve as its training data.
+      are what a cold-start model is trained on. Without ground-truth metadata, the
+      first model is trained from the labels annotators give in bootstrap mode.
+      When a model is retrained, the collected labels serve as its training data.
     </p>
 
     <div class="callout callout--tip">
-      <strong>Where labels come from.</strong> The active label space determines
-      which concepts annotators can choose. See
+      <strong>Where labels come from.</strong> In the Annotation Hub, annotators
+      choose from a quick-label list and can search GBIF for further species. The
+      list combines the species of the model checkpoint, the dataset's stored quick
+      labels, the concepts of the team's frozen label space, and species the
+      annotator pinned from GBIF. See
       <a href="../label-space/what-is-a-label-space/">What is a Label Space?</a>
-      for how it is built.
+      for how a label space is built.
     </div>
 
   </main>

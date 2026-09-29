@@ -62,8 +62,8 @@
 
     <p>
       A dataset becomes <code>is_ready_for_feed</code> once its default snippet set
-      exists and has status <code>ready</code>. Until then, feed generation is
-      disabled in the interface and embedding-dependent features are unavailable.
+      exists and has status <code>ready</code>. Until then, the Annotation Hub's
+      Generate Feed dialog warns that embeddings must be generated first.
     </p>
 
     <h2>Serving snippet data</h2>
@@ -78,7 +78,7 @@
       <tbody>
         <tr>
           <td><code>GET /api/snippets/</code></td>
-          <td>Paginated snippets for a dataset and snippet set, with optional recording filter and ID-prefix search.</td>
+          <td>Paginated snippets for a dataset and snippet set, with an optional recording filter.</td>
         </tr>
         <tr>
           <td><code>GET /api/snippets/{id}</code></td>
@@ -90,7 +90,7 @@
         </tr>
         <tr>
           <td><code>GET /api/snippets/{id}/spectrogram</code></td>
-          <td>A mel spectrogram rendered as PNG, with configurable mel bands and frequency range.</td>
+          <td>A mel spectrogram rendered as PNG, with configurable mel bands and frequency range. The Annotation Hub does not use it; it draws spectrograms in the browser from the audio.</td>
         </tr>
       </tbody>
     </table>

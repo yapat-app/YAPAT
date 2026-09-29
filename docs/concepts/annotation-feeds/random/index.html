@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The random feed samples snippets without model ordering.">
+  <meta name="description" content="Where random sampling occurs in the user-study version of YAPAT: bootstrap mode, before a dataset has a model checkpoint.">
   <title>Random — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
@@ -31,49 +31,41 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Random</h1>
 
     <p class="lede">
-      The random feed draws a random sample of snippets from a dataset. It
-      applies no model and does not favour any snippets.
+      The user-study version has no random annotation mode. Random sampling
+      appears in one place: bootstrap mode, which starts a dataset's first
+      active-learning session when no model checkpoint exists.
     </p>
 
-    <h2>When to use it</h2>
-
-    <ul>
-      <li>A first look at an unfamiliar dataset.</li>
-      <li>Establishing a baseline before model-assisted sampling.</li>
-      <li>Covering the soundscape broadly, including common and background sounds.</li>
-    </ul>
-
-    <h2>Requesting a random feed</h2>
-
-    <pre><code>GET /api/feed/?method=random&amp;dataset_id={dataset_id}&amp;limit=50</code></pre>
+    <h2>When it is used</h2>
 
     <p>
-      The client may also scope the sample to a specific snippet set or
-      recording, and control paging with <code>skip</code>.
+      When a dataset has no checkpoint, the <strong>Generate Feed</strong> dialog
+      in the Annotation Hub asks whether ground-truth metadata is available. If
+      that option is left off, the session starts in bootstrap mode, and the
+      backend returns randomly chosen snippets from the dataset's default snippet
+      set instead of model-ranked ones.
     </p>
 
     <h2>Behaviour</h2>
 
     <p>
-      The endpoint resolves the dataset's default snippet set when none is
-      given, and rejects datasets whose snippet set is not ready. Each random
-      feed is saved as a snapshot for the requesting user, and up to five
-      snapshots per method are retained.
+      The annotator labels these snippets as usual. Because no checkpoint exists
+      yet, the labels are stored as feedback without a model. Once the number of
+      labelled snippets reaches the retrain threshold, a first model is trained
+      from those labels, and from then on the feed is ranked by that model.
     </p>
 
     <div class="callout callout--tip">
-      <strong>Contrast.</strong> A random feed ignores model output. To bias
-      sampling toward likely or informative snippets, see
-      <a href="../active-learning/">Active Learning</a> or
-      <a href="../similarity/">Similarity</a>.
+      <strong>After bootstrap.</strong> Once a model exists, snippets are ranked
+      by it. See <a href="../active-learning/">Active Learning</a>.
     </div>
 
   </main>
 
+  <script>window.DOCS_ROOT = "../../.."; /* page is not listed in docs-config.js navigation */</script>
   <script src="../../../js/docs-config.js"></script>
   <script src="../../../js/docs-framework.js"></script>
 </body>

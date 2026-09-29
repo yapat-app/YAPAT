@@ -69,7 +69,7 @@
         <tr>
           <td>4</td>
           <td>Define label space</td>
-          <td>A label space promoted to <code>active</code> by a team owner (see <a href="../../concepts/label-space/managing-versions/">Managing Versions</a>).</td>
+          <td>A label space frozen into an <code>active</code> custom taxonomy (see <a href="../../concepts/label-space/managing-versions/">Freezing a Label Space</a>).</td>
         </tr>
         <tr>
           <td>5</td>
@@ -99,7 +99,7 @@
         <li style="--i:0"><span class="di-num">1</span>Register dataset<span class="di-sub">Dataset</span></li>
         <li style="--i:1"><span class="di-num">2</span>Scan / process<span class="di-sub">Recording rows</span></li>
         <li style="--i:2"><span class="di-num">3</span>Embed<span class="di-sub">SnippetSet</span></li>
-        <li style="--i:3"><span class="di-num">4</span>Define label space<span class="di-sub">Active label space</span></li>
+        <li style="--i:3"><span class="di-num">4</span>Define label space<span class="di-sub">Frozen label space</span></li>
         <li style="--i:4"><span class="di-num">5</span>Generate feed<span class="di-sub">Ordered batch of snippets</span></li>
         <li style="--i:5"><span class="di-num">6</span>Annotate<span class="di-sub">Annotations and feedback</span></li>
         <li style="--i:6"><span class="di-num">7</span>Train / retrain<span class="di-sub">Active-learning checkpoint</span></li>
@@ -120,7 +120,7 @@
     <ul>
       <li><code>processing</code> — dataset scanning and snippet creation.</li>
       <li><code>embeddings</code> — audio embedding generation.</li>
-      <li><code>exports</code> — export and report generation.</li>
+      <li><code>exports</code> — consumed by the general worker; no task in the user-study backend is routed to it, and annotation export runs in the request.</li>
       <li><code>pam_al</code> — active-learning training and retraining.</li>
       <li><code>default</code> — general fallback tasks.</li>
     </ul>
@@ -129,7 +129,7 @@
       <ol class="di-flow di-animate di-n4">
         <li style="--i:0">Client sends a request</li>
         <li style="--i:1">API replies at once<span class="di-sub">with a task or job ID</span></li>
-        <li style="--i:2">Celery worker runs the task<span class="di-sub">queues: processing, embeddings, exports, pam_al, default</span></li>
+        <li style="--i:2">Celery worker runs the task<span class="di-sub">queues: processing, embeddings, pam_al, default</span></li>
         <li style="--i:3">Client polls for status<span class="di-sub">until the task finishes</span></li>
       </ol>
       <figcaption>Steps 2, 3, and 7 follow this pattern.</figcaption>
@@ -140,8 +140,8 @@
     <p>
       Steps 5, 6, and 7 form a loop: annotate a batch, let the annotations
       accumulate, retrain, and generate a new batch ranked by the updated model.
-      Random, similarity, and filter feeds do not depend on a trained model and
-      can be used at any point.
+      Before a model exists, the first feed comes from bootstrap mode, which
+      offers randomly sampled snippets until enough labels exist to train one.
     </p>
 
     <div class="callout callout--tip">

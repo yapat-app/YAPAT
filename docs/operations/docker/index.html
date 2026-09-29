@@ -35,8 +35,9 @@
     <h1>Docker</h1>
 
     <p class="lede">
-      The backend ships three Compose files: the base stack in
-      <code>docker-compose.yml</code>, a development override, and a GPU file.
+      The backend ships the base stack in <code>docker-compose.yml</code>, a
+      development override, and a GPU file. The user-study branch also contains
+      <code>docker-compose.staging.clean.yml</code>, a separate staging stack.
     </p>
 
     <h2>Compose files</h2>
@@ -50,8 +51,8 @@
       </thead>
       <tbody>
         <tr><td><code>docker-compose.yml</code></td><td>Base services: database, Redis, API, workers, beat, Flower.</td></tr>
-        <tr><td><code>docker-compose.override.yml</code></td><td>Development override: starts the API with four uvicorn workers and bind-mounts the source directory (<code>.:/app</code>) into the API, workers, beat, and Flower.</td></tr>
-        <tr><td><code>docker-compose.gpu.yml</code></td><td>NVIDIA device reservations for the API and both Celery workers.</td></tr>
+        <tr><td><code>docker-compose.override.yml</code></td><td>Development override: starts the API with uvicorn's auto-reload and bind-mounts the source directory (<code>.:/app</code>) into the API, workers, beat, and Flower.</td></tr>
+        <tr><td><code>docker-compose.gpu.yml</code></td><td>GPU device reservations for the API and the PAM active-learning worker.</td></tr>
       </tbody>
     </table>
 
@@ -78,7 +79,7 @@
           <td><code>db</code></td>
           <td><code>pgvector/pgvector:pg15</code></td>
           <td>5432</td>
-          <td>PostgreSQL with the pgvector extension; 1 GB shared memory for large similarity queries.</td>
+          <td>PostgreSQL with the pgvector extension; 1 GB shared memory so that large queries over big datasets do not run out of shared memory.</td>
         </tr>
         <tr>
           <td><code>redis</code></td>
@@ -127,7 +128,6 @@
       <li><code>${HOST_DATA_ROOT}:/data</code> — raw datasets, read-only.</li>
       <li><code>${HOST_MODELS_AL:-./models_AL}:/app/models_AL</code> — model checkpoints, read-write.</li>
       <li><code>${HOST_MODELS_AL:-./models_AL}:/app/assets/models/single_species_models</code> — species model weights, read-only, in the API service.</li>
-      <li><code>${HOST_WSSED_FOCAL_DIR}:/wssed-focal-data</code> — focal recordings for the WSSED flow, read-only. The default host path in the Compose file is specific to the maintainers' server, so set it for your environment.</li>
     </ul>
 
     <h2>Frontend container</h2>

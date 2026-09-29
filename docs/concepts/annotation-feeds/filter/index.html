@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The filter feed narrows snippets by annotation status, location, or species.">
-  <title>Filter — YAPAT Documentation</title>
+  <meta name="description" content="The Annotation Hub sidebar filters in the user-study version of YAPAT: status, location, date and time, and model-derived scores.">
+  <title>Filters and Model Scores — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -32,12 +32,13 @@
 <body>
   <main data-docs-content>
 
-    <h1>Filter</h1>
+    <h1>Filters and Model Scores</h1>
 
     <p class="lede">
-      The filter feed restricts snippets by explicit criteria — annotation
-      status, recording location, and species — so you can target a specific
-      slice of the dataset.
+      The Annotation Hub's sidebar has a <strong>Filters</strong> section that
+      narrows the snippets of the active-learning feed and of the projection
+      view, first by recording properties and, from study phase 4 on, by the
+      model-derived scores. The feed can also be sorted by these values.
     </p>
 
     <h2>Available filters</h2>
@@ -51,40 +52,57 @@
       </thead>
       <tbody>
         <tr>
-          <td><code>annotation_status</code></td>
-          <td><code>any</code>, <code>annotated</code>, or <code>unannotated</code>.</td>
+          <td>Status</td>
+          <td>All, Unlabeled, or Labeled snippets. For labelled snippets, a species selection narrows the list to snippets labelled with those species.</td>
         </tr>
         <tr>
-          <td><code>location</code></td>
-          <td>One or more recording locations, comma-separated.</td>
+          <td>Location</td>
+          <td>One or more recording locations.</td>
         </tr>
         <tr>
-          <td><code>species</code></td>
-          <td>One or more species, comma-separated.</td>
+          <td>Date, month, and time of day</td>
+          <td>A date range, one or more months of the year, and a range of times of day, taken from the recording's date and time.</td>
+        </tr>
+        <tr>
+          <td>Model-derived scores</td>
+          <td>Threshold sliders over histograms of uncertainty, diversity, density, confidence, and the composite score, with an optional selection of predicted species for the confidence score when Status is All.</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>Requesting a filter feed</h2>
-
-    <pre><code>GET /api/feed/?method=filter&amp;dataset_id={dataset_id}
-    &amp;annotation_status=unannotated
-    &amp;location=site-a,site-b
-    &amp;limit=50</code></pre>
-
-    <h2>When to use it</h2>
-
-    <ul>
-      <li>Reviewing only what is still unannotated.</li>
-      <li>Auditing everything already labelled with a species.</li>
-      <li>Working through one recording site at a time.</li>
-    </ul>
+    <h2>When the filters are shown</h2>
 
     <p>
-      A recording's location is its <code>location</code> metadata value or, when that is missing, the part of its file name before the first underscore. Locations can
-      be listed for a dataset through the recording-locations endpoint. Filter
-      feeds are snapshotted like the other methods, so a configuration can be
-      reopened from <a href="../../../guides/feed-history/">Feed History</a>.
+      The study phase decides which filters are visible. Phases 1 and 2 hide the
+      sidebar. Phase 3 shows the status filter (with its species selection),
+      and the location and date and time filters.
+      Phases 4 and 5 add the model-derived scores. See the
+      <a href="../../../guides/annotation-hub/">Annotation Hub</a> guide.
+    </p>
+
+    <p>
+      A recording's location, date, and time come from its metadata, which is
+      parsed from file names that follow a recognised convention or imported from
+      a recording-metadata CSV on the Datasets page.
+    </p>
+
+    <h2>Model-derived scores</h2>
+
+    <p>
+      Uncertainty, diversity, density, and the composite score come with the
+      model's predictions for each snippet. Confidence is computed in the
+      browser from the model's predicted probabilities; when predicted species
+      are selected, it measures how confidently the model detects any of them.
+      The predicted labels themselves are never shown to the annotator.
+    </p>
+
+    <h2>Sorting the feed</h2>
+
+    <p>
+      The feed can be sorted by one or more properties: confidence, composite
+      score, uncertainty, diversity, density, date, and time. In phase 3 the date
+      and time sort options are shown but cannot be changed; in phases 4 and 5
+      all of them can be used.
     </p>
 
   </main>

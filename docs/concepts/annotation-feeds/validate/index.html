@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Validate mode inspects high-confidence model suggestions and lets experts confirm them.">
+  <meta name="description" content="Validation in the user-study version of YAPAT: no validate mode; the confidence score that annotators can filter by.">
   <title>Validate — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
@@ -31,48 +31,33 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Validate</h1>
 
     <p class="lede">
-      Validate mode is a review pass: it ranks unannotated snippets by the
-      model's confidence so an expert can confirm or correct them. It is
-      available from the Annotation Hub with
-      <code>?mode=validate</code>.
+      The user-study version has no validate annotation mode. The Annotation Hub
+      has no mode selector, and the model's predicted labels are never shown for
+      an annotator to confirm or reject.
     </p>
 
-    <h2>Configuration</h2>
-
-    <ul>
-      <li><strong>Label scope</strong> — restrict the pass to one or more focus species.</li>
-      <li><strong>Minimum confidence</strong> — ignore suggestions below a threshold.</li>
-      <li><strong>Top-K</strong> — cap the number of unannotated snippets to review.</li>
-    </ul>
+    <h2>What exists instead</h2>
 
     <p>
-      The result is a confidence-ranked list of unannotated snippets. The
-      annotator works through it, accepting a suggestion to turn it into a
-      label or rejecting it when the model is wrong.
-    </p>
-
-    <h2>Why validate</h2>
-
-    <p>
-      A validation pass lets an annotator check the model's most confident
-      suggestions. Each accepted suggestion becomes a stored label and is recorded
-      as feedback, so the pass also checks the model's output and supplies labels
-      for later retraining.
+      The model's <strong>confidence</strong> is one of the model-derived scores.
+      In study phases 4 and 5, annotators can filter and sort the feed by it in
+      the Annotation Hub's sidebar, alongside uncertainty, diversity, density, and
+      the composite score, and can narrow the confidence score to predicted
+      species. The labels themselves are always chosen by the annotator.
     </p>
 
     <div class="callout callout--tip">
-      <strong>Difference from active learning.</strong> Active learning orders
-      snippets with a chosen strategy, such as uncertainty, diversity, density, or
-      a composite of them. Validate orders unannotated snippets by the model's
-      confidence instead.
+      <strong>Related.</strong> See <a href="../active-learning/">Active
+      Learning</a> for how the feed is ranked and how labels are collected, and
+      <a href="../filter/">Filters and Model Scores</a> for the sidebar.
     </div>
 
   </main>
 
+  <script>window.DOCS_ROOT = "../../.."; /* page is not listed in docs-config.js navigation */</script>
   <script src="../../../js/docs-config.js"></script>
   <script src="../../../js/docs-framework.js"></script>
 </body>

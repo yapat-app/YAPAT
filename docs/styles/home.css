@@ -196,6 +196,10 @@
     transition: transform 2.4s ease-in-out;
   }
 
+  /* Spectrogram scrolls left, one tile (222 SVG units) per loop. */
+  .hero-svg .v-spec-scroll { animation: v-spec-scroll 30s linear infinite; }
+  @keyframes v-spec-scroll { to { transform: translateX(-222px); } }
+
   @keyframes v-s { 50% { fill-opacity: 0.55; } }
 
   @keyframes v-drift {
