@@ -132,7 +132,7 @@
         </tr>
         <tr>
           <td>Expert confirmation before a concept enters the label space</td>
-          <td>Implemented: returned candidates are added to the label space by the user, all at once or one by one, and can be removed again before submission.</td>
+          <td>Implemented: returned candidates are added to the label space by the user, all at once or one by one, and can be removed again until the label space is frozen.</td>
         </tr>
         <tr>
           <td>Local OWL modules for concepts without an external match</td>
@@ -144,15 +144,15 @@
         </tr>
         <tr>
           <td>Provenance of label-space construction</td>
-          <td>Partly: the backend stores the chat history and records who added each concept and when.</td>
+          <td>Partly: the backend stores the chat history and records when each concept was added; the frozen taxonomy records who froze it.</td>
         </tr>
         <tr>
           <td>A frozen session ontology exported as OWL or JSON-LD</td>
-          <td>Not found. Label-space versions are stored as JSON in the database.</td>
+          <td>Partly: the label space is frozen before annotation, but it is stored as a custom taxonomy in JSON in the database; no OWL or JSON-LD export was found.</td>
         </tr>
         <tr>
           <td>Governance of the label space as it evolves</td>
-          <td>YAPAT has a submit-and-promote step: a member submits a version and a team owner activates one. The papers describe governance in general terms and do not specify this mechanism.</td>
+          <td>Not found: freezing creates an active taxonomy directly, with no review or approval step. The papers describe governance in general terms.</td>
         </tr>
         <tr>
           <td>Evaluation at workflow, knowledge, and downstream levels</td>
@@ -165,7 +165,7 @@
       <strong>Related pages.</strong>
       <a href="../../concepts/label-space/what-is-a-label-space/">What is a Label Space?</a>,
       <a href="../../concepts/label-space/grounding/">Grounding</a>, and
-      <a href="../../concepts/label-space/managing-versions/">Managing versions</a>
+      <a href="../../concepts/label-space/managing-versions/">Freezing a Label Space</a>
       describe the implemented workflow.
     </div>
 

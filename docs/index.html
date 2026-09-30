@@ -168,6 +168,31 @@
           <defs>
             <clipPath id="hero-clip-proj"><rect x="272" y="72" width="224" height="115" rx="6"/></clipPath>
             <clipPath id="hero-clip-feed"><rect x="0" y="290" width="520" height="52"/></clipPath>
+            <clipPath id="hero-clip-spec"><rect x="24" y="78" width="222" height="166" rx="4"/></clipPath>
+            <linearGradient id="spec-body" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.08"/>
+              <stop offset="0.03" stop-color="#fff" stop-opacity="0.46"/>
+              <stop offset="0.3" stop-color="#fff" stop-opacity="0.55"/>
+              <stop offset="0.55" stop-color="#fff" stop-opacity="0.5"/>
+              <stop offset="0.9" stop-color="#fff" stop-opacity="0.55"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0.6"/>
+            </linearGradient>
+            <linearGradient id="spec-chorus" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.45"/><stop offset="0.13" stop-color="#fff" stop-opacity="0.75"/><stop offset="0.28" stop-color="#fff" stop-opacity="0.4"/><stop offset="0.45" stop-color="#fff" stop-opacity="0.2"/><stop offset="0.62" stop-color="#fff" stop-opacity="0.8"/><stop offset="0.8" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0.45"/></linearGradient>
+            <linearGradient id="spec-stripe" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.34"/><stop offset="0.25" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.32"/><stop offset="0.72" stop-color="#fff" stop-opacity="0.6"/><stop offset="1" stop-color="#fff" stop-opacity="0.34"/></linearGradient>
+            <linearGradient id="spec-low" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.68"/><stop offset="0.4" stop-color="#fff" stop-opacity="0.5"/><stop offset="0.7" stop-color="#fff" stop-opacity="0.8"/><stop offset="1" stop-color="#fff" stop-opacity="0.68"/></linearGradient>
+            <filter id="spec-map" filterUnits="userSpaceOnUse" x="18" y="78" width="234" height="166" color-interpolation-filters="sRGB">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="0.8 1.4" result="e"/>
+              <feColorMatrix in="e" type="matrix" values="0 0 0 1 0  0 0 0 1 0  0 0 0 1 0  0 0 0 0 1" result="eg"/>
+              <feTurbulence x="24" y="78" width="222" height="166" stitchTiles="stitch" type="fractalNoise" baseFrequency="1.15 0.06" numOctaves="3" seed="3" result="n"/>
+              <feColorMatrix in="n" type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="ng"/>
+              <feComposite x="24" y="78" width="222" height="166" in="eg" in2="ng" operator="arithmetic" k1="0" k2="1" k3="0.36" k4="-0.180"/>
+              <feComponentTransfer x="24" y="78" width="222" height="166">
+                <feFuncR type="table" tableValues="0.267 0.278 0.231 0.173 0.129 0.157 0.369 0.678 0.992"/>
+                <feFuncG type="table" tableValues="0.004 0.176 0.322 0.447 0.569 0.682 0.788 0.863 0.906"/>
+                <feFuncB type="table" tableValues="0.329 0.482 0.545 0.557 0.549 0.502 0.384 0.188 0.145"/>
+                <feFuncA type="linear" slope="0" intercept="1"/>
+              </feComponentTransfer>
+            </filter>
             <clipPath id="hero-clip-progress"><rect class="v-progress" x="52" y="-2" width="328" height="24"/></clipPath>
           </defs>
 
@@ -182,85 +207,26 @@
           <!-- 01 Spectrogram -->
           <text class="v-label" x="24" y="64">01 SPECTROGRAM</text>
           <rect class="v-plot" x="16" y="72" width="240" height="180" rx="6"/>
-          <rect class="s1" style="animation-delay:-0.55s" x="38" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.65s" x="66" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-3.30s" x="108" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-4.40s" x="136" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-5.50s" x="164" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-6.05s" x="178" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-7.70s" x="220" y="78" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.95s" x="94" y="92" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-4.60s" x="136" y="92" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-5.15s" x="150" y="92" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-6.80s" x="192" y="92" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-0.95s" x="38" y="106" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.50s" x="52" y="106" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.05s" x="66" y="106" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.25s" x="66" y="120" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-3.90s" x="108" y="120" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-5.00s" x="136" y="120" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-4.10s" x="108" y="134" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-0.50s" x="220" y="134" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.00s" x="24" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.55s" x="38" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.10s" x="52" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-3.20s" x="80" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-5.40s" x="136" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-5.95s" x="150" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-0.70s" x="220" y="148" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-3.95s" x="94" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-4.50s" x="108" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-5.05s" x="122" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-5.60s" x="136" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-7.80s" x="192" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-0.35s" x="206" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-0.90s" x="220" y="162" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.95s" x="38" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-4.70s" x="108" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-5.25s" x="122" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-7.45s" x="178" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-0.00s" x="192" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-0.55s" x="206" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.65s" x="234" y="176" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-4.35s" x="94" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-4.90s" x="108" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-6.00s" x="136" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-6.55s" x="150" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-7.10s" x="164" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-7.65s" x="178" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-0.20s" x="192" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.30s" x="220" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.85s" x="234" y="190" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.80s" x="24" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.35s" x="38" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-3.45s" x="66" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-4.00s" x="80" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-4.55s" x="94" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-5.10s" x="108" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-5.65s" x="122" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-6.20s" x="136" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-6.75s" x="150" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-7.30s" x="164" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-0.40s" x="192" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.05s" x="234" y="204" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s3" style="animation-delay:-3.65s" x="66" y="218" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-4.20s" x="80" y="218" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-4.75s" x="94" y="218" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s2" style="animation-delay:-6.95s" x="150" y="218" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-0.05s" x="178" y="218" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-0.60s" x="192" y="218" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.20s" x="24" y="232" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-2.75s" x="38" y="232" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-3.85s" x="66" y="232" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-4.40s" x="80" y="232" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-6.60s" x="136" y="232" width="11.5" height="11.5" rx="1.5"/>
-          <rect class="s1" style="animation-delay:-1.90s" x="220" y="232" width="11.5" height="11.5" rx="1.5"/>
-          <g class="v-boxg">
-            <rect class="v-box" x="49" y="117" width="86" height="114" rx="3"/>
-            <rect class="v-tag" x="49" y="101" width="58" height="15" rx="3"/>
-            <text class="v-tagtext t0" x="55" y="112">call_A</text>
-            <text class="v-tagtext t1" x="55" y="112">call_B</text>
-            <text class="v-tagtext t2" x="55" y="112">call_C</text>
+          <!-- Spectrogram in the style of YAPAT's spectrogram player (viridis):
+               time runs left to right, frequency bottom to top. The tile and its
+               copy scroll left in a seamless loop (see .v-spec-scroll in home.css). -->
+          <g class="v-spec" clip-path="url(#hero-clip-spec)">
+            <g class="v-spec-scroll">
+            <g id="hero-spec-tile" filter="url(#spec-map)" fill="none" stroke-linecap="round">
+              <rect x="18" y="78" width="234" height="166" fill="url(#spec-body)"/>
+              <path d="M18 94.6H252" stroke="url(#spec-chorus)" stroke-width="12"/>
+              <path d="M18 105.4H252" stroke="url(#spec-chorus)" stroke-width="4"/>
+              <path d="M18 112.9H252" stroke="url(#spec-stripe)" stroke-width="1.6"/>
+              <path d="M18 118.7H252" stroke="url(#spec-stripe)" stroke-width="1.2"/>
+              <path d="M18 124.5H252" stroke="url(#spec-stripe)" stroke-width="1.5"/>
+              <path d="M18 129.5H252" stroke="url(#spec-stripe)" stroke-width="1"/>
+              <path d="M18 135.3H252" stroke="url(#spec-stripe)" stroke-width="1.3"/>
+              <path d="M18 141.1H252" stroke="url(#spec-stripe)" stroke-width="1"/>
+              <path d="M18 147.7H252" stroke="url(#spec-stripe)" stroke-width="1.2"/>
+              <path d="M18 242.0H252" stroke="url(#spec-low)" stroke-width="5"/>
+            </g>
+            <use href="#hero-spec-tile" x="222"/>
+            </g>
           </g>
 
           <!-- 02 Feature projection -->

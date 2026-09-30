@@ -220,6 +220,7 @@
   }
 
   function spectrogram(n) {
+    if (!rowKeys.length) return;   // spectrogram is a static heatmap, no cells
     // Band sweeps down and back up through the frequency rows.
     var span = rowKeys.length * 2 - 2;
     var k = n % span;

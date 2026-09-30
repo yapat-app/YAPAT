@@ -46,7 +46,7 @@
     <ul>
       <li><strong>Docker</strong> and <strong>Docker Compose</strong> — for the backend stack.</li>
       <li><strong>Node.js 20.19 or newer</strong> — for the frontend dev server. The frontend uses Vite 7, which requires it; the frontend Dockerfile builds with Node 20.</li>
-      <li>Optional: an NVIDIA GPU and the GPU compose override, used by the embedding and active-learning workers.</li>
+      <li>Optional: an NVIDIA GPU and the GPU compose file, which reserves a GPU for the API and the active-learning worker.</li>
     </ul>
 
     <h2>Clone the repository</h2>
@@ -60,6 +60,34 @@
     <p>If you already cloned without submodules:</p>
 
     <pre><code>git submodule update --init --recursive</code></pre>
+
+    <div class="callout">
+      <strong>A recursive clone is not the user-study version.</strong> The main
+      repository records backend commit <code>108b988</code> and frontend commit
+      <code>aa92395</code>, and a recursive clone checks out exactly those. They
+      are not the user-study version of YAPAT that these pages describe.
+    </div>
+
+    <p>
+      The user-study version is the <code>finalUserStudy</code> branch of the
+      backend and of the frontend. These pages were checked against backend
+      commit <code>15b3dcd</code> and frontend commit <code>a49d641</code>. After
+      cloning, switch both components:
+    </p>
+
+    <pre><code>git -C backend fetch origin
+git -C backend checkout finalUserStudy
+git -C frontend fetch origin
+git -C frontend checkout finalUserStudy</code></pre>
+
+    <p>
+      To reproduce exactly the documented state, check out
+      <code>15b3dcd</code> in <code>backend</code> and <code>a49d641</code> in
+      <code>frontend</code> instead. The user-study branches do not specify
+      versions of oe_yapat and WSSED; these pages describe them at the commits
+      the main repository records (<code>2b1d300</code> and
+      <code>b89375a</code>).
+    </p>
 
     <h2>Start the backend</h2>
 
@@ -93,8 +121,8 @@ docker compose up</code></pre>
 
     <div class="callout callout--tip">
       <strong>Interactive docs.</strong> The generated OpenAPI docs
-      (<code>/docs</code>, <code>/redoc</code>) are disabled by default. Set
-      <code>ENABLE_DOCS=true</code> in the backend environment to serve them.
+      (<code>/docs</code>, <code>/redoc</code>) are served by default. Set
+      <code>ENABLE_DOCS=false</code> in the backend environment to turn them off.
     </div>
 
     <p>To run detached, stop, or reset the stack:</p>
@@ -108,14 +136,19 @@ docker compose down -v    # stop and remove data volumes</code></pre>
     <pre><code>cd frontend
 npm install
 cp .env.example .env
-# Edit .env — at minimum set VITE_YAPAT_BACKEND_URL
+# Edit .env — review the study-phase settings; set VITE_YAPAT_BACKEND_URL
+# if the backend is not at http://localhost:8000
 npm run dev</code></pre>
 
     <p>
-      The dev server runs at <code>http://localhost:3000</code>. The only
-      required frontend variable is <code>VITE_YAPAT_BACKEND_URL</code>; set
+      The dev server runs at <code>http://localhost:3000</code>. The frontend
+      calls the backend at <code>VITE_YAPAT_BACKEND_URL</code>, which defaults to
+      <code>http://localhost:8000</code>; set
       <code>VITE_YAPAT_FRONTEND_URL</code> when invitation links must point at a
-      public address.
+      public address. The example file locks the interface to study phase
+      <code>P1</code> and turns on the guided study flow; see
+      <a href="../../operations/environment/">Environment Setup</a> for these
+      variables.
     </p>
 
     <h2>Optional services</h2>
@@ -153,10 +186,11 @@ npm run dev</code></pre>
     <h2>Hosted instance</h2>
 
     <p>
-      The repository's benchmark scripts use
+      This documentation links to
       <a href="https://yapat.ni.dfki.de/" target="_blank" rel="noopener noreferrer">yapat.ni.dfki.de</a>
-      as the address of the project's hosted instance. Who may use it is decided
-      by its operators. The software itself supports account creation on a
+      as the project's hosted instance. The user-study code does not name a
+      hosted address, so which version that instance runs cannot be confirmed
+      from the repositories, and who may use it is decided by its operators. The software itself supports account creation on a
       sign-up page and through invitation links, described in
       <a href="../first-workflow/">First Workflow</a>.
     </p>

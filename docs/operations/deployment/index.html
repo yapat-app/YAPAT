@@ -52,7 +52,7 @@
       <tbody>
         <tr>
           <td><code>api</code></td>
-          <td>FastAPI application. The base Compose file starts one uvicorn process; the override file starts four workers.</td>
+          <td>FastAPI application. The base Compose file starts one uvicorn process; the development override runs it with auto-reload.</td>
         </tr>
         <tr>
           <td><code>celery-worker</code></td>
@@ -111,8 +111,9 @@
       </li>
       <li>
         <strong>Training</strong> — the PAM active-learning worker has the
-        largest memory allowance of the stack (a 160 GB limit in the Compose
-        file) because it loads embedding matrices and PyTorch models.
+        largest memory allowance of the stack (a 16 GB limit and an 8 GB
+        reservation in the Compose file, against 4 GB for the general worker)
+        because it loads embedding matrices and PyTorch models.
       </li>
     </ul>
 
@@ -138,22 +139,20 @@
     <h2>Database connection pool</h2>
 
     <p>
-      Every worker process and uvicorn worker opens its own pool. The stack's
-      worst-case connection count is the sum of
-      <code>processes × (POOL_SIZE + MAX_OVERFLOW)</code> and must stay under the
-      server's PostgreSQL <code>max_connections</code>. The API threadpool limit
-      is meant to match the API pool size (pool size plus overflow) so that
-      synchronous endpoints wait for a thread rather than time out on a
-      connection.
+      Every worker process and uvicorn worker opens its own pool. In the
+      user-study backend the pool is fixed in code, with a pool size of 10, up to
+      20 overflow connections, and a 30-second timeout; there are no environment
+      variables for it. The stack's worst-case connection count is therefore
+      <code>processes × 30</code> and must stay under the server's PostgreSQL
+      <code>max_connections</code>.
     </p>
 
     <h2>GPU deployments</h2>
 
     <p>
-      The stack runs on CPU by default. The GPU file adds NVIDIA device
-      reservations to the API and to both Celery workers; the general worker
-      uses it for embedding inference. Set <code>DEVICE=gpu</code> and select
-      the GPU file:
+      The stack runs on CPU by default. The GPU file adds GPU device
+      reservations to the API and to the PAM active-learning worker; the general
+      worker gets none. Set <code>DEVICE=gpu</code> and select the GPU file:
     </p>
 
     <pre><code>DEVICE=gpu
@@ -177,8 +176,8 @@ COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml</code></pre>
       (<code>HOST_DATA_ROOT</code>). Model checkpoints are stored in
       <code>/app/models_AL</code>, a bind mount of <code>HOST_MODELS_AL</code>
       (default <code>./models_AL</code>) that is writable so retraining can save
-      new checkpoints. Focal-recordings data for the WSSED flow is mounted
-      read-only at <code>/wssed-focal-data</code>.
+      new checkpoints. The base Compose file has no mount for WSSED
+      focal-recordings data.
     </p>
 
     <h2>Migrations</h2>

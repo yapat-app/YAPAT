@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="How a label space moves from a chat session to a submitted version and then to the active version of a team, and how freeze and archive fit in.">
-  <title>Managing versions — YAPAT Documentation</title>
+  <meta name="description" content="How a label space moves from a chat session to a frozen custom taxonomy in the user-study version of YAPAT.">
+  <title>Freezing a Label Space — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -31,94 +31,78 @@
 </head>
 <body>
   <main data-docs-content>
-    <h1>Managing versions</h1>
+    <h1>Freezing a Label Space</h1>
 
     <p class="lede">
-      Label spaces are versioned. A member finalises a label space as a new
-      version, and a team owner decides which version is active. This page
-      describes that lifecycle as the backend implements it.
+      A label space built in the label-space chat is finalised by freezing it —
+      the <strong>Add To label space list</strong> button in the interface. Each
+      freeze creates a new custom taxonomy that is immediately usable for
+      annotation, and earlier taxonomies are kept. This page describes that
+      lifecycle as the backend implements it.
     </p>
 
-    <h2>From conversation to active version</h2>
+    <h2>From conversation to taxonomy</h2>
 
     <ol>
       <li>
         <strong>Start a conversation.</strong> A label-space session is opened
-        for a team or dataset. It can optionally be seeded with the concepts of
-        the team's current active version.
+        for a team. If no team is given, the user's first team is used.
       </li>
       <li>
         <strong>Build the concept list.</strong> Concepts that the user adds from
         the chat accumulate in the conversation's label space.
       </li>
       <li>
-        <strong>Submit.</strong> Submitting finalises the label space as a new
-        taxonomy named <code>Version N</code>, with status
-        <code>submitted</code>, attributed to the user who submitted it. The
-        conversation is marked completed and frozen. A submitted version cannot
-        be used for annotation yet.
+        <strong>Freeze.</strong> Freezing turns the label space into a new custom
+        taxonomy with status <code>active</code>, owned by the conversation's
+        team and attributed to the user who froze it. The web interface names it
+        <code>Label space</code> followed by the date and time. The conversation
+        is marked completed and frozen, and no more concepts can be added to it.
       </li>
       <li>
-        <strong>Promote.</strong> A team owner promotes one submitted version to
-        <code>active</code>. The previously active version goes back to
-        <code>submitted</code> and can be promoted again.
-      </li>
-      <li>
-        <strong>Archive.</strong> Deleting a custom taxonomy through the API sets
-        its status to <code>archived</code>; the record is kept.
+        <strong>Annotate.</strong> The Annotation Hub adds the concepts of the
+        team's most recently frozen label space to the labels annotators can
+        choose from.
       </li>
     </ol>
 
-    <p>
-      A conversation can also be cancelled, which ends it without creating a
-      taxonomy.
-    </p>
-
-    <figure class="docs-infographic" aria-label="Label-space version lifecycle: conversation, submit, promote, archive.">
+    <figure class="docs-infographic" aria-label="Label-space lifecycle: conversation, concept list, freeze, annotation.">
       <ol class="di-flow di-animate di-n4">
-        <li style="--i:0">Conversation<span class="di-sub">optionally seeded from the active version</span></li>
-        <li style="--i:1">Submit<span class="di-sub">status: submitted, named Version N</span></li>
-        <li style="--i:2">Promote<span class="di-sub">team owner; status: active</span></li>
-        <li style="--i:3">Archive<span class="di-sub">via DELETE; status: archived</span></li>
+        <li style="--i:0">Conversation<span class="di-sub">for one team</span></li>
+        <li style="--i:1">Concept list<span class="di-sub">concepts added from the chat</span></li>
+        <li style="--i:2">Freeze<span class="di-sub">status: active</span></li>
+        <li style="--i:3">Annotate<span class="di-sub">concepts join the label list</span></li>
       </ol>
-      <figcaption>Promoting a version returns the previously active one to submitted.</figcaption>
+      <figcaption>Freezing again creates another taxonomy; it does not replace an earlier one.</figcaption>
     </figure>
 
     <div class="callout">
-      <strong>Freeze is a separate, older path.</strong> The API also has a
-      <code>freeze</code> endpoint. It finalises a conversation directly into a
-      named taxonomy that is already <code>active</code>, so it skips the review
-      step. Submit and freeze are alternatives, not consecutive steps: each
-      requires a conversation that has not been finalised yet. The web interface
-      offers only the submit action.
+      <strong>No review step.</strong> Freezing is the only way the web interface
+      finalises a label space. There is no submission for review and no promotion
+      by a team owner, and a team can hold more than one active custom taxonomy.
     </div>
 
-    <h2>Review and promotion</h2>
+    <h2>Changing a frozen label space</h2>
 
     <p>
-      Team owners, and platform administrators, can list a team's versions with
-      <code>GET /api/teams/{team_id}/label-space/submissions</code>. It returns
-      submitted versions by default; the <code>status</code> parameter selects
-      another status or <code>all</code>. A team owner promotes a version with
-      <code>PUT /api/teams/{team_id}/active-label-space</code>, sending the
-      database ID of the custom taxonomy as <code>taxonomy_db_id</code>. Any team
-      member can read the current active version.
+      The user-study interface has no screen for renaming, editing, or archiving
+      a frozen label space. To change the concepts, build and freeze a new label
+      space.
     </p>
 
     <h2>What is kept when a label space changes</h2>
 
     <p>
-      A change to the label space produces a new version instead of editing the old
-      one, and earlier versions stay in the database with their status. An
+      A change to the label space produces a new taxonomy instead of editing the
+      old one, and earlier taxonomies stay in the database with their status. An
       annotation stores the taxon ID and a snapshot of the resolved name from the
-      time it was made. The annotation record does not point to a label-space
-      version.
+      time it was made. The annotation record does not point to a taxonomy.
     </p>
 
     <div class="callout callout--tip">
       <strong>In the interface.</strong> The
       <a href="../../../guides/label-management/">Label Management</a> guide
-      covers the chat, submission, and promotion screens.
+      covers the chat and the freeze action.
     </div>
 
   </main>

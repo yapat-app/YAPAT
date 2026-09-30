@@ -44,7 +44,7 @@ window.YAPAT_DOCS = {
     {
       id: "concepts",
       label: "Concepts",
-      summary: "Feeds, embeddings, label spaces, and the annotation modes that power YAPAT.",
+      summary: "Label spaces, embeddings, active learning, and the Annotation Hub's filters in the user-study version of YAPAT.",
       pages: [
         {
           id: "pam-and-annotations",
@@ -52,13 +52,14 @@ window.YAPAT_DOCS = {
           href: "concepts/pam-and-annotations/"
         },
         {
-          id: "label-space",
-          title: "Label Space",
-          pages: [
-            { id: "what-is-a-label-space", title: "What is a Label Space?", href: "concepts/label-space/what-is-a-label-space/" },
-            { id: "grounding", title: "Grounding", href: "concepts/label-space/grounding/" },
-            { id: "managing-versions", title: "Managing versions", href: "concepts/label-space/managing-versions/" }
-          ]
+          id: "active-learning",
+          title: "Active Learning",
+          href: "concepts/annotation-feeds/active-learning/"
+        },
+        {
+          id: "filter",
+          title: "Filters and Model Scores",
+          href: "concepts/annotation-feeds/filter/"
         },
         {
           id: "embeddings",
@@ -66,14 +67,12 @@ window.YAPAT_DOCS = {
           href: "concepts/embeddings/"
         },
         {
-          id: "annotation-feeds",
-          title: "Annotation Feeds",
+          id: "label-space",
+          title: "Label Space",
           pages: [
-            { id: "random", title: "Random", href: "concepts/annotation-feeds/random/" },
-            { id: "similarity", title: "Similarity", href: "concepts/annotation-feeds/similarity/" },
-            { id: "active-learning", title: "Active Learning", href: "concepts/annotation-feeds/active-learning/" },
-            { id: "filter", title: "Filter", href: "concepts/annotation-feeds/filter/" },
-            { id: "validate", title: "Validate", href: "concepts/annotation-feeds/validate/" }
+            { id: "what-is-a-label-space", title: "What is a Label Space?", href: "concepts/label-space/what-is-a-label-space/" },
+            { id: "grounding", title: "Grounding", href: "concepts/label-space/grounding/" },
+            { id: "managing-versions", title: "Freezing a Label Space", href: "concepts/label-space/managing-versions/" }
           ]
         }
       ]
@@ -91,22 +90,21 @@ window.YAPAT_DOCS = {
     {
       id: "guides",
       label: "Guides",
-      summary: "Step-by-step guides for datasets, the annotation hub, label management, teams, and feed history.",
+      summary: "Step-by-step guides for datasets and WSSED training, the Annotation Hub and study phases, label management, and teams.",
       pages: [
         { id: "datasets", title: "Datasets", href: "guides/datasets/" },
         { id: "annotation-hub", title: "Annotation Hub", href: "guides/annotation-hub/" },
         { id: "label-management", title: "Label Management", href: "guides/label-management/" },
-        { id: "teams", title: "Teams", href: "guides/teams/" },
-        { id: "feed-history", title: "Feed History", href: "guides/feed-history/" }
+        { id: "teams", title: "Teams", href: "guides/teams/" }
       ]
     },
     {
       id: "reference",
       label: "API Reference",
-      summary: "REST endpoints and feed methods for integrating with YAPAT programmatically.",
+      summary: "The REST endpoints the user-study interface uses, the active-learning API, and the backend data models.",
       pages: [
         { id: "rest-api", title: "REST API", href: "reference/rest-api/" },
-        { id: "feed-methods", title: "Feed Methods", href: "reference/feed-methods/" },
+        { id: "feed-methods", title: "Active Learning API", href: "reference/feed-methods/" },
         { id: "data-models", title: "Data Models", href: "reference/data-models/" }
       ]
     },

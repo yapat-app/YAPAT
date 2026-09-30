@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The similarity feed finds snippets that resemble a reference snippet or an uploaded audio region.">
+  <meta name="description" content="Similarity search in the user-study version of YAPAT: not offered; how embeddings are used instead.">
   <title>Similarity — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
@@ -31,64 +31,36 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Similarity</h1>
 
     <p class="lede">
-      The similarity feed uses embeddings to return snippets whose audio lies
-      closest to a reference. The reference can be an existing snippet or a
-      region of an audio file you upload.
+      The user-study version has no similarity annotation mode. The Annotation
+      Hub's "Find similar" control is switched off in every study phase, and the
+      Hub never shows a feed of similar snippets.
     </p>
 
-    <h2>Two ways to give a reference</h2>
-
-    <h3>From an existing snippet</h3>
-
-    <pre><code>GET /api/feed/?method=similarity&amp;dataset_id={dataset_id}&amp;query_snippet_id={snippet_id}&amp;embedding_model_id={model_id}&amp;limit=50</code></pre>
+    <h2>What the user-study version does instead</h2>
 
     <p>
-      An optional <code>crop_start_sec</code> and <code>crop_end_sec</code>
-      restrict the reference to a sub-region of the query snippet, which is
-      useful when only part of the window contains the sound of interest.
-    </p>
-
-    <h3>From uploaded audio</h3>
-
-    <pre><code>POST /api/feed/similarity-search
-Content-Type: multipart/form-data</code></pre>
-
-    <p>
-      The multipart request carries the audio file plus
-      <code>start_time</code> and <code>end_time</code> selecting the reference
-      region, along with <code>dataset_id</code>, an
-      <code>embedding_model_id</code>, and a result <code>limit</code>.
-      Supported formats are WAV, MP3, FLAC, OGG, M4A, and AAC, up to 100 MB.
-    </p>
-
-    <h2>How it works</h2>
-
-    <p>
-      The reference region is embedded with the same model used for the dataset,
-      and the store is queried for the snippet vectors with the smallest cosine
-      distance. Because it
-      relies on the embedding space, the query must use the embedding model that
-      produced the dataset's snippet set.
+      Every feed in the Annotation Hub comes from active learning. Embeddings are
+      still central to it: the active-learning model is trained on them, and the
+      projection view is computed from them.
     </p>
 
     <p>
-      Like other feed methods, a similarity response is saved as a snapshot so
-      the same result can be revisited from
-      <a href="../../../guides/feed-history/">Feed History</a>.
+      The backend code still contains older similarity-search endpoints from an
+      earlier feed design. They are not part of the user-study workflow and are
+      not described in these pages.
     </p>
 
     <div class="callout callout--tip">
-      <strong>Typical use.</strong> Label one clear example of a species, then
-      run a similarity feed from it to quickly find and confirm the rest of its
-      occurrences.
+      <strong>Related.</strong> See <a href="../../embeddings/">Embeddings</a>
+      and <a href="../active-learning/">Active Learning</a>.
     </div>
 
   </main>
 
+  <script>window.DOCS_ROOT = "../../.."; /* page is not listed in docs-config.js navigation */</script>
   <script src="../../../js/docs-config.js"></script>
   <script src="../../../js/docs-framework.js"></script>
 </body>

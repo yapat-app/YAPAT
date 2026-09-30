@@ -42,22 +42,43 @@
     <h2>1. Create an account and sign in</h2>
 
     <p>
-      Accounts can be created on the sign-up page. Invitation links attach a new
-      account to a team or to datasets:
+      The sign-up page creates an account with the global role
+      <code>user</code> that belongs to no team. An administrator can instead
+      send a team invitation link from the team list; opening it shows the
+      sign-in form in registration mode, and the new account joins that team.
+      An owner link gives the account the global role <code>team_owner</code>, a
+      member link the role <code>user</code>. Links expire after two days. After
+      registering, sign in with the new account. See
+      <a href="../../guides/teams/">Teams</a> for the details.
     </p>
 
-    <ul>
-      <li>
-        A <strong>team invitation</strong> adds the new user to that team with the
-        role stored in the link, either owner or user. Links created through the
-        interface expire after two days by default.
-      </li>
-      <li>
-        A <strong>dataset invitation</strong>, created by an administrator, makes
-        the new user a team owner of the team that holds the invited datasets. For
-        datasets without a team, it grants direct access instead.
-      </li>
-    </ul>
+    <p>
+      Signing in opens the <strong>Dashboard</strong>. It greets you with your
+      role (Administrator, Team owner, or Annotator) and the number of datasets
+      you can access, offers a <strong>Start Annotating</strong> button that
+      opens the Annotation Hub, and shows a card for each service your role may
+      use:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Card</th>
+          <th>Shown to</th>
+          <th>Opens</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Dataset Management</td><td>Everyone</td><td>The <a href="../../guides/datasets/">Datasets</a> page.</td></tr>
+        <tr><td>Annotate</td><td>Everyone</td><td>The <a href="../../guides/annotation-hub/">Annotation Hub</a>. The card's text still mentions random feeds and similarity search; the Hub itself offers only active learning.</td></tr>
+        <tr><td>WSSED</td><td>Administrators, and users with access to a <code>FOCAL_RECORDINGS</code> dataset</td><td>The WSSED training page; see <a href="../../guides/datasets/">Datasets</a>.</td></tr>
+        <tr><td>Label Management</td><td>Everyone</td><td>The <a href="../../guides/label-management/">label-space chat</a>.</td></tr>
+        <tr><td>Feed History</td><td>Everyone</td><td>A page from an older feed design that is not part of the user-study workflow.</td></tr>
+        <tr><td>Team Management</td><td>Administrators and team owners</td><td>The <a href="../../guides/teams/">team list</a>.</td></tr>
+        <tr><td>Study Logs</td><td>Administrators</td><td>The study-log viewer; see <a href="../../guides/annotation-hub/">Annotation Hub</a>.</td></tr>
+        <tr><td>Documentation</td><td>Everyone</td><td>A user manual built into the frontend (<code>/documentation</code>), separate from these pages.</td></tr>
+      </tbody>
+    </table>
 
     <h2>2. Register a dataset</h2>
 
@@ -72,43 +93,41 @@
     <h2>3. Generate embeddings</h2>
 
     <p>
-      Embeddings are vectors computed for short audio segments. Similarity search
-      and active learning depend on them. On the dataset card, an administrator or
-      team owner chooses an embedding model and starts the job. It runs on a Celery
-      worker and, when finished, leaves the dataset with a snippet set that feeds
-      can use.
+      Embeddings are vectors computed for short audio segments. Active learning
+      and the projection view depend on them. On the dataset card, an
+      administrator chooses an embedding model and starts the job. It runs on a
+      Celery worker and, when finished, leaves the dataset with a snippet set that
+      feeds can use.
     </p>
 
     <h2>4. Build a feed</h2>
 
     <p>
       Once the dataset is ready for feeds, open the
-      <a href="../../guides/annotation-hub/">Annotation Hub</a> and choose a mode:
+      <a href="../../guides/annotation-hub/">Annotation Hub</a>, select the
+      dataset, and click <strong>Generate Feed</strong>. If the dataset has no
+      model checkpoint yet, the dialog asks for a model family name and offers two
+      starts: a cold start that trains a first model from a ground-truth metadata
+      file, or bootstrap mode, which begins with randomly sampled snippets. Once a
+      checkpoint exists, the model ranks the snippets and the dialog sets how many
+      are returned (Top-K).
     </p>
-
-    <ul>
-      <li><strong>Random</strong> — an unordered sample, useful for a first look.</li>
-      <li><strong>Similarity</strong> — snippets close to a reference sound.</li>
-      <li><strong>Active Learning</strong> — snippets ranked by a model.</li>
-      <li><strong>Filter</strong> — snippets narrowed by annotation status, location, or species.</li>
-      <li><strong>Validate</strong> — unannotated snippets ordered by model confidence.</li>
-    </ul>
 
     <h2>5. Annotate</h2>
 
     <p>
-      Review each snippet's spectrogram and audio, and assign labels from the
-      active label space. In the model-assisted modes each card offers Accept,
-      Reject, and Modify actions for the model's suggestion; in the other modes you
-      pick labels directly. Confirmed labels are saved to the backend database.
+      Review each snippet's spectrogram and audio, and assign one or more labels.
+      The model's predicted labels are not shown; you choose labels from the
+      quick-label list or find a species through the GBIF search. Your selection
+      is saved to the backend as soon as it changes.
     </p>
 
-    <h2>6. Revisit earlier feeds</h2>
+    <h2>6. Let the model retrain</h2>
 
     <p>
-      Feeds from the random, similarity, and filter methods are saved per user.
-      The <a href="../../guides/feed-history/">Feed History</a> page lists the most
-      recent ones so you can reopen a batch instead of rebuilding it.
+      Each labelled snippet counts as feedback for the dataset's model. When the
+      count reaches the retrain threshold, a retrain job starts automatically, and
+      the feed is ranked again with the updated model.
     </p>
 
     <h2>7. Export</h2>
@@ -120,10 +139,11 @@
     </p>
 
     <div class="callout callout--tip">
-      <strong>Going further.</strong>
-      Once labels exist, an active-learning session can train a model on them and
-      rank the remaining snippets. See
-      <a href="../../concepts/annotation-feeds/active-learning/">Active Learning</a>.
+      <strong>Study phases.</strong>
+      Which views and filters the Annotation Hub shows depends on the study
+      phase. See the <a href="../../guides/annotation-hub/">Annotation Hub</a>
+      guide and <a href="../../concepts/annotation-feeds/active-learning/">Active
+      Learning</a>.
     </div>
 
   </main>

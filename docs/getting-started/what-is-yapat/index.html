@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="What YAPAT is: a web application for annotating passive acoustic monitoring audio, with model-assisted sampling of snippets.">
+  <meta name="description" content="What YAPAT is: a web application for annotating passive acoustic monitoring audio, in which an active-learning model ranks the snippets that annotators label.">
   <title>What is YAPAT? — YAPAT Documentation</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
@@ -65,20 +65,40 @@
       </li>
       <li>
         <strong>Embeddings</strong> — numeric vectors computed for each snippet.
-        They power similarity search and the classifier used for active learning.
+        They are the input to the active-learning classifier and to the
+        projection of snippets shown in the Annotation Hub.
       </li>
       <li>
-        <strong>Feeds</strong> — batches of snippets chosen by a sampling
-        method: random, similarity, filter, active learning, or validate.
+        <strong>Annotation Hub with active learning</strong> — the one place where
+        annotation happens. A model trained on the annotators' labels decides
+        which snippets are shown next and is retrained automatically as labels
+        accumulate. Until a first model exists, bootstrap mode shows randomly
+        chosen snippets.
+      </li>
+      <li>
+        <strong>Blind labelling</strong> — the model's predicted labels are never
+        shown. Annotators pick one or more labels themselves from a quick-label
+        list or a GBIF species search.
+      </li>
+      <li>
+        <strong>Study phases</strong> — the Annotation Hub runs in one of five
+        phases (P1 to P5) that decide which views, filters, and sort options are
+        shown. A guided study flow with instructions and a tour, and interaction
+        logging with an admin viewer, can be switched on for study sessions.
       </li>
       <li>
         <strong>Label spaces</strong> — the lists of concepts that labels are
-        chosen from. They can be built through a chat that looks up candidate
-        concepts in GBIF, ENVO, and Wikipedia.
+        chosen from. They are built through a chat that looks up candidate
+        concepts in GBIF, ENVO, and Wikipedia, and then frozen for a team.
       </li>
       <li>
-        <strong>Teams</strong> — groups that share datasets and a label space.
+        <strong>Teams</strong> — groups that share datasets and label spaces.
         Access depends on the user's role.
+      </li>
+      <li>
+        <strong>WSSED</strong> — for focal-recording datasets, a page that trains
+        a sound event detection model on a GPU server and registers it for
+        active learning.
       </li>
     </ul>
 
@@ -117,7 +137,7 @@
         <tr>
           <td>GPU training server (WSSED)</td>
           <td>FastAPI</td>
-          <td>Trains weakly supervised sound event detection models for FOCAL_RECORDINGS datasets. Optional.</td>
+          <td>Trains weakly supervised sound event detection models for FOCAL_RECORDINGS datasets. The WSSED page, shown to administrators and to users with access to such a dataset, starts training and registers the trained model as an active-learning checkpoint. Optional.</td>
         </tr>
       </tbody>
     </table>
@@ -145,36 +165,26 @@
     </p>
 
     <ol>
-      <li>Choose a dataset and a mode.</li>
-      <li>Review each snippet's spectrogram and audio, and assign labels from the active label space.</li>
-      <li>In the model-assisted modes, accept, reject, or modify the label a model proposes.</li>
+      <li>Choose a dataset and generate a feed; the study phase decides which views and filters are available.</li>
+      <li>Review each snippet's spectrogram and audio, and assign one or more labels, chosen from the quick-label list or found through a GBIF species search.</li>
+      <li>After a set number of labelled snippets, the model is retrained and the feed is ranked again.</li>
       <li>The labels are saved in the backend database and can be exported as JSON or CSV.</li>
     </ol>
 
     <div class="callout callout--tip">
-      <strong>Who decides.</strong> Models rank snippets and, in active-learning and
-      validate modes, propose labels. A label is stored only when an annotator
-      accepts, edits, or enters it.
+      <strong>Who decides.</strong> The model ranks snippets, but its predicted
+      labels are not shown in the annotation interface. Every stored label is one
+      that an annotator selected.
     </div>
-
-    <h2>Annotation modes</h2>
-
-    <ul>
-      <li><strong>Random</strong> — a sample of snippets without model ordering.</li>
-      <li><strong>Similarity</strong> — snippets whose embeddings are close to a reference snippet or an uploaded audio region.</li>
-      <li><strong>Active Learning</strong> — snippets ranked by a trained model, using strategies such as uncertainty, diversity, density, or a composite of them.</li>
-      <li><strong>Filter</strong> — snippets narrowed by annotation status, recording location, or species.</li>
-      <li><strong>Validate</strong> — unannotated snippets ordered by the model's confidence, for confirming or correcting suggestions.</li>
-    </ul>
 
     <h2>Getting data out of the API</h2>
 
     <p>
-      Every endpoint is served under the <code>/api</code> prefix. A feed
-      retrieval call looks like this:
+      Every endpoint is served under the <code>/api</code> prefix. An annotation
+      export call looks like this:
     </p>
 
-    <pre><code>GET /api/feed/?method=random&amp;dataset_id=1&amp;limit=20</code></pre>
+    <pre><code>GET /api/datasets/1/annotations/export?format=csv</code></pre>
 
     <p>
       See the <a href="../../reference/rest-api/">REST API</a> reference for the

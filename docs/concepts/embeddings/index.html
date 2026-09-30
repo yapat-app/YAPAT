@@ -35,16 +35,16 @@
 
     <p class="lede">
       An embedding is a fixed-length vector computed from a snippet's audio. YAPAT
-      computes embeddings once per snippet set and reuses them for similarity
-      search, active learning, and projection views.
+      computes embeddings once per snippet set and reuses them for active
+      learning and for the projection view in the Annotation Hub.
     </p>
 
     <h2>Why embeddings</h2>
 
     <p>
       Comparing raw audio directly is costly. With one vector per snippet, YAPAT
-      can find the snippets closest to a reference using pgvector's cosine
-      distance, and it can give a classifier compact features to learn from.
+      can give a classifier compact features to learn from and place every
+      snippet of a dataset in a two-dimensional projection.
     </p>
 
     <h2>Embedding models</h2>
@@ -64,16 +64,16 @@
       Running an embedding job produces a <strong>snippet set</strong>: a
       collection of snippets cut with a specific window and step, together with the
       embeddings from one model. A dataset can have several snippet sets. It is
-      ready for feeds only when it has a snippet set with status
+      ready for annotation only when its default snippet set has status
       <code>ready</code>.
     </p>
 
-    <figure class="docs-infographic" aria-label="From recordings to snippets to embeddings, which feed similarity feeds, active learning, and projections.">
+    <figure class="docs-infographic" aria-label="From recordings to snippets to embeddings, which feed active learning and projections.">
       <ol class="di-flow di-animate di-n4">
         <li style="--i:0">Recordings</li>
         <li style="--i:1">Snippets<span class="di-sub">cut with a fixed window and step</span></li>
         <li style="--i:2">Embeddings<span class="di-sub">one vector per snippet; 1024 dimensions for BirdNET v2.4</span></li>
-        <li style="--i:3">Used for<span class="di-sub">similarity, active learning, projections</span></li>
+        <li style="--i:3">Used for<span class="di-sub">active learning, projections</span></li>
       </ol>
       <figcaption>A snippet set holds the snippets and the embeddings of one model.</figcaption>
     </figure>
@@ -99,9 +99,8 @@ GET  /api/embeddings/{job_id}</code></pre>
     <h2>What embeddings are used for</h2>
 
     <ul>
-      <li><strong>Similarity feeds</strong> — find snippets near a reference snippet or an uploaded sound.</li>
       <li><strong>Active learning</strong> — train and score a classifier on embedding vectors; a cold-start run needs an embedding model.</li>
-      <li><strong>Projections</strong> — the Annotation Hub shows a 2D projection of the snippets (PCA, UMAP, t-SNE, or Isomap). The API can also compute 3D projections; the current interface requests 2D only.</li>
+      <li><strong>Projections</strong> — from study phase 2 on, the Annotation Hub shows a 2D projection of the dataset's snippets, computed with PCA (the default), UMAP, or t-SNE.</li>
     </ul>
 
     <div class="callout">

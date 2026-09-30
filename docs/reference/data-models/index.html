@@ -92,7 +92,7 @@
         <tr><td><code>file_path</code></td><td>string</td><td>Full path on the data volume.</td></tr>
         <tr><td><code>duration</code></td><td>float | null</td><td>Length in seconds.</td></tr>
         <tr><td><code>sample_rate</code></td><td>float | null</td><td>Hz.</td></tr>
-        <tr><td><code>extra_metadata</code></td><td>JSON | null</td><td>Values such as <code>location</code>.</td></tr>
+        <tr><td><code>extra_metadata</code></td><td>JSON | null</td><td>Values such as <code>location</code>, <code>recorded_date</code>, and <code>recorded_time</code>.</td></tr>
       </tbody>
     </table>
 
@@ -138,36 +138,17 @@
         <tr><td><code>username</code></td><td>string | null</td><td>Author's username, in responses.</td></tr>
         <tr><td><code>taxon_id</code></td><td>string</td><td>Namespaced concept ID such as <code>gbif:…</code>, <code>custom:…</code>, <code>wiki:…</code>, or <code>local:…</code>.</td></tr>
         <tr><td><code>resolved_name_snapshot</code></td><td>string</td><td>Name of the concept at the time of annotation.</td></tr>
-        <tr><td><code>extra_metadata</code></td><td>JSON | null</td><td>Free-form metadata.</td></tr>
-        <tr><td><code>created_at</code>, <code>updated_at</code></td><td>datetime</td><td>Creation and last-update times.</td></tr>
+        <tr><td><code>confidence</code></td><td>float | null</td><td>Optional confidence value.</td></tr>
+        <tr><td><code>notes</code></td><td>string | null</td><td>Optional notes.</td></tr>
+        <tr><td><code>extra_metadata</code></td><td>JSON | null</td><td>Free-form metadata; labels written from the Annotation Hub carry <code>source: active_learning</code>.</td></tr>
+        <tr><td><code>created_at</code></td><td>datetime</td><td>Creation time.</td></tr>
       </tbody>
     </table>
 
     <p>
-      When creating an annotation, the request supplies exactly one of
-      <code>taxon_id</code> or <code>species_name</code>, plus an optional
-      <code>display_name</code>; the backend stores the resolved
-      <code>taxon_id</code> and name. A snippet can carry several labels, but
-      the pair <code>snippet_id</code> and <code>taxon_id</code> is unique.
-    </p>
-
-    <h2>User feed</h2>
-
-    <table>
-      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
-      <tbody>
-        <tr><td><code>id</code></td><td>integer</td><td>Primary key.</td></tr>
-        <tr><td><code>user_id</code></td><td>integer</td><td>User who generated the feed.</td></tr>
-        <tr><td><code>method</code></td><td>string</td><td><code>random</code>, <code>similarity</code>, or <code>filter</code>.</td></tr>
-        <tr><td><code>request_params</code></td><td>JSON</td><td>The full request that produced the feed.</td></tr>
-        <tr><td><code>response</code></td><td>JSON</td><td>The list of snippets the feed returned.</td></tr>
-        <tr><td><code>created_at</code></td><td>datetime</td><td>Snapshot time.</td></tr>
-      </tbody>
-    </table>
-
-    <p>
-      The database retains the last five snapshots per user and method; older
-      entries are dropped.
+      Labels given in the Annotation Hub reach this table when they resolve to a
+      taxon ID or a species name. A snippet can carry several labels, but the
+      pair <code>snippet_id</code> and <code>taxon_id</code> is unique.
     </p>
 
     <h2>Custom taxonomy</h2>
@@ -177,11 +158,10 @@
       <tbody>
         <tr><td><code>id</code></td><td>integer</td><td>Database primary key.</td></tr>
         <tr><td><code>taxonomy_id</code></td><td>string</td><td>Unique identifier for the label space.</td></tr>
-        <tr><td><code>name</code></td><td>string</td><td>Unique per team and dataset. Submitted versions are named "Version N" automatically.</td></tr>
+        <tr><td><code>name</code></td><td>string</td><td>Unique per team. The interface names a frozen label space "Label space" followed by the date and time.</td></tr>
         <tr><td><code>description</code></td><td>string | null</td><td>Optional description.</td></tr>
-        <tr><td><code>status</code></td><td>string</td><td><code>submitted</code>, <code>active</code>, or <code>archived</code> in normal use; a <code>draft</code> value exists but the current code does not set it.</td></tr>
-        <tr><td><code>team_id</code></td><td>integer | null</td><td>Team scope, or null for admin / dataset-scoped taxonomies.</td></tr>
-        <tr><td><code>dataset_id</code></td><td>integer | null</td><td>Optional dataset scope.</td></tr>
+        <tr><td><code>status</code></td><td>string</td><td><code>active</code> or <code>archived</code> in normal use; a <code>draft</code> value exists but the current code does not set it.</td></tr>
+        <tr><td><code>team_id</code></td><td>integer | null</td><td>Team that owns the taxonomy; freezing requires one.</td></tr>
         <tr><td><code>created_by_user_id</code></td><td>integer</td><td>User who created it.</td></tr>
         <tr><td><code>taxonomy_data</code></td><td>JSON</td><td>The concept list.</td></tr>
         <tr><td><code>is_global</code></td><td>bool</td><td>Whether the taxonomy is global.</td></tr>
@@ -191,43 +171,44 @@
     <h2>Sample scores</h2>
 
     <p>
-      The backend attaches <code>uncertainty</code>, <code>diversity</code>,
-      <code>density</code>, and <code>composite_score</code> to each projection
-      point. The table below is the frontend's per-snippet view model, which
-      also carries display fields; it is not a database entity.
+      Each prediction row and each projection point carries these scores for
+      its snippet, next to the predicted labels:
     </p>
 
     <table>
       <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
       <tbody>
-        <tr><td><code>uncertainty</code></td><td>float</td><td>Model uncertainty for the snippet.</td></tr>
-        <tr><td><code>diversity</code></td><td>float</td><td>Embedding-space dispersion.</td></tr>
-        <tr><td><code>density</code></td><td>float</td><td>Local neighbourhood density.</td></tr>
-        <tr><td><code>composite_score</code></td><td>float</td><td>Weighted blend of the above.</td></tr>
-        <tr><td><code>year_cycle</code></td><td>float | null</td><td>Temporal cycle feature.</td></tr>
-        <tr><td><code>day_cycle</code></td><td>float | null</td><td>Diurnal cycle feature.</td></tr>
-        <tr><td><code>sound_type</code></td><td>string | null</td><td><code>Bio</code>, <code>Anthro</code>, or <code>Geo</code>.</td></tr>
-        <tr><td><code>birdnet_label</code></td><td>string | null</td><td>BirdNET predicted label.</td></tr>
-        <tr><td><code>yamnet_label</code></td><td>string | null</td><td>YAMNet predicted label.</td></tr>
-        <tr><td><code>actual_label</code></td><td>string | null</td><td>User-supplied ground truth.</td></tr>
+        <tr><td><code>uncertainty</code></td><td>float | null</td><td>Model uncertainty for the snippet.</td></tr>
+        <tr><td><code>diversity</code></td><td>float | null</td><td>Embedding-space dispersion.</td></tr>
+        <tr><td><code>density</code></td><td>float | null</td><td>Local neighbourhood density.</td></tr>
+        <tr><td><code>composite_score</code></td><td>float | null</td><td>Weighted blend of the above.</td></tr>
       </tbody>
     </table>
+
+    <p>
+      Prediction rows also carry <code>predicted_labels</code> and
+      <code>predicted_probabilities</code>. The Annotation Hub uses them for
+      ranking and for the confidence score, and does not show the predicted
+      labels to annotators.
+    </p>
 
     <h2>Feature-projection view</h2>
 
     <p>
-      <code>POST</code> and <code>GET /api/visualisations/fpv</code> return the
-      projection data directly. The response holds <code>points</code> (snippet
-      ID, predicted labels, and the four scores), <code>projections_2d</code>,
-      and, when requested with <code>run_3d</code>, <code>projections_3d</code>.
-      Each projection map is keyed by method (<code>pca</code>,
-      <code>umap</code>, <code>tsne</code>, <code>isomap</code>). An optional
-      <code>method_availability</code> object marks methods that will not be
-      computed for a dataset of this size, with an <code>available</code> flag
-      and a <code>reason</code>. Asynchronous generation with a queued
-      <code>task_id</code> belongs to <code>POST /api/visualisations/fpv-dataset</code>,
-      whose data is then read with <code>GET</code> on the same path. The
-      Annotation Hub uses only the 2D projections.
+      The Annotation Hub starts projection generation for the whole dataset with
+      <code>POST /api/visualisations/fpv-dataset</code>, which queues a task and
+      returns its <code>task_id</code>, and reads the result with
+      <code>GET</code> on the same path. The projection data holds
+      <code>points</code> (snippet ID, predicted labels, and the four scores),
+      <code>projections_2d</code>, and, when requested with <code>run_3d</code>,
+      <code>projections_3d</code>. Each projection map is keyed by method
+      (<code>pca</code>, <code>umap</code>, <code>tsne</code>,
+      <code>isomap</code>). An optional <code>method_availability</code> object
+      marks methods that will not be computed for a dataset of this size, with an
+      <code>available</code> flag and a <code>reason</code>. The Hub uses the 2D
+      PCA, UMAP, and t-SNE projections. The backend's
+      <code>/api/visualisations/fpv</code> endpoints return the same kind of data
+      for a model family; the user-study interface does not call them.
     </p>
 
   </main>
