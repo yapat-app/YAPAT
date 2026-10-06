@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="About the YAPAT project: the repositories that make up the system, the license statement, and what these docs were checked against.">
-  <title>Project — YAPAT Documentation</title>
+  <meta name="description" content="About the YAPAT project: the repositories, the hosted instance, the license, and the documented version.">
+  <title>YAPAT Documentation – Project</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -34,98 +34,52 @@
     <h1>Project</h1>
 
     <p class="lede">
-      YAPAT is an annotation tool for passive acoustic monitoring audio. It uses
-      machine-learning models to decide which samples an expert labels next, with
-      the aim of reducing the labelling effort needed to collect training data.
+      YAPAT is an AI-powered annotation tool for passive acoustic monitoring
+      audio, developed at the German Research Center for Artificial
+      Intelligence (DFKI). It uses active learning to reduce the time experts
+      spend labelling.
     </p>
 
-    <h2>Repository structure</h2>
-
-    <p>
-      The main repository links the components as Git submodules:
-    </p>
+    <h2>Repositories</h2>
 
     <table>
       <thead>
-        <tr>
-          <th>Directory</th>
-          <th>Repository</th>
-          <th>Contents</th>
-        </tr>
+        <tr><th>Directory</th><th>Repository</th><th>Contents</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><code>frontend/</code></td>
-          <td>yapat-frontend</td>
-          <td>The annotation interface, built with React, TypeScript, and Vite.</td>
-        </tr>
-        <tr>
-          <td><code>backend/</code></td>
-          <td>yapat-backend</td>
-          <td>The FastAPI application, Celery workers, and the machine-learning code for embeddings and active learning.</td>
-        </tr>
-        <tr>
-          <td><code>oe_yapat/</code></td>
-          <td>oe_yapat</td>
-          <td>An MCP tool server for looking up concepts in GBIF, ENVO (through OLS), and Wikipedia, plus an ontology tool for locally defined concepts, and a command-line client.</td>
-        </tr>
-        <tr>
-          <td><code>WSSED/</code></td>
-          <td>WSSED-YAPAT</td>
-          <td>A FastAPI server for training and running weakly supervised sound event detection models on GPU hardware.</td>
-        </tr>
-        <tr>
-          <td><code>docs/</code></td>
-          <td>—</td>
-          <td>The static site you are reading.</td>
-        </tr>
+        <tr><td><code>frontend/</code></td><td>yapat-frontend</td><td>The web interface (React, TypeScript, Vite).</td></tr>
+        <tr><td><code>backend/</code></td><td>yapat-backend</td><td>The application programming interface (API), background workers, and machine-learning code (FastAPI, Celery).</td></tr>
+        <tr><td><code>oe_yapat/</code></td><td>oe_yapat</td><td>The ontology tool server behind the label-space chat.</td></tr>
+        <tr><td><code>WSSED/</code></td><td>WSSED-YAPAT</td><td>The training server for Weakly Supervised Sound Event Detection (WSSED), which trains sound event detection models. See <a href="../../concepts/wssed/">WSSED</a>.</td></tr>
+        <tr><td><code>docs/</code></td><td>—</td><td>This documentation site.</td></tr>
       </tbody>
     </table>
+
+    <p>
+      The main repository, <a href="https://github.com/yapat-app/YAPAT" target="_blank" rel="noopener noreferrer">yapat-app/YAPAT</a>,
+      links them as Git submodules.
+    </p>
 
     <h2>Hosted instance</h2>
 
     <p>
-      This documentation links to https://yapat.ni.dfki.de as the project's
-      hosted instance. The user-study code does not name a hosted address, so
-      which version that instance runs cannot be confirmed from the
-      repositories. The backend serves its REST API
-      under the <code>/api</code> prefix; see the
-      <a href="../../reference/rest-api/">REST API</a> reference.
-    </p>
-
-    <h2>Background</h2>
-
-    <p>
-      According to the papers themselves (the repositories do not state this),
-      the two papers summarised under
-      <a href="../research-context/">Research Context</a> come from the German
-      Research Center for Artificial Intelligence (DFKI) in Oldenburg and the
-      University of Oldenburg, and were written within the DFKI project area
-      Computational Sustainability &amp; Technology.
+      A hosted instance is linked from this documentation:
+      <a href="https://yapat.ni.dfki.de/" target="_blank" rel="noopener noreferrer">yapat.ni.dfki.de</a>.
+      Access to it is managed by its operators.
     </p>
 
     <h2>License</h2>
 
     <p>
-      The top-level README states that the YAPAT source code is available under
-      the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
-      International license (CC BY-NC-SA 4.0). None of the repositories includes
-      a separate license file, so check each repository before reusing its code.
+      The source code is available under the Creative Commons
+      Attribution-NonCommercial-ShareAlike 4.0 International license
+      (CC BY-NC-SA 4.0), as stated in the main repository's README.
     </p>
 
-    <h2>Documentation basis</h2>
-
-    <p>
-      These pages describe the version of YAPAT used for the user study: the
-      <code>finalUserStudy</code> branches of yapat-backend at commit
-      <code>15b3dcd</code> (4 September 2026) and of yapat-frontend at
-      <code>a49d641</code> (11 September 2026), with oe_yapat at
-      <code>2b1d300</code> and WSSED-YAPAT at <code>b89375a</code>. The
-      <code>main</code> branches, checked at yapat-backend <code>959cdbc</code>
-      and yapat-frontend <code>3917ed2</code>, served as repository context
-      only; features that exist only there are not described as current. Later
-      changes to these repositories may not be reflected here.
-    </p>
+    <div class="callout callout--tip">
+      <strong>Found a problem?</strong> Report it in the
+      <a href="https://github.com/yapat-app/YAPAT/issues" target="_blank" rel="noopener noreferrer">issue tracker</a>.
+    </div>
 
   </main>
 

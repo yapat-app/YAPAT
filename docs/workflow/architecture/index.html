@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How YAPAT is built: the services, how a request flows through them, and where each part lives in the backend and frontend code.">
+  <title>YAPAT Documentation – Architecture</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Architecture</h1>
+
+    <p class="lede">
+      YAPAT's interface is a React web app talking to a FastAPI backend. Anything slow, such
+      as scanning folders, computing embeddings, or training models, runs in
+      background workers. This page shows how the parts fit together and where
+      to find them in the code.
+    </p>
+
+    <h2>Services</h2>
+    <p>
+      Besides the core services, two are optional: the <strong>ontology service</strong> (oe_yapat)
+      looks up species and environmental terms for the label-space chat; the
+      <strong>Weakly Supervised Sound Event Detection (WSSED)</strong> server
+      trains a sound event detection model from recordings labelled only with the species
+      they contain, on a machine with a graphics processing unit (GPU). YAPAT
+      can use that model as a dataset's first active-learning model; see
+      <a href="../../concepts/wssed/">WSSED</a>.
+    </p>
+
+
+    <figure class="docs-infographic" aria-label="Services: the browser loads the frontend, which calls the FastAPI backend; the backend stores data in PostgreSQL and queues work in Redis for two Celery workers; optional services are the ontology service and the WSSED GPU server.">
+      <div class="di-cols">
+        <div class="di-node">Frontend<span class="di-sub">React, TypeScript, Vite · port 3000</span></div>
+        <span class="di-arrow" aria-hidden="true">&rarr;</span>
+        <div class="di-node di-key">Backend API<span class="di-sub">FastAPI under /api · port 8000</span></div>
+        <span class="di-arrow" aria-hidden="true">&rarr;</span>
+        <div class="di-stack">
+          <div class="di-node">PostgreSQL + pgvector<span class="di-sub">all data, including embedding vectors</span></div>
+          <div class="di-node">Redis and Celery workers<span class="di-sub">scanning, embeddings, training</span></div>
+          <div class="di-node di-opt">oe_yapat<span class="di-sub">optional · label-space chat</span></div>
+          <div class="di-node di-opt">WSSED GPU server<span class="di-sub">optional · trains detection models</span></div>
+        </div>
+      </div>
+      <figcaption>Dashed boxes are optional; the rest of YAPAT works without them.</figcaption>
+    </figure>
+
+    <table>
+      <thead>
+        <tr><th>Service</th><th>Role</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>api</code></td><td>The FastAPI app. Runs database migrations on start.</td></tr>
+        <tr><td><code>celery-worker</code></td><td>A Celery worker (Celery is a Python task queue): folder scans, snippet creation, and embeddings (queues <code>processing</code>, <code>embeddings</code>, <code>exports</code>, <code>default</code>).</td></tr>
+        <tr><td><code>celery-worker-pam-al</code></td><td>Active-learning training and retraining (queue <code>pam_al</code>), kept apart so training never blocks other work.</td></tr>
+        <tr><td><code>celery-beat</code></td><td>Schedules periodic tasks.</td></tr>
+        <tr><td><code>db</code>, <code>redis</code></td><td>PostgreSQL with pgvector (an extension that stores and searches embedding vectors), and Redis, the message broker that hands tasks to the workers.</td></tr>
+        <tr><td><code>flower</code></td><td>Flower, a web dashboard for Celery tasks, on port 5555.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>What happens when you label a clip</h2>
+
+    <figure class="docs-infographic" aria-label="Labelling flow: the Hub sends feedback to the API, which stores it; after ten labels a retrain job is queued, the worker trains a new checkpoint, and the Hub fetches new predictions.">
+      <ol class="di-flow di-animate di-n4">
+        <li style="--i:0">Annotation Hub<span class="di-sub">sends the labels</span><span class="di-edge">POST</span></li>
+        <li style="--i:1">API<span class="di-sub">stores feedback, counts it</span><span class="di-edge">queue</span></li>
+        <li class="di-key" style="--i:2">pam_al worker<span class="di-sub">trains a new checkpoint</span><span class="di-edge">done</span></li>
+        <li style="--i:3">Annotation Hub<span class="di-sub">fetches the new ranking</span></li>
+      </ol>
+      <figcaption>The retrain is queued after every 10 labels; until then only the first two steps run.</figcaption>
+    </figure>
+
+    <h2>Backend code</h2>
+
+    <table>
+      <thead>
+        <tr><th>Path</th><th>Contains</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>app/main.py</code></td><td>The FastAPI app; registers every router under <code>/api</code>.</td></tr>
+        <tr><td><code>app/api/</code></td><td>One router per area: <code>auth</code>, <code>teams</code>, <code>invitations</code>, <code>datasets</code>, <code>recordings</code>, <code>snippets</code>, <code>embeddings</code>, <code>annotations</code>, <code>pam_active_learning</code>, <code>taxonomy</code>, <code>custom_taxonomy</code>, <code>visualisations</code>, <code>wssed</code>, <code>study_events</code>, <code>tasks</code>, <code>feed</code>, <code>reference_links</code>.</td></tr>
+        <tr><td><code>app/models/</code>, <code>app/schemas/</code></td><td>SQLAlchemy tables and the Pydantic request and response models.</td></tr>
+        <tr><td><code>app/services/</code></td><td>The logic behind the routers; active learning lives in <code>app/services/pam_al/</code>.</td></tr>
+        <tr><td><code>app/tasks/</code></td><td>Celery tasks: <code>processing_tasks</code>, <code>embedding_tasks</code>, <code>pam_al_tasks</code>, <code>wssed_tasks</code>.</td></tr>
+        <tr><td><code>app/core/</code></td><td>Authentication, permissions, and taxonomy helpers.</td></tr>
+        <tr><td><code>active_learning/</code></td><td>The classifiers (<code>model_zoo/</code>), the scoring code (<code>samplers.py</code>), and the tunable defaults (<code>config.yaml</code>).</td></tr>
+        <tr><td><code>classifiers/</code></td><td>Models used by the WSSED workflow.</td></tr>
+        <tr><td><code>alembic/</code></td><td>Database migrations.</td></tr>
+        <tr><td><code>tests/</code></td><td><code>unit/</code> and <code>integration/</code> tests (pytest).</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Frontend code</h2>
+
+    <table>
+      <thead>
+        <tr><th>Path</th><th>Contains</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>src/pages/</code></td><td>One component per screen; the Annotation Hub is in <code>pages/annotationHub/</code>.</td></tr>
+        <tr><td><code>src/components/</code></td><td>Shared components; the Hub's feed, projection, and label picker are in <code>components/al/</code>.</td></tr>
+        <tr><td><code>src/services/api.ts</code></td><td>Every call to the backend.</td></tr>
+        <tr><td><code>src/redux/</code></td><td>Application state, one slice per area (datasets, teams, active learning, …).</td></tr>
+        <tr><td><code>src/studyPhases/</code></td><td>What each of the five phases shows (<code>phases.ts</code>).</td></tr>
+        <tr><td><code>src/studyFlow/</code>, <code>src/studyLogging/</code></td><td>The guided introductions and the interaction logging.</td></tr>
+        <tr><td><code>src/routes/</code></td><td>Access guards, for example admin-only pages.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout--tip">
+      <strong>Next:</strong> <a href="../development/">Development Setup</a> — run YAPAT from source and make a change.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

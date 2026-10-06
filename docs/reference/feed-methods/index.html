@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The active-learning endpoints the user-study Annotation Hub calls: first model, feed, feedback, and retraining.">
-  <title>Active Learning API — YAPAT Documentation</title>
+  <meta name="description" content="The active-learning endpoints the Annotation Hub calls: first model, feed, feedback, and retraining.">
+  <title>YAPAT Documentation – Active Learning API</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -75,7 +75,7 @@
         <tr><td><code>snippet_set_id</code></td><td>The dataset's default snippet set.</td></tr>
         <tr><td><code>model_family_name</code></td><td>The model family entered in the Generate Feed dialog.</td></tr>
         <tr><td><code>sample_suggestion</code></td><td><code>true</code> when "Return only Top-K suggestions" is on, so that a ranked subset is returned; <code>false</code> returns all predictions for the snippet set.</td></tr>
-        <tr><td><code>suggestion_strategy</code></td><td>The ranking; the user-study Hub sends <code>uncertainty</code>.</td></tr>
+        <tr><td><code>suggestion_strategy</code></td><td>The ranking; the Hub sends <code>uncertainty</code>.</td></tr>
         <tr><td><code>k</code></td><td>Top-K, 1 to 500 in the Generate Feed dialog.</td></tr>
       </tbody>
     </table>
@@ -103,7 +103,7 @@
       The Hub sends the annotator's selected labels with the action
       <code>MODIFY</code> shortly after the selection changes. The schema also
       accepts <code>ACCEPT</code> and <code>REJECT</code>, which refer to the
-      model's predicted labels; the user-study interface never sends them. The
+      model's predicted labels; the web interface does not send them. The
       caller needs access to the dataset.
     </p>
 
@@ -137,7 +137,7 @@
       <strong>Other active-learning endpoints.</strong> The backend has further
       <code>/api/pam-al</code> endpoints — registering and activating
       checkpoints, listing all checkpoints and retrain jobs, manual retraining,
-      and deleting stored labels — that the user-study interface does not call.
+      and deleting stored labels — that the web interface does not call.
       They are listed separately in the <a href="../rest-api/">REST API</a>
       reference.
     </div>

@@ -727,28 +727,338 @@ a.docs-nav-link.is-active:hover {
   background: var(--green-soft);
 }
 
-/* ---------- Infographics ----------
-   Small explanatory diagrams: <figure class="docs-infographic">. Sequences use
-   .di-flow (an <ol>), architecture uses .di-cols, relationships use .di-tree.
-   Colours come from the shared tokens, so both themes work unchanged. Motion
-   is a slow highlight that steps through the nodes; it is optional
-   (.di-animate + .di-n{count}) and disabled under reduced motion. */
+/* "For developers" box: the technical layer at the end of a user page. */
+.docs-content .callout--dev {
+  border-left: 3px solid var(--primary);
+  background: var(--surface-soft);
+}
 
-.docs-content .docs-infographic {
-  margin: 0 0 24px;
-  padding: 16px;
+.docs-content .callout--dev ul {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+}
+
+.docs-content .callout--dev li {
+  margin: 2px 0;
+}
+
+/* ---------- Screenshots ----------
+   <figure class="docs-shot"><img …><figcaption>…</figcaption></figure>.
+   Click to enlarge (js/docs-framework.js → lightbox). */
+
+.docs-content .docs-shot {
+  margin: 8px 0 28px;
+}
+
+.docs-content .docs-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  cursor: zoom-in;
+  transition:
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.docs-content .docs-shot img:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.docs-content .docs-shot img:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 3px;
+}
+
+/* Narrow crops (a sidebar, a dialog) should not be stretched to full width. */
+.docs-content .docs-shot--narrow img {
+  width: auto;
+  max-width: min(100%, 360px);
+}
+
+.docs-content .docs-shot--medium img {
+  width: auto;
+  max-width: min(100%, 560px);
+}
+
+.docs-content .docs-shot figcaption {
+  margin-top: 10px;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.docs-lightbox {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 56px 24px 24px;
+  border: 0;
+  background: transparent;
+  overflow: auto;
+}
+
+.docs-lightbox::backdrop {
+  background: rgba(8, 12, 20, 0.86);
+}
+
+.docs-lightbox[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: docs-lightbox-in 0.18s ease-out;
+}
+
+.docs-lightbox-figure {
+  margin: 0;
+  max-width: min(1600px, 100%);
+}
+
+.docs-lightbox-figure img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.docs-lightbox-figure figcaption {
+  max-width: 720px;
+  margin: 14px auto 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.docs-lightbox-close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.docs-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.docs-lightbox-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+@keyframes docs-lightbox-in {
+  from { opacity: 0; transform: scale(0.98); }
+}
+
+@media (max-width: 519px) {
+  .docs-lightbox {
+    padding: 64px 8px 16px;
+  }
+
+  .docs-lightbox-figure figcaption {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-lightbox[open] {
+    animation: none;
+  }
+}
+
+/* Screenshot tabs (js/docs-framework.js → shotTabs). */
+.docs-content .docs-shot-tabs {
+  margin: 8px 0 28px;
+}
+
+.docs-content .docs-shot-tabs > .docs-shot {
+  margin-bottom: 0;
+}
+
+.docs-content .docs-shot-tabs:not(.is-tabbed) > .docs-shot + .docs-shot {
+  margin-top: 20px;
+}
+
+.docs-content .docs-shot-tablist {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 4px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-soft);
 }
 
-.docs-content .docs-infographic figcaption {
-  margin-top: 12px;
-  line-height: 1.6;
+.docs-content .docs-shot-tab {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
+.docs-content .docs-shot-tab:hover {
+  color: var(--text);
+}
+
+.docs-content .docs-shot-tab[aria-selected="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.docs-content .docs-shot-tab:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 2px;
+}
+
+/* Keyboard keys in running text. */
+.docs-content kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* "You need:" line under a guide's intro. */
+.docs-content .docs-needs {
+  margin: -12px 0 24px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+/* ---------- Infographics ----------
+   Explanatory diagrams: <figure class="docs-infographic">. No panel: nodes and
+   connectors sit directly on the page, so they read the same in both themes.
+   - .di-flow (an <ol>): a sequence. Connectors are drawn between items; an
+     optional <span class="di-edge"> inside an item labels the arrow leaving it.
+     .di-flow--loop adds a return arrow (label: .di-loop-label, count: --n).
+     .di-flow--grid wraps into rows of four.
+   - .di-cols: columns joined by arrows; .di-stack fans out to several nodes.
+   - .di-tree: nested relationships.
+   Node modifiers: .di-key (blue, the step that matters), .di-opt (dashed,
+   optional), .di-code (monospace title). Items stack vertically on phones.
+   Motion is a slow highlight stepping through the nodes (.di-animate +
+   .di-n{count}); it is off under reduced motion. */
+
+.docs-content .docs-infographic {
+  --di-line: var(--text-muted);
+  --di-gap: 48px;
+  margin: 8px 0 32px;
+  padding: 8px 0 0;
+  border: 0;
+  background: none;
+}
+
+.docs-content .docs-infographic figcaption {
+  margin-top: 16px;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* Nodes */
+
+.docs-content .di-flow > li,
+.docs-content .di-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  margin: 0;
+  padding: 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.docs-content .di-code,
+.docs-content .di-flow > li.di-code {
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+}
+
+.docs-content .di-sub {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.docs-content .di-key,
+.docs-content .di-flow > li.di-key {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.docs-content .di-opt {
+  border-style: dashed;
+  background: transparent;
+}
+
+.docs-content .di-num {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--primary);
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* Sequence */
+
 .docs-content .di-flow {
-  --di-gap: 24px;
+  position: relative;
   display: flex;
   align-items: stretch;
   gap: var(--di-gap);
@@ -757,93 +1067,207 @@ a.docs-nav-link.is-active:hover {
   list-style: none;
 }
 
-.docs-content .di-flow--grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  row-gap: 22px;
-}
-
-.docs-content .di-flow > li,
-.docs-content .di-node {
-  position: relative;
-  display: block;
-  min-width: 0;
-  margin: 0;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--text);
-  font-family: var(--font-mono), monospace;
-  font-size: 11.5px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
 .docs-content .di-flow > li {
   flex: 1 1 0;
 }
 
-.docs-content .di-sub {
-  display: block;
-  margin-top: 3px;
-  color: var(--text-muted);
-  font-family: var(--font-sans), sans-serif;
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.45;
-}
-
-.docs-content .di-num {
-  color: var(--text-muted);
-  margin-right: 6px;
-}
-
-.docs-content .di-opt {
-  border-style: dashed;
-}
-
-/* Arrow between consecutive nodes. */
-.docs-content .di-flow > li:not(:last-child)::after {
-  content: "\2192";
-  content: "\2192" / "";
+/* Connector: a line across the gap, ending in an arrowhead. */
+.docs-content .di-flow > li:not(:last-of-type)::before {
+  content: "";
   position: absolute;
   top: 50%;
-  right: calc(var(--di-gap) / -2 - 7px);
-  transform: translateY(-50%);
-  width: 14px;
-  color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1;
-  text-align: center;
+  left: 100%;
+  width: calc(var(--di-gap) - 2px);
+  border-top: 1.5px solid var(--di-line);
 }
 
+.docs-content .di-flow > li:not(:last-of-type)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(100% + var(--di-gap) - 8px);
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid var(--di-line);
+  border-right: 1.5px solid var(--di-line);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* Label on the arrow leaving an item. */
+.docs-content .di-edge {
+  position: absolute;
+  bottom: calc(50% + 5px);
+  left: 100%;
+  width: var(--di-gap);
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Grid of four per row; no connector at the end of a row. */
+.docs-content .di-flow--grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--di-gap);
+  row-gap: 20px;
+}
+
+.docs-content .di-flow--grid > li:nth-child(4n)::before,
 .docs-content .di-flow--grid > li:nth-child(4n)::after {
   display: none;
 }
 
-/* Architecture: three columns joined by arrows. */
-.docs-content .di-cols {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr) 22px minmax(0, 1.25fr);
-  align-items: center;
-  gap: 0;
+/* Loop: a return arrow under the row, from the last item back to the first. */
+.docs-content .di-flow--loop {
+  --di-first: calc((100% - (var(--n) - 1) * var(--di-gap)) / var(--n) / 2);
+  padding-bottom: 42px;
 }
 
-.docs-content .di-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
+.docs-content .di-flow--loop::before {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  left: var(--di-first);
+  right: var(--di-first);
+  height: 32px;
+  border: 1.5px solid var(--di-line);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+}
+
+.docs-content .di-flow--loop::after {
+  content: "";
+  position: absolute;
+  bottom: 36px;
+  left: calc(var(--di-first) - 3.5px);
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid var(--di-line);
+  border-left: 1.5px solid var(--di-line);
+  transform: rotate(45deg);
+}
+
+.docs-content .di-loop-label {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  padding: 0 8px;
+  background: var(--background);
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Columns: node → node → fan-out stack. */
+.docs-content .di-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--di-gap) minmax(0, 1fr) var(--di-gap) minmax(0, 1.3fr);
+  align-items: center;
 }
 
 .docs-content .di-arrow {
-  color: var(--text-muted);
-  font-size: 13px;
-  text-align: center;
+  position: relative;
+  display: block;
+  height: 10px;
+  font-size: 0;
 }
 
-/* Relationships: nested tree. */
+.docs-content .di-arrow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 2px;
+  border-top: 1.5px solid var(--di-line);
+}
+
+.docs-content .di-arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1px;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid var(--di-line);
+  border-right: 1.5px solid var(--di-line);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* The arrow into a fan-out stack is a plain line that meets the bracket;
+   the arrowheads are on the branches. */
+.docs-content .di-cols .di-arrow:has(+ .di-stack)::before {
+  right: 0;
+}
+
+.docs-content .di-cols .di-arrow:has(+ .di-stack)::after {
+  display: none;
+}
+
+.docs-content .di-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding-left: 22px;
+}
+
+/* The bracket the incoming arrow meets, with a branch to every node. Each
+   node draws its own piece (a vertical segment plus its branch) with two
+   gradients, so the bracket starts and ends exactly at the first and last
+   node's centre whatever their heights. The stack gap is 10px (5px each side). */
+.docs-content .di-stack > .di-node::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: -22px;
+  width: 20px;
+  background:
+    linear-gradient(var(--di-line), var(--di-line)) left top / 1.5px 100% no-repeat,
+    linear-gradient(var(--di-line), var(--di-line)) left center / 100% 1.5px no-repeat;
+}
+
+.docs-content .di-stack > .di-node:first-child::before {
+  top: 50%;
+  background:
+    linear-gradient(var(--di-line), var(--di-line)) left top / 1.5px 100% no-repeat,
+    linear-gradient(var(--di-line), var(--di-line)) left top / 100% 1.5px no-repeat;
+}
+
+.docs-content .di-stack > .di-node:last-child::before {
+  bottom: 50%;
+  background:
+    linear-gradient(var(--di-line), var(--di-line)) left top / 1.5px 100% no-repeat,
+    linear-gradient(var(--di-line), var(--di-line)) left bottom / 100% 1.5px no-repeat;
+}
+
+.docs-content .di-stack > .di-node::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid var(--di-line);
+  border-right: 1.5px solid var(--di-line);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.docs-content .di-cols .di-node {
+  text-align: left;
+}
+
+/* Tree */
+
 .docs-content .di-tree,
 .docs-content .di-tree ul {
   margin: 0;
@@ -852,33 +1276,52 @@ a.docs-nav-link.is-active:hover {
 }
 
 .docs-content .di-tree ul {
-  margin: 6px 0 0 14px;
-  padding-left: 18px;
-  border-left: 1px solid var(--border);
+  margin: 8px 0 0 18px;
+  padding-left: 22px;
 }
 
 .docs-content .di-tree li {
   position: relative;
-  margin: 8px 0;
+  margin: 10px 0;
 }
 
+/* Elbow from the parent's line into each child, and a continuation down to
+   the next sibling; the line stops at the last child. */
 .docs-content .di-tree ul > li::before {
   content: "";
   position: absolute;
-  top: 15px;
-  left: -18px;
-  width: 14px;
-  border-top: 1px solid var(--border);
+  top: -10px;
+  left: -22px;
+  width: 18px;
+  height: 28px;
+  border-left: 1.5px solid var(--di-line);
+  border-bottom: 1.5px solid var(--di-line);
+  border-bottom-left-radius: 6px;
+}
+
+.docs-content .di-tree ul > li:first-child::before {
+  top: -18px;
+  height: 36px;
+}
+
+.docs-content .di-tree ul > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: -10px;
+  left: -22px;
+  border-left: 1.5px solid var(--di-line);
 }
 
 .docs-content .di-tree .di-node {
-  display: inline-block;
+  display: inline-flex;
+  text-align: left;
 }
 
 .docs-content .di-tree .di-note {
-  margin-left: 8px;
+  margin-left: 10px;
   color: var(--text-muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -898,75 +1341,160 @@ a.docs-nav-link.is-active:hover {
   .docs-content .di-n7 > li { --di-n: 7; animation-name: di-hl-7; }
   .docs-content .di-n8 > li { --di-n: 8; animation-name: di-hl-8; }
 
+  /* Key nodes stay blue; the highlight passes over the others. */
+  .docs-content .di-animate > li.di-key { animation-name: none; }
+
   @keyframes di-hl-3 {
-    0% { border-color: var(--border); background-color: var(--surface); }
-    3.75%, 21.25% { border-color: var(--primary); background-color: var(--primary-soft); }
-    25.00%, 100% { border-color: var(--border); background-color: var(--surface); }
+    0% { border-color: var(--border); }
+    3.75%, 21.25% { border-color: var(--primary); }
+    25.00%, 100% { border-color: var(--border); }
   }
   @keyframes di-hl-4 {
-    0% { border-color: var(--border); background-color: var(--surface); }
-    3.00%, 17.00% { border-color: var(--primary); background-color: var(--primary-soft); }
-    20.00%, 100% { border-color: var(--border); background-color: var(--surface); }
+    0% { border-color: var(--border); }
+    3.00%, 17.00% { border-color: var(--primary); }
+    20.00%, 100% { border-color: var(--border); }
   }
   @keyframes di-hl-5 {
-    0% { border-color: var(--border); background-color: var(--surface); }
-    2.50%, 14.17% { border-color: var(--primary); background-color: var(--primary-soft); }
-    16.67%, 100% { border-color: var(--border); background-color: var(--surface); }
+    0% { border-color: var(--border); }
+    2.50%, 14.17% { border-color: var(--primary); }
+    16.67%, 100% { border-color: var(--border); }
   }
   @keyframes di-hl-6 {
-    0% { border-color: var(--border); background-color: var(--surface); }
-    2.14%, 12.14% { border-color: var(--primary); background-color: var(--primary-soft); }
-    14.29%, 100% { border-color: var(--border); background-color: var(--surface); }
+    0% { border-color: var(--border); }
+    2.14%, 12.14% { border-color: var(--primary); }
+    14.29%, 100% { border-color: var(--border); }
   }
   @keyframes di-hl-7 {
-    0% { border-color: var(--border); background-color: var(--surface); }
-    1.88%, 10.62% { border-color: var(--primary); background-color: var(--primary-soft); }
-    12.50%, 100% { border-color: var(--border); background-color: var(--surface); }
+    0% { border-color: var(--border); }
+    1.88%, 10.62% { border-color: var(--primary); }
+    12.50%, 100% { border-color: var(--border); }
   }
   @keyframes di-hl-8 {
-    0% { border-color: var(--border); background-color: var(--surface); }
-    1.67%, 9.44% { border-color: var(--primary); background-color: var(--primary-soft); }
-    11.11%, 100% { border-color: var(--border); background-color: var(--surface); }
+    0% { border-color: var(--border); }
+    1.67%, 9.44% { border-color: var(--primary); }
+    11.11%, 100% { border-color: var(--border); }
   }
 }
 
+/* Phones and narrow tablets: everything stacks, connectors point down. */
 @media (max-width: 767px) {
 
-  .docs-content .di-flow {
-    --di-gap: 22px;
-    flex-direction: column;
+  .docs-content .docs-infographic {
+    --di-gap: 30px;
   }
 
+  .docs-content .di-flow,
   .docs-content .di-flow--grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 12px;
-    row-gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--di-gap);
   }
 
-  .docs-content .di-flow--grid > li::after {
-    display: none;
-  }
-
-  .docs-content .di-flow:not(.di-flow--grid) > li:not(:last-child)::after {
-    content: "\2193";
-    content: "\2193" / "";
-    top: auto;
-    right: auto;
-    bottom: calc(var(--di-gap) / -2 - 7px);
+  .docs-content .di-flow > li:not(:last-of-type)::before,
+  .docs-content .di-flow--grid > li:nth-child(4n):not(:last-child)::before {
+    display: block;
+    top: 100%;
     left: 50%;
-    transform: translate(-50%, 0);
+    width: 0;
+    height: calc(var(--di-gap) - 2px);
+    border-top: 0;
+    border-left: 1.5px solid var(--di-line);
+  }
+
+  .docs-content .di-flow > li:not(:last-of-type)::after,
+  .docs-content .di-flow--grid > li:nth-child(4n):not(:last-child)::after {
+    display: block;
+    top: calc(100% + var(--di-gap) - 8px);
+    left: calc(50% - 3px);
+    transform: rotate(135deg);
+  }
+
+  .docs-content .di-edge {
+    bottom: auto;
+    top: 100%;
+    left: calc(50% + 10px);
     width: auto;
+    line-height: var(--di-gap);
+    text-align: left;
+  }
+
+  .docs-content .di-flow--loop {
+    padding-bottom: 0;
+    padding-right: 40px;
+  }
+
+  .docs-content .di-flow--loop::before {
+    top: 24px;
+    bottom: 24px;
+    left: auto;
+    right: 8px;
+    width: 32px;
+    height: auto;
+    border: 1.5px solid var(--di-line);
+    border-left: 0;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .docs-content .di-flow--loop::after {
+    top: 20.5px;
+    bottom: auto;
+    left: auto;
+    right: 36px;
+    transform: rotate(-135deg);
+  }
+
+  .docs-content .di-loop-label {
+    top: 50%;
+    bottom: auto;
+    left: auto;
+    right: 0;
+    padding: 6px 0;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
   }
 
   .docs-content .di-cols {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 0;
   }
 
   .docs-content .di-cols .di-arrow {
-    padding: 4px 0;
-    transform: rotate(90deg);
+    height: var(--di-gap);
+  }
+
+  .docs-content .di-cols .di-arrow::before {
+    top: 0;
+    bottom: 2px;
+    left: 50%;
+    right: auto;
+    border-top: 0;
+    border-left: 1.5px solid var(--di-line);
+  }
+
+  .docs-content .di-cols .di-arrow::after {
+    top: auto;
+    bottom: 1px;
+    left: calc(50% - 3px);
+    right: auto;
+    transform: rotate(135deg);
+  }
+
+  /* Fan-out on phones: the line from above runs down the left edge and
+     branches into every node of the stack. */
+  .docs-content .di-cols .di-arrow:has(+ .di-stack)::before {
+    left: 16px;
+    right: auto;
+    bottom: 0;
+  }
+
+  .docs-content .di-stack {
+    margin-left: 16px;
+  }
+
+  .docs-content .di-stack > .di-node:first-child::before {
+    top: 0;
+    background:
+      linear-gradient(var(--di-line), var(--di-line)) left top / 1.5px 100% no-repeat,
+      linear-gradient(var(--di-line), var(--di-line)) left center / 100% 1.5px no-repeat;
   }
 }
 
@@ -1259,6 +1787,40 @@ a.docs-nav-link.is-active:hover {
 
   .docs-toc-mobile {
     display: block;
+    margin-bottom: 0;
+    background: var(--surface);
+  }
+
+  /* Breadcrumbs + on-this-page stay pinned to the top of the scroll area,
+     with the page content scrolling underneath. */
+  .docs-pagebar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin-bottom: 20px;
+    padding: 12px 0;
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .docs-pagebar .docs-breadcrumbs {
+    margin-bottom: 10px;
+  }
+
+  .docs-pagebar .docs-breadcrumbs:last-child {
+    margin-bottom: 0;
+  }
+
+  /* An open menu scrolls on its own instead of covering the whole page. */
+  .docs-toc-mobile[open] ol {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  /* Jumping to a section lands just below the pinned bar. */
+  .docs-content h2,
+  .docs-content h3 {
+    scroll-margin-top: 112px;
   }
 
   /* Footer stacks so brand / copyright / link never fight for one row. */
@@ -1415,15 +1977,27 @@ a.docs-nav-link.is-active:hover {
   }
 }
 
+/* ---------- Very narrow phones: the "Documentation" label gives way ---------- */
+
+@media (max-width: 399px) {
+
+  .docs-header-inner .logo-sub {
+    display: none;
+  }
+}
+
 /* ---------- Small phones ---------- */
 
 @media (max-width: 519px) {
 
-  /* Keep the bar to menu + brand + theme control; GitHub and the DFKI logo
-     are still in the footer. */
-  .docs-header .github,
+  /* Menu, brand, theme control and GitHub stay; the DFKI logo is in the
+     footer. */
   .docs-header .dfki-logo {
     display: none;
+  }
+
+  .docs-header .github {
+    font-size: 11.5px;
   }
 
   .docs-content h1 {

@@ -10,7 +10,7 @@
 
   <meta
     name="description"
-    content="YAPAT Documentation — Yet Another PAM Annotation Tool"
+    content="Documentation for YAPAT, an AI-powered annotation tool for passive acoustic monitoring (PAM) recordings: setup, the annotation workflow, the methods behind it, and the developer reference."
   >
 
   <title>YAPAT Documentation — Yet Another PAM Annotation Tool</title>
@@ -112,7 +112,7 @@
         <div class="hero-copy">
 
           <div class="eyebrow">
-            AI-POWERED PAM ANNOTATION
+            AI-POWERED ANNOTATION
           </div>
 
           <h1>
@@ -122,10 +122,9 @@
           </h1>
 
           <p class="intro">
-            The documentation hub for YAPAT — a human-in-the-loop
-            annotation system for Passive Acoustic Monitoring data.
-            Guides for datasets, label spaces, annotation workflows,
-            and active learning.
+            YAPAT is an AI-powered annotation tool for passive acoustic
+            monitoring (PAM) recordings. An active-learning model picks the
+            clips that most need an expert and learns from every label.
           </p>
 
           <div class="actions">
@@ -180,6 +179,9 @@
             <linearGradient id="spec-chorus" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.45"/><stop offset="0.13" stop-color="#fff" stop-opacity="0.75"/><stop offset="0.28" stop-color="#fff" stop-opacity="0.4"/><stop offset="0.45" stop-color="#fff" stop-opacity="0.2"/><stop offset="0.62" stop-color="#fff" stop-opacity="0.8"/><stop offset="0.8" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0.45"/></linearGradient>
             <linearGradient id="spec-stripe" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.34"/><stop offset="0.25" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.32"/><stop offset="0.72" stop-color="#fff" stop-opacity="0.6"/><stop offset="1" stop-color="#fff" stop-opacity="0.34"/></linearGradient>
             <linearGradient id="spec-low" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.68"/><stop offset="0.4" stop-color="#fff" stop-opacity="0.5"/><stop offset="0.7" stop-color="#fff" stop-opacity="0.8"/><stop offset="1" stop-color="#fff" stop-opacity="0.68"/></linearGradient>
+            <filter id="spec-call-soft" filterUnits="userSpaceOnUse" x="18" y="78" width="234" height="166">
+              <feGaussianBlur stdDeviation="1.6 1.1"/>
+            </filter>
             <filter id="spec-map" filterUnits="userSpaceOnUse" x="18" y="78" width="234" height="166" color-interpolation-filters="sRGB">
               <feGaussianBlur in="SourceAlpha" stdDeviation="0.8 1.4" result="e"/>
               <feColorMatrix in="e" type="matrix" values="0 0 0 1 0  0 0 0 1 0  0 0 0 1 0  0 0 0 0 1" result="eg"/>
@@ -224,10 +226,21 @@
               <path d="M18 141.1H252" stroke="url(#spec-stripe)" stroke-width="1"/>
               <path d="M18 147.7H252" stroke="url(#spec-stripe)" stroke-width="1.2"/>
               <path d="M18 242.0H252" stroke="url(#spec-low)" stroke-width="5"/>
+              <!-- Calls: short, bright harmonic stacks. Their intensity rises and
+                   falls (see .v-call in home.css), reading as stronger or weaker
+                   detections inside the heatmap itself. -->
+              <g class="v-calls" filter="url(#spec-call-soft)" stroke="#fff" stroke-width="3.6">
+                <path class="v-call" style="--d:0s" d="M50 176q12 -5 27 -3M53 163q10 -4 22 -2M57 152q6 -2 13 -1"/>
+                <path class="v-call" style="--d:-2s" d="M116 141q14 3 31 -4M120 128q11 2 23 -3"/>
+                <path class="v-call" style="--d:-4s" d="M176 199q10 -6 24 -6M179 187q8 -5 20 -4M183 176q5 -3 11 -2"/>
+              </g>
             </g>
             <use href="#hero-spec-tile" x="222"/>
             </g>
           </g>
+          <!-- Red playback line: follows the audio playhead below (same --ph value
+               and transitions; see js/site.js → audio). -->
+          <line class="v-spec-head" clip-path="url(#hero-clip-spec)" x1="24" y1="78" x2="24" y2="244"/>
 
           <!-- 02 Feature projection -->
           <text class="v-label" x="272" y="64">02 FEATURE PROJECTION</text>
@@ -411,7 +424,7 @@
       >
 
         <div class="cards-head">
-          <span class="eyebrow">DOCUMENTATION</span>
+          <h2 class="cards-title">Documentation</h2>
         </div>
 
         <div class="cards" data-doc-cards></div>

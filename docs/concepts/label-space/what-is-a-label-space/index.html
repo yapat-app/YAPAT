@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="What a label space is in YAPAT: the concepts annotators choose from, how they are stored, and the statuses a custom taxonomy can have.">
-  <title>What is a Label Space? — YAPAT Documentation</title>
+  <meta name="description" content="A label space is your team's list of concepts to annotate, each linked to a trusted source such as GBIF.">
+  <title>YAPAT Documentation – What is a Label Space?</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -34,104 +34,60 @@
     <h1>What is a Label Space?</h1>
 
     <p class="lede">
-      A label space is a team's list of concepts, built in the label-space chat
-      and then frozen. Its entries carry identifiers and source details, so a
-      label is more than a free-text name. In the Annotation Hub, the concepts of
-      the team's most recently frozen label space are one of the sources of the
-      quick-label list annotators choose from.
+      A label space is your team's agreed list of things to label. Each entry is a
+      <strong>concept</strong> linked to a trusted source, not just a word, so
+      labels in different datasets can be compared by their identifiers.
     </p>
 
     <h2>Labels versus concepts</h2>
 
     <p>
-      A plain label list holds only names. An entry in a YAPAT label space is a
-      <strong>concept</strong>. It stores an identifier such as
-      <code>gbif:2420576</code>, a display name, a scientific name, taxonomic
-      details such as rank, family, and kingdom where the source provides them, the
-      metadata returned by the lookup that found it, and when it was added.
-      Identifiers from a shared resource make it possible to tell whether two
-      datasets that use the same word, or different words, mean the same thing.
+      A plain label is only a name, and names are ambiguous: two teams may use
+      different words for the same species, or the same word for different ones.
+      A concept in YAPAT also stores an identifier from its source, such as
+      <code>gbif:2420576</code>, and details like the scientific name, rank,
+      family, and kingdom. The identifier makes labels comparable across
+      datasets.
     </p>
 
-    <p>
-      The stored label space is a flat list of such entries. YAPAT does not
-      currently store relations between them.
-    </p>
-
-    <h2>Taxonomies in YAPAT</h2>
-
-    <p>
-      YAPAT draws concepts from two kinds of taxonomy:
-    </p>
-
-    <ul>
-      <li>
-        <strong>External taxonomies</strong> — read-only reference vocabularies
-        such as <strong>GBIF</strong> for species. They are searched and resolved
-        through the taxonomy API.
-      </li>
-      <li>
-        <strong>Custom taxonomies</strong> — team-specific label spaces built
-        through the label-space chat and frozen into a taxonomy stored in YAPAT.
-      </li>
-    </ul>
-
-    <p>
-      The taxonomy API covers both:
-      <code>GET /api/taxonomy/available</code> lists GBIF and the active custom
-      taxonomies, <code>/suggest</code> and <code>/search</code> find concepts, and
-      <code>/resolve</code> resolves concept IDs.
-    </p>
-
-    <h2>Frozen label spaces</h2>
-
-    <p>
-      Freezing a label space in the label-space chat turns its concept list into
-      a <strong>custom taxonomy</strong> with status <code>active</code>. There is
-      no review or promotion step, and freezing again creates a further taxonomy
-      rather than replacing the previous one. The Annotation Hub adds the concepts
-      of the team's most recently frozen label space to the list of labels
-      annotators can choose from. A custom taxonomy can have one of three statuses:
-    </p>
+    <h2>Where concepts come from</h2>
 
     <table>
       <thead>
-        <tr>
-          <th>Status</th>
-          <th>Meaning</th>
-        </tr>
+        <tr><th>Source</th><th>Used for</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><code>draft</code></td>
-          <td>Defined in the code but not assigned by the current backend. While a chat session is open, its concepts are held in the conversation, not in a taxonomy.</td>
-        </tr>
-        <tr>
-          <td><code>active</code></td>
-          <td>Created by freezing a label space. Usable for annotation.</td>
-        </tr>
-        <tr>
-          <td><code>archived</code></td>
-          <td>Set when a custom taxonomy is archived through the API; the user-study interface has no archive action. The record stays in the database and is hidden from listings.</td>
-        </tr>
+        <tr><td>Global Biodiversity Information Facility (GBIF)</td><td>Species and other taxa.</td></tr>
+        <tr><td>Environment Ontology (ENVO)</td><td>Environmental sounds, such as rain or wind.</td></tr>
+        <tr><td>Wikipedia</td><td>A fallback when no ontology entry fits.</td></tr>
+        <tr><td>Local</td><td>Your own concept, when no source has one.</td></tr>
       </tbody>
     </table>
 
-    <h2>Research background</h2>
+    <h2>How a label space is made</h2>
+
+    <ol>
+      <li>Describe what you want to label in the label-space chat.</li>
+      <li>Keep the suggested concepts that fit. See <a href="../grounding/">Grounding</a>.</li>
+      <li>Freeze the list. Its concepts now appear in the Annotation Hub for your team. See <a href="../managing-versions/">Freezing a Label Space</a>.</li>
+    </ol>
 
     <p>
-      The papers summarised under
-      <a href="../../../about/research-context/">Research Context</a> argue that
-      flat, ungrounded label sets limit reuse and interoperability, and that
-      ontology-linked label spaces could carry hierarchy and relations. That is a
-      research argument. The current software keeps identifiers and source details
-      for each concept but does not model hierarchy or relations between them.
+      The list is flat: YAPAT does not store relations such as "is a kind of"
+      between concepts.
     </p>
 
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>A frozen label space is stored as a custom taxonomy with status <code>active</code>. Statuses <code>draft</code> and <code>archived</code> exist in the model; archiving is API-only and hides the taxonomy from listings.</li>
+        <li>The taxonomy API covers GBIF and custom taxonomies: <code>GET /api/taxonomy/available</code>, <code>/suggest</code>, <code>/search</code>, <code>/resolve</code>. See <a href="../../../reference/rest-api/">REST API</a>.</li>
+      </ul>
+    </div>
+
     <div class="callout callout--tip">
-      <strong>Next.</strong> See <a href="../grounding/">Grounding</a> for how
-      concepts are found, and <a href="../managing-versions/">Freezing a Label
-      Space</a> for how a label space is finalised.
+      <strong>Background.</strong> The ideas behind label spaces are described
+      in the project's <a href="../../../about/research-context/">publications</a>.
     </div>
 
   </main>

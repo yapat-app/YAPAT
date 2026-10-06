@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Teams, roles, and team invitation links in the user-study version of YAPAT, including what the Team Management screens can and cannot do.">
-  <title>Teams — YAPAT Documentation</title>
+  <meta name="description" content="Create teams, invite people with a link, understand the three roles, and delete a team.">
+  <title>YAPAT Documentation – Teams</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -31,130 +31,83 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Teams</h1>
 
     <p class="lede">
-      Teams group users with the datasets and label spaces they share. In the
-      user-study version, team administration happens on the team list, which
-      administrators use; the team detail page does not load (see below).
+      A team is a group of people who share datasets and label spaces. You see
+      the datasets of the teams you belong to.
+    </p>
+
+    <p class="docs-needs">
+      <strong>You need:</strong> an administrator account to create teams and
+      invite people.
     </p>
 
     <h2>Roles</h2>
 
-    <p>
-      Every account has one global role, shown on the Dashboard as
-      Administrator, Team owner, or Annotator. Team membership has its own role,
-      owner or user.
-    </p>
-
     <table>
       <thead>
-        <tr>
-          <th>Global role</th>
-          <th>What the interface offers</th>
-        </tr>
+        <tr><th>Role</th><th>Can</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>Admin</strong></td>
-          <td>Sees all datasets and teams. Registers datasets, generates embeddings, creates and deletes teams, and creates team invitation links. The only role that sees the Study Logs page.</td>
-        </tr>
-        <tr>
-          <td><strong>Team owner</strong> (<code>team_owner</code>)</td>
-          <td>Sees the Team Management card. A team owner who already belongs to a team is sent straight to that team's detail page, which does not load in this version. Can change a dataset's spectrogram display settings.</td>
-        </tr>
-        <tr>
-          <td><strong>User</strong> (Annotator)</td>
-          <td>Annotates the datasets their teams can access. Does not see Team Management or Study Logs.</td>
-        </tr>
+        <tr><td><strong>Administrator</strong></td><td>See all teams and datasets, add datasets, generate embeddings, create and delete teams, invite people, and view Study Logs.</td></tr>
+        <tr><td><strong>Team owner</strong></td><td>Annotate, start a cold-start model, and change a dataset's spectrogram settings.</td></tr>
+        <tr><td><strong>Annotator</strong></td><td>Annotate the datasets of their teams.</td></tr>
       </tbody>
     </table>
 
-    <h2>The team list</h2>
-
-    <p>
-      The Team Management card on the Dashboard is shown to administrators and
-      team owners and opens the team list (<code>/teams</code>). There,
-      administrators create teams, create invitation links with
-      <strong>Invite People</strong>, and delete teams.
-    </p>
-
-    <h2>Creating a team</h2>
-
-    <p>
-      The <strong>Create Team</strong> dialog needs a team name and at least one
-      dataset; its Create button stays disabled until both are given. A dataset
-      can belong to only one team, so datasets already assigned elsewhere appear
-      disabled. A team owner who creates a team becomes its owner; an
-      administrator who creates a team does not.
-    </p>
-
-    <h2>The team detail page</h2>
-
-    <div class="callout">
-      <strong>Does not load in this version.</strong> The detail page
-      (<code>/teams/{team_id}</code>) first requests
-      <code>GET /api/teams/{team_id}</code>, and the user-study backend has no
-      such route; it defines only <code>DELETE</code> on that path. Until the
-      request succeeds the page shows "Team not found.", so the member list,
-      invitation links, team editing, member removal, and team deletion offered
-      on that page are not usable. Editing a team and removing a member would
-      also call routes the backend does not have. This follows from the code; it
-      was not observed in a running instance.
-    </div>
-
-    <h2>Invitations</h2>
-
-    <p>
-      The working invitation flow runs from the team list:
-    </p>
+    <h2>Create a team</h2>
 
     <ol>
-      <li>
-        <strong>Create the link.</strong> An administrator clicks
-        <strong>Invite People</strong> for a team. The link is an owner
-        invitation when the team has no owner yet, and a member invitation
-        otherwise. Links expire after two days and have no limit on the number
-        of uses.
-      </li>
-      <li>
-        <strong>Open the link.</strong> It points to the sign-in page with the
-        token and the intended role (<code>/login/?token=…&amp;target_role=owner</code>
-        or <code>user</code>). With a token present, the form registers a new
-        account instead of signing in.
-      </li>
-      <li>
-        <strong>Register.</strong> The new account joins the team as owner or
-        user. The global role follows the link too: an owner link creates an
-        account with the global role <code>team_owner</code>, and a member link
-        one with the role <code>user</code>.
-      </li>
+      <li>Open <strong>Team Management</strong> on the Dashboard.</li>
+      <li>Click <strong>Create Team</strong>.</li>
+      <li>Enter a name and choose at least one dataset. A dataset belongs to one team only, so datasets already in a team are greyed out.</li>
+      <li>Click <strong>Create</strong>.</li>
+    </ol>
+
+    <!-- IMAGE teams-list.png | screenshot | The team list with Create Team and Invite People. -->
+
+    <h2>Invite people</h2>
+
+    <ol>
+      <li>In the team list, click <strong>Invite People</strong> for the team, then <strong>Copy link</strong>.</li>
+      <li>Send the link. It is valid for two days and can be used more than once.</li>
+      <li>The person opens it, registers an account, and joins the team.</li>
     </ol>
 
     <p>
-      Because team owners with a team are redirected to the detail page, they
-      cannot create invitation links in the user-study interface. There is also
-      no control for revoking a link. The sign-up page creates an account with
-      the global role <code>user</code> that belongs to no team.
+      The first link for a team without an owner makes the person its
+      <strong>team owner</strong>. Later links add <strong>annotators</strong>.
+      People who sign up on their own, without a link, get an annotator account
+      that belongs to no team yet.
     </p>
 
-    <h2>Deleting a team</h2>
+    <h2>Delete a team</h2>
 
     <p>
-      Administrators delete teams from the team list with the delete icon, which
-      acts immediately without a confirmation step. The backend also accepts
-      deletion by the team's owner, but the owner's delete control is on the
-      detail page. Deleting a team unassigns its datasets — they are not
-      deleted — and removes its memberships and invitations. Users who had
-      access through the team lose it. This action is irreversible.
+      Click the delete icon next to the team in the team list. It acts
+      immediately, with no confirmation. The datasets are kept but no longer
+      belong to a team, and the team's members lose access through it.
     </p>
 
+    <div class="callout">
+      <strong>Good to know.</strong> Team membership is managed from the team
+      list. A team owner who already belongs to a team is taken to the team page,
+      which shows "Team not found."; ask an administrator to invite people or change
+      the team. Invitation links cannot be revoked; they expire after two days.
+    </div>
+
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>Global roles are <code>admin</code>, <code>team_owner</code>, and <code>user</code>; a membership is <code>owner</code> or <code>user</code>.</li>
+        <li>Invitation links point to <code>/login/?token=…&amp;target_role=owner|user</code>. Set <code>VITE_YAPAT_FRONTEND_URL</code> so links use the public address.</li>
+        <li>The team page (<code>/teams/{id}</code>) calls <code>GET /api/teams/{id}</code>, which the backend does not provide. See <a href="../../reference/rest-api/">REST API</a>.</li>
+      </ul>
+    </div>
+
     <div class="callout callout--tip">
-      <strong>Access checks.</strong> The backend verifies team membership and
-      dataset access on the operations that need them; administrators bypass
-      team-level checks. See <a href="../../reference/rest-api/">REST API</a> for
-      the endpoint-level rules.
+      <strong>Next:</strong> <a href="../../concepts/annotation-feeds/active-learning/">Active Learning</a> — how YAPAT chooses which clips you see.
     </div>
 
   </main>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="How concepts are matched to GBIF, ENVO/OLS, Wikipedia, or a local ontology in the label-space chat, and what is recorded for each.">
-  <title>Grounding — YAPAT Documentation</title>
+  <meta name="description" content="Grounding links a concept you describe in plain language to an entry in a trusted source, with its identifier and details.">
+  <title>YAPAT Documentation – Grounding</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -34,104 +34,49 @@
     <h1>Grounding</h1>
 
     <p class="lede">
-      Grounding links a concept described in natural language to an entry in a
-      reference resource, and keeps the identifier and source details that were
-      found.
+      Grounding means linking a concept you describe in your own words to an
+      entry in a trusted source. For example, you describe a bird
+      species, the assistant suggests matching entries from the Global
+      Biodiversity Information Facility (GBIF), and the one you choose keeps its
+      GBIF identifier.
     </p>
 
-    <h2>The workflow</h2>
+    <h2>How it works</h2>
 
-    <p>
-      In the label-space chat, an expert describes the concepts they need in
-      ordinary language. For each message the backend asks the ontology service for
-      candidate matches and shows the reply together with the candidates. The
-      expert then adds candidates to the label space, either all at once or one at
-      a time, and can send further messages to refine the search. An added concept
-      can be removed again until the label space is frozen. The papers call this
-      approach <em>grounding-first</em>: alignment with authoritative resources is
-      attempted before a locally defined concept is created.
-    </p>
-
-    <figure class="docs-infographic" aria-label="Grounding flow: expert message, backend, ontology service, candidates, label space.">
-      <ol class="di-flow di-animate di-n5">
-        <li style="--i:0">Expert message<span class="di-sub">in ordinary language</span></li>
-        <li style="--i:1">Backend<span class="di-sub">sends the prompt to the ontology service</span></li>
-        <li style="--i:2">Ontology service (oe_yapat)<span class="di-sub">GBIF, ENVO/OLS, Wikipedia, local ontology</span></li>
-        <li style="--i:3">Candidates<span class="di-sub">shown with the reply</span></li>
-        <li style="--i:4">Label space<span class="di-sub">expert adds selected concepts</span></li>
+    <figure class="docs-infographic" aria-label="Grounding flow: your message, the assistant looks up sources, candidates shown, you choose, label space.">
+      <ol class="di-flow di-animate di-n4">
+        <li style="--i:0">You describe<span class="di-sub">in plain language</span><span class="di-edge">ask</span></li>
+        <li style="--i:1">Assistant looks up<span class="di-sub">GBIF, ENVO, Wikipedia</span><span class="di-edge">suggest</span></li>
+        <li style="--i:2">Candidates<span class="di-sub">shown in the chat</span><span class="di-edge">review</span></li>
+        <li class="di-key" style="--i:3">You choose<span class="di-sub">added to the label space</span></li>
       </ol>
-      <figcaption>The concept list stays editable until the label space is frozen.</figcaption>
+      <figcaption>Nothing enters the label space until you add it, and you can remove it until you freeze.</figcaption>
     </figure>
 
-    <h2>Reference resources</h2>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Resource</th>
-          <th>Used for</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>GBIF</td>
-          <td>Species and other taxa: name matching, search, details, and occurrence checks.</td>
-        </tr>
-        <tr>
-          <td>ENVO through OLS</td>
-          <td>Environmental concepts, looked up in the Environment Ontology through the Ontology Lookup Service.</td>
-        </tr>
-        <tr>
-          <td>Wikipedia</td>
-          <td>A fallback that supplies a page reference when no ontology term fits.</td>
-        </tr>
-        <tr>
-          <td>Local ontology</td>
-          <td>For a concept with no external match, a tool that builds a small OWL module in Turtle from the expert's description.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>How it is implemented</h2>
-
     <p>
-      The lookups are carried out by the separate oe_yapat project, whose MCP
-      server exposes tools for GBIF, ENVO/OLS, Wikipedia, and local ontology
-      construction. The YAPAT backend sends each chat prompt to
-      <code>POST {OE_YAPAT_SERVICE_URL}/api/generate-taxonomy</code>, stores the
-      reply in the conversation, and copies the concepts the user selects into the
-      label space, skipping duplicates. The chat endpoints are under
-      <code>/api/taxonomy/chat</code>; for example,
-      <code>POST /api/taxonomy/chat/{conversation_id}/message</code> sends a prompt.
+      YAPAT tries trusted sources first and only creates a local concept when
+      none of them has a match. You always make the final choice.
     </p>
 
-    <p>
-      Two lookups do not go through oe_yapat. <code>GET /api/taxonomy/match</code>
-      and <code>GET /api/taxonomy/envo/suggest</code> are answered by the backend
-      itself, which contacts the GBIF match service and the EBI OLS search API
-      directly. When a label given in the Annotation Hub is a species name, the
-      backend resolves it with the same GBIF match before writing it to the
-      annotation table, so the backend needs outbound access to those services.
-      The Hub's own species search queries the GBIF API from the browser.
-    </p>
+    <!-- IMAGE grounding-candidates.png | screenshot | The chat showing candidate concepts for one request. -->
 
-    <h2>Provenance</h2>
+    <h2>What is kept</h2>
 
     <p>
-      Each label-space entry keeps the identifier and the metadata returned by the
-      lookup, such as rank, family, kingdom, and the tool or source that produced
-      it, together with the time it was added. The chat history is stored with the
-      conversation. The backend has no separate grounding-status field, so whether
-      an entry came from GBIF, a fallback, or a locally defined concept has to be
-      read from its identifier and metadata.
+      Each concept keeps its identifier, the details its source returned (such as
+      rank, family, and kingdom), where it came from, and when it was added. The
+      chat history is saved with the conversation, so you can see how the label
+      space was built.
     </p>
 
-    <div class="callout callout--tip">
-      <strong>Research background.</strong> One of the papers defines explicit
-      grounding-status categories and a provenance log for this process. The
-      comparison in
-      <a href="../../../about/research-context/">Research Context</a> shows which
-      of those ideas the software implements.
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>Lookups run in the separate <a href="https://github.com/yapat-app/oe_yapat" target="_blank" rel="noopener noreferrer">oe_yapat</a> service, a Model Context Protocol (MCP) tool server. Its tools look up GBIF, the Environment Ontology (ENVO) through the Ontology Lookup Service (OLS) of the European Bioinformatics Institute (EBI), and Wikipedia, and can write local Web Ontology Language (OWL) modules.</li>
+        <li>The backend forwards each chat message to <code>POST {OE_YAPAT_SERVICE_URL}/api/generate-taxonomy</code>; the chat API is under <code>/api/taxonomy/chat</code>.</li>
+        <li><code>GET /api/taxonomy/match</code> and <code>/api/taxonomy/envo/suggest</code> call GBIF and EBI OLS directly, so the backend needs outbound internet access. The Hub's species search calls GBIF from the browser.</li>
+        <li>There is no separate grounding-status field; the source is visible in each entry's identifier and metadata.</li>
+      </ul>
     </div>
 
   </main>

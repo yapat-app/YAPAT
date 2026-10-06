@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create, inspect, and manage datasets in YAPAT.">
-  <title>Datasets — YAPAT Documentation</title>
+  <meta name="description" content="Add a dataset of audio recordings, prepare it for annotation, add metadata and quick labels, and export the labels.">
+  <title>YAPAT Documentation – Datasets</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -31,187 +31,138 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Datasets</h1>
 
     <p class="lede">
-      The Datasets page is the entry point for the data you annotate. It lists
-      every dataset you can access, with filters by team and dataset type and
-      sorting by name, age, snippet count, or annotation count, and exposes the
-      actions that prepare a dataset for annotation.
+      A dataset is a folder of audio recordings. YAPAT reads the files where they
+      are and never changes them. The Datasets page lists every dataset you can
+      access and is where you prepare one for annotation.
     </p>
 
-    <h2>Creating a dataset</h2>
+    <p class="docs-needs">
+      <strong>You need:</strong> an administrator account to add datasets and
+      generate embeddings. Every user can browse datasets and manage quick labels.
+    </p>
+
+    <h2>Add a dataset</h2>
+
+    <ol>
+      <li>On the Datasets page, click <strong>Add Dataset</strong>.</li>
+      <li>Enter a name and, optionally, a description.</li>
+      <li>Choose the type: <strong>PAM</strong> for passive acoustic monitoring (PAM) of soundscapes, or <strong>FOCAL_RECORDINGS</strong> (recordings made to capture one animal or species, labelled with it) for training a WSSED model (see <a href="#training-a-model-with-wssed">below</a>).</li>
+      <li>Pick the folder with the audio files, and optionally the team the dataset belongs to.</li>
+      <li>Optionally set a maximum spectrogram frequency in kHz; leave it empty to show the full frequency range.</li>
+      <li>Save. YAPAT scans the folder in the background and lists each audio file it finds.</li>
+    </ol>
+
+    <!-- IMAGE datasets-add.png | screenshot | The Add Dataset form with the folder picker open. -->
+
+    <h2>Prepare it for annotation</h2>
 
     <p>
-      The Add Dataset action is shown to administrators and team owners. Its
-      folder picker relies on an administrator-only endpoint, so in practice an
-      administrator registers new datasets. The creation form collects:
+      Before a dataset can be annotated, YAPAT needs
+      <a href="../../concepts/embeddings/">embeddings</a>: a numeric summary of
+      every 3-second clip. On the dataset card, an administrator clicks
+      <strong>Generate Embeddings</strong> and picks the embedding model. The job
+      runs in the background; when it finishes, the dataset is ready and can be
+      opened in the <a href="../annotation-hub/">Annotation Hub</a>.
     </p>
+
+    <figure class="docs-shot">
+      <img src="../../assets/screenshots/datasets-card.webp" width="1680" height="500" loading="lazy" alt="A dataset card with its quick labels, Export, Metadata, Generate Feed and Active Learning buttons, and file, snippet and annotation counts.">
+      <figcaption>A dataset card. The counters show audio files, clips (snippets) and how many clips are labelled.</figcaption>
+    </figure>
+
+    <h2>Finding a dataset</h2>
+
+    <p>
+      Administrators and team owners get a toolbar above the list: search by
+      name or folder path, filter by team or dataset type, and sort by name,
+      age, number of clips, or number of labels.
+    </p>
+
+    <h2>The dataset card</h2>
 
     <table>
       <thead>
-        <tr>
-          <th>Field</th>
-          <th>Notes</th>
-        </tr>
+        <tr><th>On the card</th><th>What it does</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Name</td>
-          <td>Display name of the dataset.</td>
-        </tr>
-        <tr>
-          <td>Description</td>
-          <td>Optional free text.</td>
-        </tr>
-        <tr>
-          <td>Dataset type</td>
-          <td><code>PAM</code> for soundscapes, <code>FOCAL_RECORDINGS</code> for the species-model workflow.</td>
-        </tr>
-        <tr>
-          <td>Source folder</td>
-          <td>Chosen from the mounted data volume with the folder picker.</td>
-        </tr>
-        <tr>
-          <td>Team</td>
-          <td>Optional in the form; leaving it empty creates an unassigned dataset. The API requires it for non-administrators.</td>
-        </tr>
-        <tr>
-          <td>Max spectrogram frequency</td>
-          <td>Optional upper frequency in kHz used when rendering spectrograms; empty means the full band.</td>
-        </tr>
+        <tr><td>Audio files, snippets, annotated snippets</td><td>How many recordings and 3-second clips the dataset has, and how many clips are labelled. The file count opens a searchable list of the recordings.</td></tr>
+        <tr><td>Annotation spectrogram</td><td>The frequency range spectrograms show. <strong>Auto</strong> uses each file's full range; administrators and team owners can change it.</td></tr>
+        <tr><td>Embeddings</td><td>Shows <strong>Embeddings ready</strong> once the dataset can be annotated; administrators see <strong>Generate Embeddings</strong> before that.</td></tr>
+        <tr><td>Metadata</td><td>Download a comma-separated values (CSV) template, fill in location, date, and time for each recording, and upload it. You can review and rename locations before importing. The Hub's filters use these values.</td></tr>
+        <tr><td>Quick labels</td><td>Shows the first labels of the dataset's list; <strong>Manage</strong> edits it (below).</td></tr>
+        <tr><td>Active Learning</td><td>Opens the dataset in the Annotation Hub.</td></tr>
+        <tr><td>Export</td><td>Downloads the labels as CSV or JavaScript Object Notation (JSON), once something is labelled. See <a href="../../workflow/import-export/">Import &amp; Export</a>.</td></tr>
       </tbody>
     </table>
 
-    <p>
-      On save, the API creates the dataset and dispatches a background processing
-      task that scans the folder and discovers recordings. The response includes
-      the task identifier used to follow progress.
-    </p>
+    <div class="callout">
+      <strong>Tip.</strong> Start annotation with <strong>Generate Feed</strong>
+      inside the Annotation Hub. The Generate Feed button on the dataset card
+      creates feeds that the Hub does not show.
+    </div>
 
-    <h2>Dataset readiness</h2>
-
-    <p>
-      A newly created dataset is not immediately usable. It passes through two
-      gates:
-    </p>
-
-    <ol>
-      <li><strong>Recordings present</strong> — after the scan task completes.</li>
-      <li><strong>Embeddings present</strong> — after an embedding job completes and the dataset's default snippet set is ready.</li>
-    </ol>
+    <h2>Quick labels</h2>
 
     <p>
-      The dataset card shows these states. Until the dataset is ready for feeds,
-      the Annotation Hub's Generate Feed dialog warns that embeddings must be
-      generated first.
-    </p>
-
-    <h2>Inspecting a dataset</h2>
-
-    <ul>
-      <li><strong>Files</strong> — the card's audio-file count opens a searchable, paged list of the dataset's recordings.</li>
-      <li><strong>Metadata</strong> — download a CSV template, then upload recording metadata such as location, date, and time; locations can be reviewed and renamed before import. The Annotation Hub's filters use these values.</li>
-      <li><strong>Quick labels</strong> — the card shows the first five of the dataset's quick labels; <strong>Manage</strong> opens the quick-label manager described below.</li>
-      <li><strong>Annotation stats</strong> — the card shows the number of audio files, snippets, and annotated snippets.</li>
-      <li><strong>Active Learning</strong> — opens the Annotation Hub for the dataset in the current study phase.</li>
-      <li><strong>Export</strong> — downloads the dataset's annotations as CSV or JSON, once at least one snippet is annotated; see <a href="../../workflow/import-export/">Import &amp; Export</a>.</li>
-    </ul>
-
-    <p>
-      The folder scan runs once, when the dataset is created. The interface has
-      no control for scanning a dataset again.
-    </p>
-
-    <h2>Quick-label manager</h2>
-
-    <p>
-      <strong>Manage</strong> on a dataset card opens the dataset's quick-label
-      list. It is available to every signed-in user. The left side lists the
-      current labels, each of which can be removed; the right side adds labels
-      from three sources:
+      Quick labels are the short list annotators pick from. <strong>Manage</strong>
+      on the card opens the list; add labels from three sources and click
+      <strong>Save</strong>:
     </p>
 
     <ul>
-      <li><strong>GBIF</strong> — species search through the backend's taxonomy suggestions.</li>
-      <li><strong>ENVO</strong> — environmental terms such as rain or wind, searched through the Ontology Lookup Service.</li>
-      <li><strong>Local</strong> — free text, stored with a <code>local:</code> identifier, for labels such as "No biophony".</li>
+      <li>Global Biodiversity Information Facility (<strong>GBIF</strong>) — species.</li>
+      <li>Environment Ontology (<strong>ENVO</strong>) — environmental sounds such as rain or wind.</li>
+      <li><strong>Local</strong> — your own free-text label, for example "No biophony".</li>
     </ul>
 
     <p>
-      <strong>Save</strong> replaces the dataset's stored list. In the
-      Annotation Hub, this list is merged with the model checkpoint's species,
-      the team's most recently frozen label space, and each annotator's personal
-      quick labels, which are the species they pinned from the Hub's GBIF search.
+      In the Hub, this list is combined with the model's species, your team's
+      frozen <a href="../label-management/">label space</a>, and each annotator's
+      own pinned species.
     </p>
 
-    <h2>Editing and deleting</h2>
+    <h2>Training a model with WSSED</h2>
 
     <p>
-      On the card, administrators and team owners can change the spectrogram
-      display settings. The user-study interface has no control for renaming,
-      editing, or deleting a dataset.
-    </p>
-
-    <h2>Focal-recording datasets and WSSED</h2>
-
-    <p>
-      <code>FOCAL_RECORDINGS</code> datasets are used with the WSSED page (weakly
-      supervised sound event detection). Its Dashboard card is shown to
-      administrators and to users who can access at least one such dataset; the
-      page checks the same access when opened. It trains a model on the separate
-      WSSED GPU server and registers it for active learning:
+      For <strong>FOCAL_RECORDINGS</strong> datasets, the <strong>WSSED</strong>
+      page uses Weakly Supervised Sound Event Detection (WSSED): a way to train a sound event detection model from recordings that are labelled only with the species they contain, not with the exact time of each call. Training runs on a separate server with a graphics
+      processing unit (GPU), and the finished model becomes the dataset's first
+      active-learning model. See
+      <a href="../../concepts/wssed/">WSSED</a> for how it
+      works.
     </p>
 
     <ol>
-      <li>
-        <strong>Select a dataset.</strong> The Dataset Explorer on the left lists
-        the datasets and their stored audio. Until one is selected, the training
-        panel stays locked.
-      </li>
-      <li>
-        <strong>Configure training.</strong> The training panel on the right
-        chooses the model — BirdNET (the default), CDur, or TALNet — and its
-        settings: pooling method, training epochs (default 50), learning rate,
-        detection threshold, sample rate, and mel bands, plus bag and hop length
-        for CDur and TALNet. For BirdNET, the panel shows whether embeddings and a
-        checkpoint already exist on the GPU server.
-      </li>
-      <li>
-        <strong>Train.</strong> <strong>Start Training</strong> creates a training
-        job on the GPU server. The panel polls its status every five seconds and
-        shows the epoch progress; after a reload, a running job is picked up
-        again. The job ends as completed or failed.
-      </li>
-      <li>
-        <strong>Register for Active Learning.</strong> Once training has
-        completed, the centre panel offers <strong>Register for Active
-        Learning</strong>, which copies the trained model into the active-learning
-        checkpoint store and registers it under a model family.
-      </li>
-      <li>
-        <strong>Open Active Learning.</strong> This button leads to the
-        Annotation Hub. It uses the older <code>/active-learning</code> route,
-        which redirects to <code>/annotate</code> without the dataset and model
-        family, so the Hub opens with the dataset you last used.
-      </li>
+      <li>Select the dataset in the Dataset Explorer.</li>
+      <li>Choose the model (BirdNET, CDur, or TALNet) and its settings, such as the number of epochs (50 by default), learning rate, and detection threshold.</li>
+      <li>Click <strong>Start Training</strong>. The panel shows the epoch progress and picks a running job up again after a page reload.</li>
+      <li>When training completes, click <strong>Register for Active Learning</strong>, then <strong>Open Active Learning</strong> to go to the Annotation Hub.</li>
     </ol>
 
     <p>
-      The backend also has WSSED endpoints for reviewing and retraining on the
-      species model (suggestions, labels, retraining, and a confidence
-      histogram). The user-study interface does not use them; see
-      <a href="../../reference/rest-api/">REST API</a>.
+      The WSSED card is shown to administrators and to users with access to a
+      FOCAL_RECORDINGS dataset.
     </p>
+
+    <div class="callout">
+      <strong>Good to know.</strong> The folder is scanned once, when the dataset
+      is added. Renaming or deleting a dataset is not available in the interface.
+    </div>
+
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>The folder picker lists folders under the mounted data volume (<code>HOST_DATA_ROOT</code>, mounted read-only at <code>/data</code>).</li>
+        <li>Create: <code>POST /api/datasets/</code>; embeddings: <code>POST /api/datasets/{id}/embeddings</code>. See <a href="../../workflow/import-export/">Import &amp; Export</a> and <a href="../../workflow/snippets-and-embeddings/">Snippets &amp; Embeddings</a>.</li>
+        <li>WSSED needs the GPU server at <code>WSSED_GPU_SERVER_URL</code>. See <a href="../../getting-started/installation/">Installation</a>.</li>
+      </ul>
+    </div>
 
     <div class="callout callout--tip">
-      <strong>Next step.</strong> With recordings in place, the interface lets an
-      administrator generate embeddings; then open the
-      <a href="../annotation-hub/">Annotation Hub</a>. The card also shows an
-      older <strong>Generate Feed</strong> button that is not part of the
-      user-study workflow: the feeds it creates are not shown in the Annotation
-      Hub. Use Generate Feed inside the Annotation Hub instead.
+      <strong>Next:</strong> <a href="../annotation-hub/">Annotation Hub</a> — start labelling.
     </div>
 
   </main>

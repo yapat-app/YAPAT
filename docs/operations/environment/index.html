@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Environment variables used by the YAPAT backend and frontend.">
-  <title>Environment Setup — YAPAT Documentation</title>
+  <title>YAPAT Documentation – Environment Setup</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -46,7 +46,7 @@
       <thead><tr><th>Variable</th><th>Notes</th></tr></thead>
       <tbody>
         <tr><td><code>DEVICE</code></td><td><code>cpu</code> (default) or <code>gpu</code>; selects the PyTorch build used by the Docker image.</td></tr>
-        <tr><td><code>COMPOSE_FILE</code></td><td>Set to <code>docker-compose.yml:docker-compose.gpu.yml</code> to add GPU runtime.</td></tr>
+        <tr><td><code>COMPOSE_FILE</code></td><td>Set to <code>docker-compose.yml:docker-compose.gpu.yml</code> to add graphics processing unit (GPU) runtime.</td></tr>
       </tbody>
     </table>
 
@@ -56,12 +56,12 @@
       <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
       <tbody>
         <tr><td><code>DATABASE_URL</code></td><td><code>postgresql://yapat_user:yapat_password@localhost/yapat</code></td><td>PostgreSQL connection string. The Compose stack sets it for the container.</td></tr>
-        <tr><td><code>SECRET_KEY</code></td><td>placeholder value</td><td>JWT signing secret. Change in production.</td></tr>
-        <tr><td><code>ALGORITHM</code></td><td><code>HS256</code></td><td>JWT algorithm.</td></tr>
+        <tr><td><code>SECRET_KEY</code></td><td>placeholder value</td><td>Secret for signing sign-in tokens (JWT, JSON Web Token). Change in production.</td></tr>
+        <tr><td><code>ALGORITHM</code></td><td><code>HS256</code></td><td>JSON Web Token (JWT) algorithm.</td></tr>
         <tr><td><code>ACCESS_TOKEN_EXPIRE_MINUTES</code></td><td><code>30</code></td><td>JWT lifetime in minutes; the Compose stack sets 10080 (7 days) for the API.</td></tr>
         <tr><td><code>API_STR</code></td><td><code>/api</code></td><td>URL prefix for every route.</td></tr>
         <tr><td><code>ENABLE_DOCS</code></td><td><code>True</code></td><td>Serve <code>/docs</code>, <code>/redoc</code>, and <code>openapi.json</code>.</td></tr>
-        <tr><td><code>BACKEND_CORS_ORIGINS</code></td><td>localhost origins</td><td>Allowed CORS origins.</td></tr>
+        <tr><td><code>BACKEND_CORS_ORIGINS</code></td><td>localhost origins</td><td>Allowed Cross-Origin Resource Sharing (CORS) origins: the web addresses the browser may call the API from.</td></tr>
         <tr><td><code>CELERY_BROKER_URL</code></td><td><code>redis://localhost:6379/0</code></td><td>Celery broker; Compose points it at the redis service.</td></tr>
         <tr><td><code>CELERY_RESULT_BACKEND</code></td><td><code>redis://localhost:6379/0</code></td><td>Celery result backend; Compose points it at the redis service.</td></tr>
       </tbody>
@@ -76,16 +76,16 @@
         <tr><td><code>DATA_ROOT</code></td><td><code>/data</code></td><td>In-container mount point for datasets.</td></tr>
         <tr><td><code>ACTIVE_LEARNING_MODELS_DIR</code></td><td>unset in code; <code>models_AL</code> in <code>.env.example</code>; <code>/app/models_AL</code> in Compose</td><td>Root for species model weights (<code>.pt</code> files).</td></tr>
         <tr><td><code>HOST_MODELS_AL</code></td><td><code>./models_AL</code></td><td>Host path mounted for checkpoints.</td></tr>
-        <tr><td><code>PAM_CHECKPOINTS_DIR</code></td><td><code>models_AL/pam/checkpoints</code></td><td>Where PAM active-learning checkpoints are stored.</td></tr>
-        <tr><td><code>PAM_DEFAULT_DEVICE</code></td><td><code>cpu</code></td><td>Device for PAM AL training.</td></tr>
-        <tr><td><code>PAM_AUTO_RETRAIN_THRESHOLD</code></td><td><code>5</code></td><td>Defined in the settings but not read by the user-study backend. The auto-retrain threshold is <code>RETRAIN_AFTER</code> (10) in <code>active_learning/config.yaml</code>, or a dataset's <code>retrain_after_threshold</code>.</td></tr>
+        <tr><td><code>PAM_CHECKPOINTS_DIR</code></td><td><code>models_AL/pam/checkpoints</code></td><td>Where passive acoustic monitoring (PAM) active-learning checkpoints are stored.</td></tr>
+        <tr><td><code>PAM_DEFAULT_DEVICE</code></td><td><code>cpu</code></td><td>Device for PAM active-learning training.</td></tr>
+        <tr><td><code>PAM_AUTO_RETRAIN_THRESHOLD</code></td><td><code>5</code></td><td>Defined in the settings but not read by the backend. The auto-retrain threshold is <code>RETRAIN_AFTER</code> (10) in <code>active_learning/config.yaml</code>, or a dataset's <code>retrain_after_threshold</code>.</td></tr>
       </tbody>
     </table>
 
     <h2>Connection pools and task limits</h2>
 
     <p>
-      The user-study backend has no environment variables for the database
+      The backend has no environment variables for the database
       connection pool; its size is fixed in code (see
       <a href="../deployment/">Deployment</a>). The task and worker settings are:
     </p>
@@ -110,7 +110,7 @@
         <tr><td><code>OE_YAPAT_SERVICE_URL</code></td><td><code>http://localhost:8002</code></td><td>Ontology service used by the label-space chat.</td></tr>
         <tr><td><code>OE_YAPAT_API_KEY</code></td><td>—</td><td>Optional bearer token for that service.</td></tr>
         <tr><td><code>OE_YAPAT_TIMEOUT</code></td><td><code>120</code></td><td>Request timeout in seconds.</td></tr>
-        <tr><td><code>WSSED_GPU_SERVER_URL</code></td><td><code>http://localhost:8003</code></td><td>Remote GPU server for WSSED training.</td></tr>
+        <tr><td><code>WSSED_GPU_SERVER_URL</code></td><td><code>http://localhost:8003</code></td><td>URL of the Weakly Supervised Sound Event Detection (WSSED) GPU server, which trains sound event detection models.</td></tr>
         <tr><td><code>WSSED_TIMEOUT</code></td><td><code>300</code></td><td>GPU server request timeout.</td></tr>
         <tr><td><code>WSSED_FOCAL_DATA_ROOT</code></td><td>—</td><td>Path of the focal recordings inside the container. The base Compose file neither sets it nor mounts such a folder.</td></tr>
       </tbody>
@@ -127,7 +127,7 @@
         <tr><td><code>VITE_STUDY_PHASE_LOCK</code></td><td>No</td><td>When true, the phase from the environment is used and the URL parameter and stored choice are ignored.</td></tr>
         <tr><td><code>VITE_STUDY_PHASE_ALLOWED</code></td><td>No</td><td>Comma-separated phases a locked session may switch between, in order; also the sequence of the guided study flow.</td></tr>
         <tr><td><code>VITE_STUDY_FLOW_ENABLED</code></td><td>No</td><td>Guided study flow: an instructions dialog and a guided tour for each phase. On by default when the phase is locked.</td></tr>
-        <tr><td><code>VITE_STUDY_PHASE_DURATION_MINUTES</code></td><td>No</td><td>Minutes per phase (default 5). The countdown that would use it is switched off in the user-study frontend, so phases do not advance automatically; the value only appears in logged study-flow events.</td></tr>
+        <tr><td><code>VITE_STUDY_PHASE_DURATION_MINUTES</code></td><td>No</td><td>Minutes per phase (default 5). The countdown that would use it is switched off in the frontend, so phases do not advance automatically; the value only appears in logged study-flow events.</td></tr>
         <tr><td><code>VITE_STUDY_LOGGING_ENABLED</code></td><td>No</td><td>Sends a timestamped log of interactions to <code>/api/study-events/batch</code>; off by default.</td></tr>
         <tr><td><code>VITE_STUDY_LOGGING_FLUSH_SECONDS</code></td><td>No</td><td>How often logged events are sent; default 10 seconds.</td></tr>
       </tbody>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Common ways to adapt YAPAT: tune active learning, change the phases and their introductions, add an embedding model, and add an API endpoint.">
+  <title>YAPAT Documentation – Extending YAPAT</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Extending YAPAT</h1>
+
+    <p class="lede">
+      The changes people make most often, and the files to make them in. Set up
+      a development environment first; see
+      <a href="../development/">Development Setup</a>.
+    </p>
+
+    <h2>Tune active learning</h2>
+
+    <p>
+      The defaults live in the backend's <code>active_learning/config.yaml</code>.
+      They are read when a process starts, so restart <code>api</code> and
+      <code>celery-worker-pam-al</code> after editing.
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Setting</th><th>Default</th><th>Controls</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>RETRAIN_AFTER</code></td><td>10</td><td>New labels before an automatic retrain. A dataset's <code>retrain_after_threshold</code> column overrides it.</td></tr>
+        <tr><td><code>DEFAULT_EPOCHS</code>, <code>DEFAULT_LEARNING_RATE</code>, <code>DEFAULT_BATCH_SIZE</code></td><td>20, 0.001, 512</td><td>Classifier training.</td></tr>
+        <tr><td><code>DEFAULT_HIDDEN_DIM</code>, <code>DEFAULT_DROPOUT</code></td><td>128, 0.5</td><td>Size and regularisation of the classifier.</td></tr>
+        <tr><td><code>DEFAULT_INFERENCE_THRESHOLD</code></td><td>0.3</td><td>Probability above which a species counts as predicted.</td></tr>
+        <tr><td><code>DEFAULT_COMPOSITE_WU</code>, <code>_WD</code>, <code>_WR</code></td><td>0.5, 0.25, 0.25</td><td>Weights of uncertainty, diversity, and density in the composite score.</td></tr>
+        <tr><td><code>DEFAULT_DENSITY_K</code></td><td>30</td><td>Neighbours used for the density score.</td></tr>
+        <tr><td><code>NO_EVENT_LABELS</code></td><td><code>local:no_biophony</code>, <code>local:other_biophony</code></td><td>Labels meaning "no target species here". They train as negative examples, never as a class of their own.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The classifiers are in <code>active_learning/model_zoo/</code> and the
+      scores in <code>active_learning/samplers.py</code>.
+    </p>
+
+    <h2>Change the phases</h2>
+
+    <p>
+      Each phase is one entry in the frontend's
+      <code>src/studyPhases/phases.ts</code>. An entry switches parts of the Hub
+      on or off: the projection (<code>visualization.mode</code>), clicking
+      points (<code>allowPointClick</code>), the sidebar sections
+      (<code>sidebar.sampleProperties</code>, <code>sidebar.modelScores</code>),
+      and sorting (<code>sort.nonModel</code>, <code>sort.model</code>). The
+      introduction and guide cards shown for each phase are in
+      <code>src/studyFlow/phaseContent.ts</code>.
+    </p>
+
+    <p>
+      Which phases a deployment offers, and whether one is locked, is set with
+      <code>VITE_STUDY_*</code> variables, without code changes; see
+      <a href="../../operations/environment/#frontend-variables">Environment Setup</a>.
+    </p>
+
+    <h2>Add an embedding model</h2>
+
+    <p>
+      YAPAT ships with BirdNET 2.4. Adding another model takes three steps:
+    </p>
+
+    <ol>
+      <li>Implement the embedder next to <code>app/services/birdnet_model.py</code>.</li>
+      <li>Call it from <code>app/tasks/embedding_tasks.py</code>. The tasks currently call BirdNET directly, whichever model the job names, so add a choice based on the job's model.</li>
+      <li>Register the model with an Alembic migration that inserts a row into the embedding models table, with its window size, step size, and overlap.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>Vector size.</strong> Embedding vectors are stored in a
+      pgvector column of 1024 dimensions (<code>app/models/embedding.py</code>).
+      A model with a different output size needs a projection to 1024 or a
+      schema change.
+    </div>
+
+    <h2>Add an API endpoint</h2>
+
+    <ol>
+      <li>Add a route to the matching router in <code>app/api/</code>, or create a new router and register it in <code>app/main.py</code> under <code>/api</code>.</li>
+      <li>Put the logic in <code>app/services/</code> and the request and response models in <code>app/schemas/</code>.</li>
+      <li>For slow work, add a Celery task in <code>app/tasks/</code> and return a task ID instead of waiting.</li>
+      <li>Call the endpoint from the frontend in <code>src/services/api.ts</code>.</li>
+    </ol>
+
+    <p>
+      Access rules are in <code>app/core/permissions.py</code>; reuse them
+      rather than checking roles by hand.
+    </p>
+
+    <h2>Change the quick-label species names</h2>
+
+    <p>
+      The scientific names shown for the species codes on quick-label buttons,
+      for example <code>SCIALT</code> for <em>Scinax alter</em>, are listed in the
+      frontend's <code>src/constants/speciesLabels.ts</code>.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Sharing a change?</strong> See <a href="../../about/contributing/">Contributing</a>.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

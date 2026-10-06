@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Embeddings are fixed-length vectors computed per snippet; how jobs create snippet sets and what the vectors are used for.">
-  <title>Embeddings — YAPAT Documentation</title>
+  <meta name="description" content="What embeddings are, why YAPAT needs them, and how they are generated.">
+  <title>YAPAT Documentation – Embeddings</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -34,79 +34,53 @@
     <h1>Embeddings</h1>
 
     <p class="lede">
-      An embedding is a fixed-length vector computed from a snippet's audio. YAPAT
-      computes embeddings once per snippet set and reuses them for active
-      learning and for the projection view in the Annotation Hub.
+      An embedding is a list of numbers that summarises what a clip sounds like.
+      Clips that sound alike get similar numbers. YAPAT computes one embedding per
+      3-second clip, once, and uses them everywhere the model needs to compare
+      sounds.
     </p>
 
-    <h2>Why embeddings</h2>
-
-    <p>
-      Comparing raw audio directly is costly. With one vector per snippet, YAPAT
-      can give a classifier compact features to learn from and place every
-      snippet of a dataset in a two-dimensional projection.
-    </p>
-
-    <h2>Embedding models</h2>
-
-    <p>
-      <code>GET /api/embedding-models</code> lists the registered models. Each
-      record holds the window size, step size, and overlap the model works with,
-      so the same model has to be used when snippets are compared. The initial
-      database migration registers one model, BirdNET version 2.4, described as
-      using 3-second windows at 48 kHz, with a window of 3.0 seconds, a step of
-      3.0 seconds, and no overlap. Its vectors have 1024 dimensions.
-    </p>
-
-    <h2>Snippet sets</h2>
-
-    <p>
-      Running an embedding job produces a <strong>snippet set</strong>: a
-      collection of snippets cut with a specific window and step, together with the
-      embeddings from one model. A dataset can have several snippet sets. It is
-      ready for annotation only when its default snippet set has status
-      <code>ready</code>.
-    </p>
-
-    <figure class="docs-infographic" aria-label="From recordings to snippets to embeddings, which feed active learning and projections.">
-      <ol class="di-flow di-animate di-n4">
-        <li style="--i:0">Recordings</li>
-        <li style="--i:1">Snippets<span class="di-sub">cut with a fixed window and step</span></li>
-        <li style="--i:2">Embeddings<span class="di-sub">one vector per snippet; 1024 dimensions for BirdNET v2.4</span></li>
-        <li style="--i:3">Used for<span class="di-sub">active learning, projections</span></li>
-      </ol>
-      <figcaption>A snippet set holds the snippets and the embeddings of one model.</figcaption>
-    </figure>
-
-    <h2>Job lifecycle</h2>
-
-    <p>
-      Embedding generation runs asynchronously. The client requests a job and a
-      Celery worker processes the recordings in chunks:
-    </p>
-
-    <pre><code>POST /api/datasets/{dataset_id}/embeddings
-GET  /api/datasets/{dataset_id}/embeddings
-GET  /api/embeddings/{job_id}</code></pre>
-
-    <p>
-      A repeated request for the same configuration returns a conflict (HTTP 409)
-      instead of starting a second job. A snippet set that already has annotations
-      can be deleted only if the request explicitly sets
-      <code>acknowledge_annotation_loss</code> to <code>true</code>.
-    </p>
-
-    <h2>What embeddings are used for</h2>
+    <h2>Why YAPAT needs them</h2>
 
     <ul>
-      <li><strong>Active learning</strong> — train and score a classifier on embedding vectors; a cold-start run needs an embedding model.</li>
-      <li><strong>Projections</strong> — from study phase 2 on, the Annotation Hub shows a 2D projection of the dataset's snippets, computed with PCA (the default), UMAP, or t-SNE.</li>
+      <li><strong>Active learning</strong> — the model is trained on embeddings, not on the raw audio.</li>
+      <li><strong>The projection</strong> — the map of all clips in the Annotation Hub places clips with similar embeddings close together.</li>
     </ul>
 
-    <div class="callout">
-      <strong>Operational note.</strong> Embedding jobs run on the Celery
-      <code>embeddings</code> queue. See
-      <a href="../../operations/deployment/">Deployment</a> for worker settings.
+    <p>
+      This is why a dataset must have embeddings before it can be annotated.
+    </p>
+
+    <figure class="docs-shot docs-shot--medium">
+      <img src="../../assets/screenshots/hub-projection.webp" width="662" height="841" loading="lazy" alt="The feature projection: thousands of grey points with coloured labelled points, and t-SNE, UMAP and PCA buttons.">
+      <figcaption>The projection in the Annotation Hub. Each point is a clip; coloured points are labelled. The buttons at the top switch between three ways of drawing the embeddings on a flat map: t-distributed stochastic neighbor embedding (t-SNE), Uniform Manifold Approximation and Projection (UMAP), and principal component analysis (PCA).</figcaption>
+    </figure>
+
+
+    <h2>The embedding model</h2>
+
+    <p>
+      YAPAT ships with <strong>BirdNET 2.4</strong>, a published neural network for
+      recognising bird and other animal sounds. It listens in 3-second
+      windows and produces 1,024 numbers per clip. The model decides the clip
+      length, so every clip in a dataset is comparable.
+    </p>
+
+    <h2>Generating embeddings</h2>
+
+    <p>
+      An administrator clicks <strong>Generate Embeddings</strong> on the dataset
+      card. The job runs in the background; when it finishes, the dataset is ready
+      for the Annotation Hub. See <a href="../../guides/datasets/">Datasets</a>.
+    </p>
+
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>An embedding job produces a <strong>snippet set</strong>: the clips and their vectors for one model and window. A dataset is ready when its default snippet set has status <code>ready</code>.</li>
+        <li><code>POST /api/datasets/{id}/embeddings</code> starts a job (HTTP 409 if the same one exists); <code>GET /api/embeddings/{job_id}</code> reports progress. Jobs run on the <code>embeddings</code> Celery queue.</li>
+        <li>Vectors are stored in PostgreSQL with pgvector. See <a href="../../workflow/snippets-and-embeddings/">Snippets &amp; Embeddings</a>.</li>
+      </ul>
     </div>
 
   </main>

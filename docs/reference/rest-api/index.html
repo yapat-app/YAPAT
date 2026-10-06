@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="REST API of the user-study backend: the endpoints the user-study interface calls, the other backend endpoints, and frontend calls the backend does not provide.">
-  <title>REST API — YAPAT Documentation</title>
+  <meta name="description" content="The YAPAT REST API: authentication, the endpoints the web interface calls, the other backend endpoints, and known gaps.">
+  <title>YAPAT Documentation – REST API</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -35,19 +35,18 @@
     <h1>REST API</h1>
 
     <p class="lede">
-      The user-study backend is a FastAPI application. Every route is mounted
-      under the <code>/api</code> prefix; the only exceptions are
-      <code>GET /</code> and <code>GET /health</code>. This page lists the
-      endpoints in three groups: those the user-study interface calls, the other
-      endpoints the backend provides, and calls the interface makes that the
-      backend does not provide.
+      Everything the web interface does goes through this API, so anything you
+      can do in YAPAT you can also script. The backend is a FastAPI application;
+      every route is under <code>/api</code>, except <code>GET /</code> and
+      <code>GET /health</code>. A running backend also serves interactive docs
+      at <code>/docs</code>.
     </p>
 
     <h2>Authentication</h2>
 
     <p>
       Protected routes expect an HTTP <code>Authorization: Bearer &lt;token&gt;</code>
-      header. Tokens come from the login endpoint and are self-contained JWTs.
+      header. Tokens come from the login endpoint and are self-contained JSON Web Tokens (JWTs).
       Their lifetime is <code>ACCESS_TOKEN_EXPIRE_MINUTES</code>: 30 minutes by
       default in the backend settings, and seven days in the Docker Compose
       stack. Status conventions:
@@ -59,7 +58,7 @@
       <li><code>403</code> — the user lacks the required admin, team, or dataset permission.</li>
     </ul>
 
-    <h2>Used by the user-study interface</h2>
+    <h2>Used by the web interface</h2>
 
     <p>
       These endpoints are called from screens a user can reach. The middle
@@ -86,11 +85,11 @@
         <tr><td><code>GET /api/datasets/available-paths</code></td><td>Folder picker in Add Dataset.</td><td>Admin</td></tr>
         <tr><td><code>POST /api/datasets/</code></td><td>Add Dataset; creates the dataset and starts the folder scan.</td><td>Authenticated; non-admins must give a <code>team_id</code></td></tr>
         <tr><td><code>PATCH /api/datasets/{dataset_id}</code></td><td>Spectrogram display settings on the card.</td><td>Admin or owner of the dataset's team</td></tr>
-        <tr><td><code>GET /api/datasets/{dataset_id}/explorer</code></td><td>Dataset Explorer on the WSSED page.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/datasets/{dataset_id}/explorer</code></td><td>Dataset Explorer on the Weakly Supervised Sound Event Detection (WSSED) page.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/datasets/{dataset_id}/recording-locations</code></td><td>Location filter in the Hub.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/datasets/{dataset_id}/quick-labels</code></td><td>Card quick-label strip, quick-label manager, Hub label list.</td><td>Authenticated</td></tr>
         <tr><td><code>PUT /api/datasets/{dataset_id}/quick-labels</code></td><td>Quick-label manager (Save).</td><td>Authenticated</td></tr>
-        <tr><td><code>GET|POST|DELETE /api/datasets/{dataset_id}/quick-labels/mine</code></td><td>Personal quick labels: species pinned from the Hub's GBIF search.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET|POST|DELETE /api/datasets/{dataset_id}/quick-labels/mine</code></td><td>Personal quick labels: species pinned from the Hub's Global Biodiversity Information Facility (GBIF) search.</td><td>Authenticated</td></tr>
         <tr><td><code>POST /api/datasets/{dataset_id}/recordings/metadata/preview</code></td><td>Metadata dialog: checks a CSV and matches rows to recordings by file name, without saving.</td><td>Dataset access</td></tr>
         <tr><td><code>POST /api/datasets/{dataset_id}/recordings/metadata/import</code></td><td>Metadata dialog: merges the CSV's location, date, and time into the recordings' metadata.</td><td>Dataset access</td></tr>
         <tr><td><code>GET /api/datasets/{dataset_id}/annotations/export</code></td><td>Export button (<code>format=csv</code> or <code>json</code>).</td><td>Dataset access</td></tr>
@@ -131,7 +130,7 @@
         <tr><td><code>GET /api/pam-al/checkpoints/{checkpoint_id}/species</code></td><td>Quick-label list.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/pam-al/species-default</code></td><td>Quick-label list when no checkpoint species are available.</td><td>Authenticated</td></tr>
         <tr><td><code>POST /api/visualisations/fpv-dataset</code></td><td>Starting projection generation for the whole dataset.</td><td>None enforced</td></tr>
-        <tr><td><code>GET /api/visualisations/fpv-dataset</code></td><td>Reading the PCA, UMAP, and t-SNE projections.</td><td>None enforced</td></tr>
+        <tr><td><code>GET /api/visualisations/fpv-dataset</code></td><td>Reading the principal component analysis (PCA), Uniform Manifold Approximation and Projection (UMAP), and t-distributed stochastic neighbor embedding (t-SNE) projections.</td><td>None enforced</td></tr>
         <tr><td><code>GET /api/visualisations/fpv_vis_range</code></td><td>Value ranges for the score filters.</td><td>None enforced</td></tr>
       </tbody>
     </table>
@@ -155,7 +154,7 @@
         <tr><td><code>POST /api/taxonomy/chat/{id}/freeze</code></td><td>Add To label space list: freezes into an <code>active</code> custom taxonomy.</td><td>Conversation access</td></tr>
         <tr><td><code>GET /api/taxonomy/custom</code></td><td>Loading the team's custom taxonomies for the Hub's label list.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/taxonomy/suggest</code></td><td>GBIF search in the quick-label manager.</td><td>Authenticated</td></tr>
-        <tr><td><code>GET /api/taxonomy/envo/suggest</code></td><td>ENVO search in the quick-label manager.</td><td>Public</td></tr>
+        <tr><td><code>GET /api/taxonomy/envo/suggest</code></td><td>Environment Ontology (ENVO) search in the quick-label manager.</td><td>Public</td></tr>
       </tbody>
     </table>
 
@@ -181,7 +180,7 @@
         <tr><td><code>POST /api/wssed/training-jobs</code></td><td>Start Training.</td><td>Access to the WSSED dataset</td></tr>
         <tr><td><code>GET /api/wssed/training-jobs/{id}/status</code></td><td>Training progress.</td><td>Access to the WSSED dataset</td></tr>
         <tr><td><code>GET /api/wssed/training-jobs/latest</code></td><td>The dataset's latest training job.</td><td>Access to the WSSED dataset</td></tr>
-        <tr><td><code>GET /api/wssed/datasets/{id}/artifacts</code></td><td>Existing BirdNET embeddings and checkpoint on the GPU server.</td><td>Access to the WSSED dataset</td></tr>
+        <tr><td><code>GET /api/wssed/datasets/{id}/artifacts</code></td><td>Existing BirdNET embeddings and checkpoint on the graphics processing unit (GPU) server.</td><td>Access to the WSSED dataset</td></tr>
         <tr><td><code>POST /api/wssed/training-jobs/{id}/register-al</code></td><td>Register for Active Learning.</td><td>Access to the WSSED dataset</td></tr>
       </tbody>
     </table>
@@ -199,12 +198,12 @@
       </tbody>
     </table>
 
-    <h3>Older screens outside the study workflow</h3>
+    <h3>Legacy feed endpoints</h3>
 
     <p>
-      Two reachable screens still call an older feed endpoint. Its results are
-      not shown in the Annotation Hub, so these calls are not part of the
-      user-study workflow.
+      The Generate Feed button on a dataset card and the Feed History page
+      still call an older feed API. Its results are not shown in the Annotation
+      Hub; use the <a href="../feed-methods/">Active Learning API</a> instead.
     </p>
 
     <table>
@@ -212,16 +211,15 @@
       <tbody>
         <tr><td><code>GET /api/feed/</code></td><td>The older Generate Feed button on a dataset card (random method).</td><td>Authenticated</td></tr>
         <tr><td><code>POST /api/feed/similarity-search</code></td><td>The same button (similarity method, from an uploaded clip).</td><td>Authenticated</td></tr>
-        <tr><td><code>GET /api/feed/history</code></td><td>The <a href="../../guides/feed-history/">Feed History</a> page.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/feed/history</code></td><td>The Feed History page.</td><td>Authenticated</td></tr>
       </tbody>
     </table>
 
     <h2>Other backend endpoints</h2>
 
     <p>
-      The user-study backend also provides these endpoints. The user-study
-      interface does not call them, so they are not part of any workflow in
-      these pages.
+      The backend also provides these endpoints. The web interface does not
+      call them, but they are available to scripts and integrations.
     </p>
 
     <table>
@@ -258,7 +256,7 @@
         <tr><td><code>POST|GET /api/invitations/</code>, <code>DELETE /api/invitations/{invitation_id}</code></td><td>Dataset invitation links; registering with one makes the account a team owner of the invited datasets' teams.</td><td>Admin</td></tr>
         <tr><td><code>POST|GET /api/reference-links/</code>, <code>DELETE /api/reference-links/{link_id}</code></td><td>Link a reference dataset (<code>is_reference</code>) to a dataset or team.</td><td>Admin</td></tr>
         <tr><td><code>POST /api/wssed/training-jobs/{id}/dispatch</code></td><td>Re-enqueue a pending WSSED training job.</td><td>Access to the WSSED dataset</td></tr>
-        <tr><td><code>GET /api/wssed/suggestions</code>, <code>POST /api/wssed/label</code>, <code>POST /api/wssed/retrain</code>, <code>GET /api/wssed/histogram</code></td><td>Species-model suggestions, accept/reject labels, species-scoped retraining, and a confidence histogram.</td><td>WSSED dataset or WSSED access</td></tr>
+        <tr><td><code>GET /api/wssed/suggestions</code>, <code>POST /api/wssed/label</code>, <code>POST /api/wssed/retrain</code>, <code>GET /api/wssed/histogram</code></td><td>Suggestions from a WSSED model, accept/reject labels, retraining for one species, and a confidence histogram.</td><td>WSSED dataset or WSSED access</td></tr>
         <tr><td><code>GET /api/tasks/status/{task_id}</code></td><td>Celery task status and metadata.</td><td>Authenticated</td></tr>
         <tr><td><code>POST /api/tasks/datasets/{id}/scan</code>, <code>POST /api/tasks/datasets/{id}/process</code></td><td>Scan a dataset again, or run the dataset pipeline.</td><td>Authenticated</td></tr>
         <tr><td><code>DELETE /api/tasks/cancel/{task_id}</code></td><td>Revoke a running task.</td><td>Authenticated</td></tr>
@@ -269,8 +267,8 @@
     <h2>Called by the interface but not provided</h2>
 
     <p>
-      The team detail page calls three routes that the user-study backend does
-      not define. As a result that page does not load; see
+      The team detail page calls three routes that the backend does not
+      define, so that page shows "Team not found."; see
       <a href="../../guides/teams/">Teams</a>.
     </p>
 

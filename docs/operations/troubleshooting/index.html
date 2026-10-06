@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Common YAPAT problems and how to fix them: datasets, embeddings, feeds, the label-space chat, teams, and setup.">
+  <title>YAPAT Documentation – Troubleshooting</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Troubleshooting</h1>
+
+    <p class="lede">
+      Find the symptom below. If your problem is not listed, see
+      <a href="#reporting-a-problem">Reporting a problem</a>.
+    </p>
+
+    <h2>Start here</h2>
+
+    <pre><code>cd backend
+docker compose ps                 # which services are running
+docker compose logs -f api        # follow one service's log</code></pre>
+
+    <p>
+      The services are <code>api</code>, <code>celery-worker</code>,
+      <code>celery-worker-pam-al</code>, <code>celery-beat</code>,
+      <code>db</code>, <code>redis</code>, and <code>flower</code>. Flower, at
+      <code>http://localhost:5555</code>, shows every background task and its
+      result.
+    </p>
+
+    <h2>Signing in</h2>
+
+    <h3>"Incorrect username or password"</h3>
+
+    <p>
+      Check the username and password. If you have no account
+      yet, register on the sign-up page or ask an administrator for an
+      invitation link.
+    </p>
+
+    <h2>Datasets and embeddings</h2>
+
+    <h3>The folder picker in Add Dataset is empty</h3>
+
+    <p>
+      YAPAT only sees folders on its data volume. Set
+      <code>HOST_DATA_ROOT</code> in <code>backend/.env</code> to the folder that
+      holds your audio and restart the backend. The picker is available to
+      administrators only.
+    </p>
+
+    <h3>Generate Embeddings is greyed out</h3>
+
+    <p>
+      The folder scan is still running; the button's tooltip says so. Wait for it
+      to finish. Only administrators see the button; other users are asked to
+      contact an administrator.
+    </p>
+
+    <h3>"No READY default snippet set found for this dataset"</h3>
+
+    <p>
+      The Generate Feed dialog shows this when the dataset has no embeddings yet,
+      or the job has not finished. Generate embeddings on the
+      <a href="../../guides/datasets/">dataset card</a> and wait for the job in
+      Flower.
+    </p>
+
+    <h2>Annotation</h2>
+
+    <h3>Only phase 1 is available</h3>
+
+    <p>
+      The example frontend settings lock the Hub to phase 1. In
+      <code>frontend/.env</code>, list the phases you want in
+      <code>VITE_STUDY_PHASE_ALLOWED</code> (or remove it to allow all five), set
+      <code>VITE_STUDY_PHASE_LOCK=false</code>, and restart the frontend. See
+      <a href="../environment/#frontend-variables">Environment Setup</a>.
+    </p>
+
+    <h3>The model does not seem to retrain</h3>
+
+    <p>
+      Retraining starts after 10 new labels. It runs on the
+      <code>celery-worker-pam-al</code> service, so check that it is running and
+      read its log.
+    </p>
+
+    <h3>A feed from the dataset card does not appear in the Hub</h3>
+
+    <p>
+      The Generate Feed button on the dataset card uses an older feed type that
+      the Hub does not show. Use <strong>Generate Feed</strong> inside the
+      Annotation Hub.
+    </p>
+
+    <h3>Species search or label lookups fail</h3>
+
+    <p>
+      The Hub's species search calls the Global Biodiversity Information Facility (GBIF) from the browser, and the backend calls
+      GBIF and the Ontology Lookup Service (OLS) of the European Bioinformatics Institute (EBI) to resolve labels. Both need internet access.
+    </p>
+
+    <h3>A label is missing from the export</h3>
+
+    <p>
+      The export contains labels that resolve to a source identifier or a species
+      name. See <a href="../../workflow/import-export/">Import &amp; Export</a>.
+    </p>
+
+    <h2>Label spaces and teams</h2>
+
+    <h3>The label-space chat does not answer</h3>
+
+    <p>
+      The chat needs the ontology service. Check that it is running and that
+      <code>OE_YAPAT_SERVICE_URL</code> points to it; from Docker, use
+      <code>http://host.docker.internal:8002</code> for a service on the same
+      host. See <a href="../../getting-started/installation/#optional-services">Installation</a>.
+    </p>
+
+    <h3>Team Management shows "Team not found."</h3>
+
+    <p>
+      A team owner who belongs to a team is taken to the team page, which cannot
+      load. Ask an administrator to invite people or change the team from the
+      team list. See <a href="../../guides/teams/">Teams</a>.
+    </p>
+
+    <h3>An invitation link does not work</h3>
+
+    <p>
+      Links expire after two days; ask for a new one. If links point to
+      <code>localhost</code>, set <code>VITE_YAPAT_FRONTEND_URL</code> to the
+      public address of the frontend.
+    </p>
+
+    <h3>The WSSED card is missing</h3>
+
+    <p>
+      The card for Weakly Supervised Sound Event Detection (WSSED), which
+      trains sound event detection models, is shown to administrators and to users with
+      access to a FOCAL_RECORDINGS dataset.
+    </p>
+
+    <h2>Setup</h2>
+
+    <h3>The frontend cannot reach the backend</h3>
+
+    <p>
+      The frontend calls <code>VITE_YAPAT_BACKEND_URL</code>, which defaults to
+      <code>http://localhost:8000</code>. Set it if the backend runs elsewhere,
+      and check that <code>http://localhost:8000/health</code> answers.
+    </p>
+
+    <h3>You are signed out unexpectedly</h3>
+
+    <p>
+      Sign-in tokens expire after <code>ACCESS_TOKEN_EXPIRE_MINUTES</code>:
+      seven days in the Docker Compose stack, 30 minutes otherwise. Sign in again.
+    </p>
+
+    <h3>A port is already in use</h3>
+
+    <p>
+      The stack uses 5432 (PostgreSQL), 6380 (Redis), 8000 (API), 5555 (Flower),
+      and 3000 (frontend). Stop the other program, or change the port mapping in
+      <code>docker-compose.yml</code>. See <a href="../docker/">Docker</a>.
+    </p>
+
+    <h2>Reporting a problem</h2>
+
+    <p>
+      Open an issue in the
+      <a href="https://github.com/yapat-app/YAPAT/issues" target="_blank" rel="noopener noreferrer">issue tracker</a>
+      with the steps to reproduce, what you expected, and a screenshot or the
+      relevant log lines.
+    </p>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

@@ -4,7 +4,8 @@
  * Single source of truth for the whole documentation site:
  * - site links (repo / app)
  * - the complete navigation hierarchy (sections -> pages -> sub-groups)
- * - which sections appear on the homepage cards
+ * - which sections appear on the homepage cards (homeText / homeCta are the
+ *   short card text and link label; summary is the fallback)
  *
  * A page entry becomes live once it has href. Entries without href are
  * planned pages and render as muted "planned" items in navigation.
@@ -22,7 +23,9 @@ window.YAPAT_DOCS = {
     {
       id: "getting-started",
       label: "Getting Started",
-      summary: "What YAPAT is, what it does, and how to run your first annotation session.",
+      summary: "What YAPAT is, how to install it, and your first annotation session.",
+      homeText: "Install YAPAT and run a first annotation session, from dataset to exported labels.",
+      homeCta: "Start here",
       pages: [
         {
           id: "what-is-yapat",
@@ -42,9 +45,24 @@ window.YAPAT_DOCS = {
       ]
     },
     {
+      id: "guides",
+      label: "Guides",
+      summary: "Step-by-step guides for datasets, the Annotation Hub, label management, and teams.",
+      homeText: "Step-by-step help for datasets, the Annotation Hub, label spaces, and teams.",
+      homeCta: "Read the guides",
+      pages: [
+        { id: "datasets", title: "Datasets", href: "guides/datasets/" },
+        { id: "annotation-hub", title: "Annotation Hub", href: "guides/annotation-hub/" },
+        { id: "label-management", title: "Label Management", href: "guides/label-management/" },
+        { id: "teams", title: "Teams", href: "guides/teams/" }
+      ]
+    },
+    {
       id: "concepts",
       label: "Concepts",
-      summary: "Label spaces, embeddings, active learning, and the Annotation Hub's filters in the user-study version of YAPAT.",
+      summary: "The ideas behind YAPAT: active learning, filters and model scores, embeddings, WSSED, and label spaces.",
+      homeText: "Active learning, embeddings, model scores, sound event detection, and label spaces.",
+      homeCta: "Learn the concepts",
       pages: [
         {
           id: "pam-and-annotations",
@@ -67,6 +85,11 @@ window.YAPAT_DOCS = {
           href: "concepts/embeddings/"
         },
         {
+          id: "wssed",
+          title: "Sound Event Detection (WSSED)",
+          href: "concepts/wssed/"
+        },
+        {
           id: "label-space",
           title: "Label Space",
           pages: [
@@ -79,29 +102,23 @@ window.YAPAT_DOCS = {
     },
     {
       id: "workflow",
-      label: "Workflow",
-      summary: "The end-to-end pipeline from dataset import to labelled, export-ready data.",
+      label: "Developers",
+      summary: "How YAPAT is built, how data moves through it, and how to run, test, and extend the code.",
+      homeText: "Architecture, development setup, the programming interface, and extension points.",
+      homeCta: "Open developer docs",
       pages: [
-        { id: "workflow-overview", title: "Overview", href: "workflow/workflow-overview/" },
+        { id: "architecture", title: "Architecture", href: "workflow/architecture/" },
+        { id: "workflow-overview", title: "Pipeline Overview", href: "workflow/workflow-overview/" },
         { id: "import-export", title: "Import & Export", href: "workflow/import-export/" },
-        { id: "snippets-and-embeddings", title: "Snippets & Embeddings", href: "workflow/snippets-and-embeddings/" }
-      ]
-    },
-    {
-      id: "guides",
-      label: "Guides",
-      summary: "Step-by-step guides for datasets and WSSED training, the Annotation Hub and study phases, label management, and teams.",
-      pages: [
-        { id: "datasets", title: "Datasets", href: "guides/datasets/" },
-        { id: "annotation-hub", title: "Annotation Hub", href: "guides/annotation-hub/" },
-        { id: "label-management", title: "Label Management", href: "guides/label-management/" },
-        { id: "teams", title: "Teams", href: "guides/teams/" }
+        { id: "snippets-and-embeddings", title: "Snippets & Embeddings", href: "workflow/snippets-and-embeddings/" },
+        { id: "development", title: "Development Setup", href: "workflow/development/" },
+        { id: "extending", title: "Extending YAPAT", href: "workflow/extending/" }
       ]
     },
     {
       id: "reference",
       label: "API Reference",
-      summary: "The REST endpoints the user-study interface uses, the active-learning API, and the backend data models.",
+      summary: "The REST API, the active-learning endpoints, and the backend data models.",
       pages: [
         { id: "rest-api", title: "REST API", href: "reference/rest-api/" },
         { id: "feed-methods", title: "Active Learning API", href: "reference/feed-methods/" },
@@ -111,23 +128,25 @@ window.YAPAT_DOCS = {
     {
       id: "operations",
       label: "Operations",
-      summary: "Deployment, Docker configuration, and environment variables for the backend and frontend.",
+      summary: "Deployment, Docker, environment variables, and troubleshooting.",
       pages: [
         { id: "deployment", title: "Deployment", href: "operations/deployment/" },
         { id: "docker", title: "Docker", href: "operations/docker/" },
-        { id: "environment", title: "Environment Setup", href: "operations/environment/" }
+        { id: "environment", title: "Environment Setup", href: "operations/environment/" },
+        { id: "troubleshooting", title: "Troubleshooting", href: "operations/troubleshooting/" }
       ]
     },
     {
       id: "about",
       label: "About",
-      summary: "Project background, repository layout, and the research context behind YAPAT.",
+      summary: "The project, its license, the publications behind it, and how to contribute.",
       pages: [
         { id: "project", title: "Project", href: "about/project/" },
-        { id: "research-context", title: "Research Context", href: "about/research-context/" }
+        { id: "research-context", title: "Publications", href: "about/research-context/" },
+        { id: "contributing", title: "Contributing", href: "about/contributing/" }
       ]
     }
   ],
 
-  homeCards: ["getting-started", "concepts", "guides", "reference"]
+  homeCards: ["getting-started", "guides", "concepts", "workflow"]
 };

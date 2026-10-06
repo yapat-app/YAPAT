@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Report a bug, suggest a feature, or contribute code to YAPAT.">
+  <title>YAPAT Documentation – Contributing</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Contributing</h1>
+
+    <p class="lede">
+      YAPAT is open source. Bug reports, ideas, and code are welcome.
+    </p>
+
+    <h2>Report a bug or suggest a feature</h2>
+
+    <p>
+      Open an issue in the
+      <a href="https://github.com/yapat-app/YAPAT/issues" target="_blank" rel="noopener noreferrer">YAPAT issue tracker</a>.
+      For a bug, include the steps to reproduce it, what you expected, what
+      happened, and a screenshot or the relevant log lines (see
+      <a href="../../operations/troubleshooting/">Troubleshooting</a> for where
+      to find logs).
+    </p>
+
+    <h2>Contribute code</h2>
+
+    <p>
+      YAPAT is split across repositories; the main repository links them as
+      Git submodules. Make a change in the repository it belongs to:
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Change</th><th>Repository</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>The web interface</td><td><a href="https://github.com/yapat-app/yapat-frontend" target="_blank" rel="noopener noreferrer">yapat-frontend</a></td></tr>
+        <tr><td>The application programming interface (API), workers, or machine learning</td><td><a href="https://github.com/yapat-app/yapat-backend" target="_blank" rel="noopener noreferrer">yapat-backend</a></td></tr>
+        <tr><td>The label-space assistant's lookups</td><td><a href="https://github.com/yapat-app/oe_yapat" target="_blank" rel="noopener noreferrer">oe_yapat</a></td></tr>
+        <tr><td>This documentation</td><td><a href="https://github.com/yapat-app/YAPAT" target="_blank" rel="noopener noreferrer">YAPAT</a>, in <code>docs/</code></td></tr>
+      </tbody>
+    </table>
+
+    <ol>
+      <li>Set up a development environment: <a href="../../workflow/development/">Development Setup</a>.</li>
+      <li>Create a branch, make the change, and run the tests and the linter.</li>
+      <li>Open a pull request that explains what changed and why.</li>
+    </ol>
+
+    <p>
+      <a href="../../workflow/architecture/">Architecture</a> and
+      <a href="../../workflow/extending/">Extending YAPAT</a> show where things
+      live in the code.
+    </p>
+
+    <h2>Editing this documentation</h2>
+
+    <p>
+      The documentation is a static site in <code>docs/</code>. Each page is an
+      <code>index.html</code> in its own folder, and the navigation is defined in
+      <code>docs/js/docs-config.js</code>. Preview it locally with:
+    </p>
+
+    <pre><code>python3 -m http.server -d docs</code></pre>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

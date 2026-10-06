@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The Annotation Hub sidebar filters in the user-study version of YAPAT: status, location, date and time, and model-derived scores.">
-  <title>Filters and Model Scores — YAPAT Documentation</title>
+  <meta name="description" content="Narrow and sort the clips in the Annotation Hub by label status, location, date, time, and model scores.">
+  <title>YAPAT Documentation – Filters and Model Scores</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -31,79 +31,73 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Filters and Model Scores</h1>
 
     <p class="lede">
-      The Annotation Hub's sidebar has a <strong>Filters</strong> section that
-      narrows the snippets of the active-learning feed and of the projection
-      view, first by recording properties and, from study phase 4 on, by the
-      model-derived scores. The feed can also be sorted by these values.
+      Filters let you focus on part of a dataset, for example unlabelled clips
+      from one site at dawn. They narrow both the feed and the projection, and
+      the feed can be sorted by the same values.
     </p>
 
-    <h2>Available filters</h2>
+    <h2>Filters</h2>
 
     <table>
       <thead>
-        <tr>
-          <th>Filter</th>
-          <th>Values</th>
-        </tr>
+        <tr><th>Filter</th><th>Shows</th><th>From phase</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Status</td>
-          <td>All, Unlabeled, or Labeled snippets. For labelled snippets, a species selection narrows the list to snippets labelled with those species.</td>
-        </tr>
-        <tr>
-          <td>Location</td>
-          <td>One or more recording locations.</td>
-        </tr>
-        <tr>
-          <td>Date, month, and time of day</td>
-          <td>A date range, one or more months of the year, and a range of times of day, taken from the recording's date and time.</td>
-        </tr>
-        <tr>
-          <td>Model-derived scores</td>
-          <td>Threshold sliders over histograms of uncertainty, diversity, density, confidence, and the composite score, with an optional selection of predicted species for the confidence score when Status is All.</td>
-        </tr>
+        <tr><td>Status</td><td>All, unlabelled, or labelled clips; labelled clips can be narrowed to chosen species.</td><td>3</td></tr>
+        <tr><td>Location</td><td>Clips from one or more recording sites.</td><td>3</td></tr>
+        <tr><td>Date and time</td><td>A date range, months of the year, and a time of day.</td><td>3</td></tr>
+        <tr><td>Model scores</td><td>Clips within a range of each score, set with sliders over a histogram.</td><td>4</td></tr>
       </tbody>
     </table>
 
-    <h2>When the filters are shown</h2>
+    <figure class="docs-shot docs-shot--narrow">
+      <img src="../../../assets/screenshots/hub-filters.webp" width="388" height="841" loading="lazy" alt="The filter sidebar: status, location, date range, month, time of day, and model score histograms.">
+      <figcaption>The filter sidebar in phase 5. Drag the handles under each histogram to narrow the clips.</figcaption>
+    </figure>
 
     <p>
-      The study phase decides which filters are visible. Phases 1 and 2 hide the
-      sidebar. Phase 3 shows the status filter (with its species selection),
-      and the location and date and time filters.
-      Phases 4 and 5 add the model-derived scores. See the
-      <a href="../../../guides/annotation-hub/">Annotation Hub</a> guide.
+      Location, date, and time come from each recording's metadata: read from
+      file names such as <code>SITE_YYYYMMDD_HHMMSS</code>, or uploaded as a comma-separated values (CSV) on
+      the <a href="../../../guides/datasets/">Datasets</a> page.
     </p>
+
+    <h2>What the model scores mean</h2>
+
+    <table>
+      <thead>
+        <tr><th>Score</th><th>High means</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Uncertainty</td><td>The model is unsure about this clip. The feed is ranked by it.</td></tr>
+        <tr><td>Diversity</td><td>The clip is unlike the clips already labelled.</td></tr>
+        <tr><td>Density</td><td>The clip sits among many similar clips, so it represents a common sound.</td></tr>
+        <tr><td>Composite</td><td>A weighted mix, by default half uncertainty and a quarter each diversity and density.</td></tr>
+        <tr><td>Confidence</td><td>The model is confident it hears something; with species selected, confident it hears one of them.</td></tr>
+      </tbody>
+    </table>
 
     <p>
-      A recording's location, date, and time come from its metadata, which is
-      parsed from file names that follow a recognised convention or imported from
-      a recording-metadata CSV on the Datasets page.
+      The scores help you choose what to label; the model's predicted labels
+      themselves stay hidden.
     </p>
 
-    <h2>Model-derived scores</h2>
+    <h2>Sorting</h2>
 
     <p>
-      Uncertainty, diversity, density, and the composite score come with the
-      model's predictions for each snippet. Confidence is computed in the
-      browser from the model's predicted probabilities; when predicted species
-      are selected, it measures how confidently the model detects any of them.
-      The predicted labels themselves are never shown to the annotator.
+      From phase 4, the feed can be sorted by one or more of: confidence,
+      composite, uncertainty, diversity, density, date, and time.
     </p>
 
-    <h2>Sorting the feed</h2>
-
-    <p>
-      The feed can be sorted by one or more properties: confidence, composite
-      score, uncertainty, diversity, density, date, and time. In phase 3 the date
-      and time sort options are shown but cannot be changed; in phases 4 and 5
-      all of them can be used.
-    </p>
+    <div class="callout callout--dev">
+      <strong>For developers.</strong> Uncertainty, diversity, density, and
+      composite come with each prediction from the
+      <a href="../../../reference/feed-methods/">Active Learning API</a>;
+      confidence is computed in the browser from the predicted probabilities.
+      The scoring code is in the backend's <code>active_learning/samplers.py</code>.
+    </div>
 
   </main>
 

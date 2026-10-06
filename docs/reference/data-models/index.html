@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Core data models behind YAPAT's datasets, snippets, annotations, and active-learning objects.">
-  <title>Data Models — YAPAT Documentation</title>
+  <title>YAPAT Documentation – Data Models</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -42,18 +42,18 @@
 
     <figure class="docs-infographic" aria-label="Entity relationships: a dataset has recordings and snippet sets; snippets belong to a recording and a snippet set; annotations belong to a snippet.">
       <ul class="di-tree">
-        <li><span class="di-node">Dataset</span><span class="di-note">belongs to a team</span>
+        <li><span class="di-node di-code">Dataset</span><span class="di-note">belongs to a team</span>
           <ul>
-            <li><span class="di-node">Recording</span>
+            <li><span class="di-node di-code">Recording</span>
               <ul>
-                <li><span class="di-node">Snippet</span><span class="di-note">also belongs to one snippet set</span>
+                <li><span class="di-node di-code">Snippet</span><span class="di-note">also belongs to one snippet set</span>
                   <ul>
-                    <li><span class="di-node">Annotation</span><span class="di-note">snippet + taxon, by a user</span></li>
+                    <li><span class="di-node di-code di-key">Annotation</span><span class="di-note">snippet + taxon, by a user</span></li>
                   </ul>
                 </li>
               </ul>
             </li>
-            <li><span class="di-node">SnippetSet</span><span class="di-note">one embedding model; the dataset has a default</span></li>
+            <li><span class="di-node di-code">SnippetSet</span><span class="di-note">one embedding model; the dataset has a default</span></li>
           </ul>
         </li>
       </ul>
@@ -206,9 +206,9 @@
       <code>isomap</code>). An optional <code>method_availability</code> object
       marks methods that will not be computed for a dataset of this size, with an
       <code>available</code> flag and a <code>reason</code>. The Hub uses the 2D
-      PCA, UMAP, and t-SNE projections. The backend's
+      principal component analysis (PCA), Uniform Manifold Approximation and Projection (UMAP), and t-distributed stochastic neighbor embedding (t-SNE) projections. The backend's
       <code>/api/visualisations/fpv</code> endpoints return the same kind of data
-      for a model family; the user-study interface does not call them.
+      for a model family; the web interface does not call them.
     </p>
 
   </main>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Building, grounding, and freezing label spaces in YAPAT.">
-  <title>Label Management — YAPAT Documentation</title>
+  <meta name="description" content="Build your team's label space by chatting with the taxonomy assistant, then freeze it for annotation.">
+  <title>YAPAT Documentation – Label Management</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -31,75 +31,59 @@
 </head>
 <body>
   <main data-docs-content>
-
     <h1>Label Management</h1>
 
     <p class="lede">
-      The label-management workspace builds a label space through a guided
-      conversation. It is opened from the Label Management card on the Dashboard
-      (route <code>/pre-annotation</code>). When you belong to more than one team,
-      or are an administrator, you first choose the target team that will own the
-      frozen label space.
+      Label Management is where your team decides what to label. You describe
+      the sounds you care about in plain language, the assistant finds matching
+      entries in trusted sources such as the Global Biodiversity Information Facility (GBIF), and you keep the ones you want.
+      The result is your team's <a href="../../concepts/label-space/what-is-a-label-space/">label space</a>.
     </p>
 
-    <h2>The workspace</h2>
-
-    <p>
-      Two panels work together:
+    <p class="docs-needs">
+      <strong>You need:</strong> the ontology service running. See
+      <a href="../../getting-started/installation/">Installation</a>.
     </p>
 
-    <ul>
-      <li><strong>Taxonomy chatbot</strong> — you describe the concepts you need in natural language; the assistant retrieves candidate matches from reference resources and discusses them.</li>
-      <li><strong>Label space</strong> — the growing list of confirmed concepts, with the source information attached to each.</li>
-    </ul>
-
-    <h2>A session, step by step</h2>
+    <h2>Steps</h2>
 
     <ol>
-      <li>
-        <strong>Start a conversation.</strong> A session is created for the
-        selected team, or for your first team when no team is chosen.
-      </li>
-      <li>
-        <strong>Elicit concepts.</strong> Each message is sent to the taxonomy
-        assistant, which proposes grounded concepts. Candidates can be inspected
-        and added to the label space, either in bulk or individually.
-      </li>
-      <li>
-        <strong>Refine.</strong> Items can be removed from the label space while
-        it is still editable, and further messages refine the search.
-      </li>
-      <li>
-        <strong>Freeze.</strong> The <strong>Add To label space list</strong>
-        button freezes the session's concept list into a custom taxonomy with
-        status <code>active</code>, named <code>Label space</code> followed by the
-        date and time. The button then changes to <strong>Label Space created,
-        Start Annotating?</strong>, which opens the Annotation Hub.
-      </li>
+      <li>Open <strong>Label Management</strong> on the Dashboard. The page is titled <strong>Pre-Annotation</strong>. If you belong to several teams, choose the target team first.</li>
+      <li>Describe what you want to label, for example "I want to annotate Panthera leo", and press <kbd>Enter</kbd> or <strong>Send</strong>. <kbd>Shift</kbd>+<kbd>Enter</kbd> starts a new line.</li>
+      <li>Review the suggested concepts and add the ones you want: <strong>Add All</strong>, or one at a time.</li>
+      <li>Refine with more messages, and remove anything you added by mistake.</li>
+      <li>Click <strong>Add To label space list</strong> to freeze the list.</li>
+      <li>Click <strong>Label Space created, Start Annotating?</strong> to open the Annotation Hub.</li>
     </ol>
+
+    <!-- IMAGE label-chat.mp4 | short clip, 5–10 s | Type a request, add suggested concepts, then freeze the label space. -->
+
+    <h2>The two panels</h2>
+
+    <ul>
+      <li><strong>Taxonomy Assistant</strong> — the chat, where you talk with the assistant and see its suggestions.</li>
+      <li><strong>Label Space</strong> — the list you are building, with the source of each concept and a search box.</li>
+    </ul>
 
     <h2>After freezing</h2>
 
     <p>
-      A frozen conversation cannot be edited. The Annotation Hub adds the
-      concepts of the team's most recently frozen label space to the list of
-      labels annotators can choose from. There is no review or promotion step;
-      freezing another label space creates a further taxonomy.
+      A frozen label space cannot be edited. Its concepts appear in the
+      Annotation Hub's label list for everyone in the team. To change it, build
+      and freeze a new one; the newest frozen label space is the one the Hub
+      uses. See <a href="../../concepts/label-space/managing-versions/">Freezing a Label Space</a>.
     </p>
 
-    <h2>Where grounding comes from</h2>
-
-    <p>
-      The ontology service looks up species in GBIF and environmental concepts
-      in ENVO through OLS, and can also return Wikipedia entries or build a local
-      ontology module for a concept without a match. The details are covered under
-      <a href="../../concepts/label-space/grounding/">Grounding</a>.
-    </p>
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>The page is at <code>/pre-annotation</code>; the chat API is under <code>/api/taxonomy/chat</code>.</li>
+        <li>Each message is forwarded to the oe_yapat service at <code>OE_YAPAT_SERVICE_URL</code>. See <a href="../../concepts/label-space/grounding/">Grounding</a>.</li>
+      </ul>
+    </div>
 
     <div class="callout callout--tip">
-      <strong>Dependency.</strong> The chatbot requires the
-      ontology service (<strong>oe_yapat</strong>) to be running. See
-      <a href="../../getting-started/installation/">Installation</a>.
+      <strong>Next:</strong> <a href="../teams/">Teams</a> — invite the people who will annotate.
     </div>
 
   </main>
