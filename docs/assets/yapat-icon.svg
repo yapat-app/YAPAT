@@ -1,4 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path fill="#2b57d6" d="M8.6 6H18.6Q21 6 22.6 8.6L32 24V58H27.5Q25 58 25 55.5V38L7.5 8.6Q6 6 8.6 6Z"/>
-  <path fill="#7ea6ff" d="M55.4 6H45.4Q43 6 41.4 8.6L32 24V58H36.5Q39 58 39 55.5V38L56.5 8.6Q58 6 55.4 6Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>YAPAT</title>
+  <!-- An audio wave of five bars with one blue gradient (light at the top,
+       deep at the bottom), with clear gaps so the bars stay distinct at tab
+       size. Transparent background. -->
+  <defs>
+    <linearGradient id="yapat-blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d98ff"/>
+      <stop offset="1" stop-color="#2c4fdc"/>
+    </linearGradient>
+  </defs>
+  <rect x="3.00" y="11.00" width="3.0" height="10" rx="1.5" fill="url(#yapat-blue)"/>
+  <rect x="8.75" y="7.00" width="3.0" height="18" rx="1.5" fill="url(#yapat-blue)"/>
+  <rect x="14.50" y="3.50" width="3.0" height="25" rx="1.5" fill="url(#yapat-blue)"/>
+  <rect x="20.25" y="7.00" width="3.0" height="18" rx="1.5" fill="url(#yapat-blue)"/>
+  <rect x="26.00" y="11.00" width="3.0" height="10" rx="1.5" fill="url(#yapat-blue)"/>
 </svg>

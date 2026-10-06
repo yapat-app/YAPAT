@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Weakly Supervised Sound Event Detection (WSSED) is YAPAT's optional training server. It trains a sound event detection model from focal recordings and hands it to active learning as a starting model.">
+  <title>YAPAT Documentation – Weakly Supervised Sound Event Detection (WSSED)</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Weakly Supervised Sound Event Detection (WSSED)</h1>
+
+    <p class="lede">
+      <strong>Weakly Supervised Sound Event Detection (WSSED)</strong> is a way to train a sound event detection model from recordings that are labelled only with the species they contain, not with the exact time of each call. In YAPAT it runs on an optional training
+      server that builds such a model, so active learning can start
+      from a trained model instead of from random clips.
+    </p>
+
+    <h2>The idea in one paragraph</h2>
+
+    <p>
+      A <strong>sound event detection</strong> model finds where in a recording a
+      sound occurs, for example a frog call. Training one normally needs
+      <em>strong</em> labels that mark the exact start and end of every call,
+      which are slow to make. <strong>Weakly supervised</strong> training only needs
+      <em>weak</em> labels: which species can be heard in a recording, not when.
+      The model splits each recording into short segments, scores every segment,
+      and combines the segment scores into one score for the whole recording
+      (<strong>pooling</strong>), which it compares with the recording's label. This
+      way of learning from labelled groups of segments is called
+      <strong>multiple instance learning</strong>.
+    </p>
+
+    <h2>What it is used for in YAPAT</h2>
+
+    <p>
+      Many projects already have <strong>focal recordings</strong>: recordings made
+      to capture one animal or species, typically labelled with that species, for
+      example from a sound library. WSSED turns such a collection into a first
+      sound event detection model. Registered in YAPAT, that model ranks the clips of the
+      dataset straight away, so annotators start in the
+      <a href="../annotation-feeds/active-learning/">active-learning</a> loop
+      rather than in bootstrap mode.
+    </p>
+
+    <figure class="docs-infographic" aria-label="WSSED flow: a focal-recordings dataset is trained on the WSSED GPU server, the trained model is registered for active learning, and the Annotation Hub uses it as the first model.">
+      <ol class="di-flow di-animate di-n4">
+        <li style="--i:0">Focal recordings<span class="di-sub">a FOCAL_RECORDINGS dataset</span><span class="di-edge">train</span></li>
+        <li class="di-key" style="--i:1">WSSED GPU server<span class="di-sub">trains a detection model</span><span class="di-edge">add</span></li>
+        <li style="--i:2">Active-learning model<span class="di-sub">copied into YAPAT, ranks the clips</span><span class="di-edge">use</span></li>
+        <li style="--i:3">Annotation Hub<span class="di-sub">starts from a trained model</span></li>
+      </ol>
+      <figcaption>WSSED only trains. Annotation, retraining, and export happen in YAPAT as usual.</figcaption>
+    </figure>
+
+    <h2>The models</h2>
+
+    <table>
+      <thead>
+        <tr><th>Model</th><th>How it learns</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>BirdNET</strong> (default)</td><td>In two steps: it computes BirdNET embeddings for the recordings, then trains a pooled classifier on them. The embeddings are stored on the server and reused by later jobs.</td></tr>
+        <tr><td><strong>CDur</strong>, <strong>TALNet</strong></td><td>Neural networks for sound event detection that learn directly from mel spectrograms of the audio.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The training panel sets the pooling method (mean, max, or linear), the
+      number of training epochs (50 by default), the learning rate, the detection
+      threshold, the sample rate, and the number of mel bands. For CDur and
+      TALNet it also sets the length of the segments a recording is split into
+      (<em>bag</em>) and the step between them (<em>hop</em>).
+    </p>
+
+    <h2>How it fits into YAPAT</h2>
+
+    <ol>
+      <li>An administrator, or a user with access to a FOCAL_RECORDINGS dataset, opens the <strong>WSSED</strong> page from the Dashboard.</li>
+      <li><strong>Start Training</strong> asks the YAPAT backend to create a training job, which it sends to the WSSED server. The page checks the job's progress every five seconds.</li>
+      <li>When the job has completed, <strong>Register for Active Learning</strong> copies the trained model into YAPAT's active-learning model store, registers it as a model family, and starts a first ranking of the dataset's clips.</li>
+      <li><strong>Open Active Learning</strong> leads to the Annotation Hub.</li>
+    </ol>
+
+    <p>
+      The step-by-step version is in the <a href="../../guides/datasets/#training-a-model-with-wssed">Datasets</a>
+      guide. WSSED is optional: without it, YAPAT starts new datasets in bootstrap
+      mode or from ground-truth labels.
+    </p>
+
+    <div class="callout">
+      <strong>Not yet available.</strong> The WSSED server has a detection
+      endpoint, but it is a placeholder that does not run a model yet. In YAPAT,
+      WSSED is used for training only.
+    </div>
+
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>WSSED is a separate FastAPI service in the <code>WSSED/</code> submodule (repository WSSED-YAPAT), started from <code>wssed_gpu_server.py</code> on port <code>8003</code>. Its routes: <code>POST /train</code>, <code>GET /train/{job_id}/status</code>, <code>GET /artifacts</code>, <code>POST /detect</code> (placeholder), and <code>GET /health</code>.</li>
+        <li>It reads datasets below <code>WSSED_DATA_ROOT</code> and keeps job state in <code>WSSED_JOBS_DIR</code>; <code>WSSED_CUDA_VISIBLE_DEVICES</code> picks the graphics processing unit (GPU).</li>
+        <li>The YAPAT backend reaches it at <code>WSSED_GPU_SERVER_URL</code> and exposes the workflow under <code>/api/wssed</code>: <code>training-jobs</code>, <code>training-jobs/{job_id}/dispatch</code>, <code>/status</code>, <code>/register-al</code>, and <code>datasets/{dataset_id}/artifacts</code>. See <a href="../../reference/rest-api/">REST API</a>.</li>
+        <li>Registered weights are copied into <code>PAM_CHECKPOINTS_DIR</code>. The training code (models, pooling) is in <code>WSSED/MainClasses/</code>.</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

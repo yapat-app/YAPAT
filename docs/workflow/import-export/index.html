@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="How datasets are registered from the data volume and how annotations are exported as JSON or CSV.">
-  <title>Import &amp; Export — YAPAT Documentation</title>
+  <title>YAPAT Documentation – Import &amp; Export</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -34,8 +34,9 @@
     <h1>Import &amp; Export</h1>
 
     <p class="lede">
-      Audio is registered by reference rather than uploaded, and annotations are
-      exported as JSON or CSV.
+      Audio is never uploaded: YAPAT reads it from a folder on the data volume.
+      Labels come out as CSV or JSON, with enough detail to find every labelled
+      clip in the original recordings.
     </p>
 
     <h2>Importing a dataset</h2>
@@ -62,9 +63,9 @@
       source folder is rejected as a duplicate (HTTP 409), and non-administrators
       must supply a <code>team_id</code>. Creating a dataset schedules a
       background processing task that scans the folder, discovers audio files, and
-      creates recording entries. The user-study interface runs this scan only
-      at creation; the backend's task endpoints for scanning again and checking
-      progress are not used by the interface. The data volume is mounted
+      creates recording entries. The interface runs this scan only at
+      creation; the backend's task endpoints for scanning again and checking
+      progress are available through the API. The data volume is mounted
       read-only, so processing never modifies the original files.
     </p>
 

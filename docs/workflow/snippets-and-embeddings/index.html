@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="How embedding jobs create snippet sets, and how snippet audio and spectrograms are served.">
-  <title>Snippets &amp; Embeddings — YAPAT Documentation</title>
+  <title>YAPAT Documentation – Snippets &amp; Embeddings</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -35,9 +35,10 @@
     <h1>Snippets &amp; Embeddings</h1>
 
     <p class="lede">
-      Snippets are created as a by-product of embedding generation. A single job
-      cuts each recording into windows, embeds them, and stores the result as a
-      snippet set.
+      Snippets (the clips you label) are created by the embedding job: it cuts
+      each recording into windows, computes an embedding for each, and stores
+      both as a snippet set. This page covers the API side; for the idea, see
+      <a href="../../concepts/embeddings/">Embeddings</a>.
     </p>
 
     <h2>Creating a snippet set</h2>

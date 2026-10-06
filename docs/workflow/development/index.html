@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Run YAPAT from source for development: live reload, logs, database migrations, tests, and frontend builds.">
+  <title>YAPAT Documentation – Development Setup</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+
+  <script>
+    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+    (function () {
+      var d = document.documentElement, t = null;
+      d.classList.add("docs-js");
+      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
+      if (t !== "dark" && t !== "light") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      if (t === "dark") d.setAttribute("data-theme", "dark");
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../styles/tokens.css">
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/docs.css">
+</head>
+<body>
+  <main data-docs-content>
+    <h1>Development Setup</h1>
+
+    <p class="lede">
+      Everything you need to change YAPAT's code and see the result: live
+      reload for the backend and frontend, migrations, and tests. Start with
+      <a href="../../getting-started/installation/">Installation</a> if YAPAT is
+      not running yet.
+    </p>
+
+    <h2>Backend with live reload</h2>
+
+    <p>
+      Docker Compose automatically applies <code>docker-compose.override.yml</code>,
+      so a plain <code>docker compose up</code> in <code>backend/</code> already
+      runs in development mode: your source folder is mounted into every
+      container, and the API restarts when a Python file changes. Celery workers
+      do not reload; restart them after changing a task:
+    </p>
+
+    <pre><code>docker compose restart celery-worker celery-worker-pam-al</code></pre>
+
+    <p>
+      To run the stack without the development override, name the files
+      explicitly: <code>docker compose -f docker-compose.yml up</code>. For a graphics processing unit (GPU),
+      add <code>-f docker-compose.gpu.yml</code>.
+    </p>
+
+    <h2>Logs and background tasks</h2>
+
+    <pre><code>docker compose logs -f api                    # the API
+docker compose logs -f celery-worker-pam-al   # active-learning training</code></pre>
+
+    <p>
+      Flower at <code>http://localhost:5555</code> lists every background task
+      with its arguments, result, and error. The interactive API docs at
+      <code>http://localhost:8000/docs</code> let you call any endpoint.
+    </p>
+
+    <h2>Database migrations</h2>
+
+    <p>
+      Migrations run automatically when the <code>api</code> container starts.
+      After changing a model in <code>app/models/</code>, create a migration and
+      apply it:
+    </p>
+
+    <pre><code>docker compose exec api alembic revision --autogenerate -m "describe the change"
+docker compose exec api alembic upgrade head</code></pre>
+
+    <p>
+      Review the generated file in <code>alembic/versions/</code> before
+      committing it.
+    </p>
+
+    <h2>Tests</h2>
+
+    <pre><code>docker compose exec api pytest tests/unit
+docker compose exec api pytest tests/integration</code></pre>
+
+    <h2>Frontend</h2>
+
+    <table>
+      <thead>
+        <tr><th>Command</th><th>Does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>npm run dev</code></td><td>Development server with hot reload at <code>http://localhost:3000</code>.</td></tr>
+        <tr><td><code>npm run lint</code></td><td>Runs ESLint.</td></tr>
+        <tr><td><code>npm run build</code></td><td>Type-checks and builds the production bundle into <code>dist/</code>.</td></tr>
+        <tr><td><code>npm run preview</code></td><td>Serves the production build locally.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Frontend settings are <code>VITE_*</code> variables in
+      <code>frontend/.env</code>. Vite reads them at start-up, so restart
+      <code>npm run dev</code> after changing one. See
+      <a href="../../operations/environment/#frontend-variables">Environment Setup</a>.
+    </p>
+
+    <div class="callout callout--tip">
+      <strong>Next:</strong> <a href="../extending/">Extending YAPAT</a> — the common changes, and where to make them.
+    </div>
+
+  </main>
+
+  <script src="../../js/docs-config.js"></script>
+  <script src="../../js/docs-framework.js"></script>
+</body>
+</html>

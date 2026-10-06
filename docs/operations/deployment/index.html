@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Deploying YAPAT with Docker Compose: services, workers, queues, resource limits, and operational settings.">
-  <title>Deployment — YAPAT Documentation</title>
+  <title>YAPAT Documentation – Deployment</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -79,13 +79,13 @@
 
     <figure class="docs-infographic" aria-label="Service layout: the api service queues work in Redis; the general worker and the PAM active-learning worker consume it.">
       <div class="di-cols">
-        <div class="di-node">api<span class="di-sub">FastAPI</span></div>
+        <div class="di-node di-code">api<span class="di-sub">FastAPI</span></div>
         <span class="di-arrow" aria-hidden="true">&rarr;</span>
-        <div class="di-node">redis<span class="di-sub">broker and result backend</span></div>
+        <div class="di-node di-code">redis<span class="di-sub">broker and result backend</span></div>
         <span class="di-arrow" aria-hidden="true">&rarr;</span>
         <div class="di-stack">
-          <div class="di-node">celery-worker<span class="di-sub">default, embeddings, processing, exports</span></div>
-          <div class="di-node">celery-worker-pam-al<span class="di-sub">pam_al</span></div>
+          <div class="di-node di-code">celery-worker<span class="di-sub">default, embeddings, processing, exports</span></div>
+          <div class="di-node di-code di-key">celery-worker-pam-al<span class="di-sub">pam_al</span></div>
         </div>
       </div>
       <figcaption>Task path. db (PostgreSQL with pgvector) is used by the api and both workers; celery-beat schedules periodic tasks; flower monitors the workers.</figcaption>
@@ -110,7 +110,7 @@
         <code>EMBEDDING_CHORD_CHUNK_SIZE</code>.
       </li>
       <li>
-        <strong>Training</strong> — the PAM active-learning worker has the
+        <strong>Training</strong> — the passive acoustic monitoring (PAM) active-learning worker has the
         largest memory allowance of the stack (a 16 GB limit and an 8 GB
         reservation in the Compose file, against 4 GB for the general worker)
         because it loads embedding matrices and PyTorch models.
@@ -140,7 +140,7 @@
 
     <p>
       Every worker process and uvicorn worker opens its own pool. In the
-      user-study backend the pool is fixed in code, with a pool size of 10, up to
+      backend the pool is fixed in code, with a pool size of 10, up to
       20 overflow connections, and a 30-second timeout; there are no environment
       variables for it. The stack's worst-case connection count is therefore
       <code>processes × 30</code> and must stay under the server's PostgreSQL
@@ -150,7 +150,8 @@
     <h2>GPU deployments</h2>
 
     <p>
-      The stack runs on CPU by default. The GPU file adds GPU device
+      The stack runs on the central processing unit (CPU) by default. For a graphics processing
+      unit (GPU), the GPU file adds GPU device
       reservations to the API and to the PAM active-learning worker; the general
       worker gets none. Set <code>DEVICE=gpu</code> and select the GPU file:
     </p>
@@ -176,7 +177,7 @@ COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml</code></pre>
       (<code>HOST_DATA_ROOT</code>). Model checkpoints are stored in
       <code>/app/models_AL</code>, a bind mount of <code>HOST_MODELS_AL</code>
       (default <code>./models_AL</code>) that is writable so retraining can save
-      new checkpoints. The base Compose file has no mount for WSSED
+      new checkpoints. The base Compose file has no mount for Weakly Supervised Sound Event Detection (WSSED)
       focal-recordings data.
     </p>
 
@@ -206,7 +207,7 @@ docker compose exec api alembic current</code></pre>
       <code>host.docker.internal:8002</code>) and the GPU server at
       <code>WSSED_GPU_SERVER_URL</code>, which Compose does not preset; set it
       in <code>.env</code>. Label-space grounding also needs outbound access to
-      the GBIF and EBI OLS services.
+      the Global Biodiversity Information Facility (GBIF) and the Ontology Lookup Service (OLS) of the European Bioinformatics Institute (EBI) services.
     </div>
 
   </main>
