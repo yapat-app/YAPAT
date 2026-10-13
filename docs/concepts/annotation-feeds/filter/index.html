@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Narrow and sort the clips in the Annotation Hub by label status, location, date, time, and model scores.">
+  <meta name="description" content="Narrow and sort the snippets in the Annotation Hub by label status, location, date, time, and model scores.">
   <title>YAPAT Documentation – Filters and Model Scores</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/base.css">
@@ -34,7 +34,7 @@
     <h1>Filters and Model Scores</h1>
 
     <p class="lede">
-      Filters let you focus on part of a dataset, for example unlabelled clips
+      Filters let you focus on part of a dataset, for example unlabelled snippets
       from one site at dawn. They narrow both the feed and the projection, and
       the feed can be sorted by the same values.
     </p>
@@ -46,16 +46,16 @@
         <tr><th>Filter</th><th>Shows</th><th>From phase</th></tr>
       </thead>
       <tbody>
-        <tr><td>Status</td><td>All, unlabelled, or labelled clips; labelled clips can be narrowed to chosen species.</td><td>3</td></tr>
-        <tr><td>Location</td><td>Clips from one or more recording sites.</td><td>3</td></tr>
+        <tr><td>Status</td><td>All, unlabelled, or labelled snippets; labelled snippets can be narrowed to chosen species.</td><td>3</td></tr>
+        <tr><td>Location</td><td>Snippets from one or more recording sites.</td><td>3</td></tr>
         <tr><td>Date and time</td><td>A date range, months of the year, and a time of day.</td><td>3</td></tr>
-        <tr><td>Model scores</td><td>Clips within a range of each score, set with sliders over a histogram.</td><td>4</td></tr>
+        <tr><td>Model scores</td><td>Snippets within a range of each score, set with sliders over a histogram.</td><td>4</td></tr>
       </tbody>
     </table>
 
     <figure class="docs-shot docs-shot--narrow">
       <img src="../../../assets/screenshots/hub-filters.webp" width="388" height="841" loading="lazy" alt="The filter sidebar: status, location, date range, month, time of day, and model score histograms.">
-      <figcaption>The filter sidebar in phase 5. Drag the handles under each histogram to narrow the clips.</figcaption>
+      <figcaption>The filter sidebar in phase 5. Drag the handles under each histogram to narrow the snippets.</figcaption>
     </figure>
 
     <p>
@@ -71,9 +71,9 @@
         <tr><th>Score</th><th>High means</th></tr>
       </thead>
       <tbody>
-        <tr><td>Uncertainty</td><td>The model is unsure about this clip. The feed is ranked by it.</td></tr>
-        <tr><td>Diversity</td><td>The clip is unlike the clips already labelled.</td></tr>
-        <tr><td>Density</td><td>The clip sits among many similar clips, so it represents a common sound.</td></tr>
+        <tr><td>Uncertainty</td><td>The model is unsure about this snippet. The feed is ranked by it.</td></tr>
+        <tr><td>Diversity</td><td>The snippet is unlike the snippets already labelled.</td></tr>
+        <tr><td>Density</td><td>The snippet sits among many similar snippets, so it represents a common sound.</td></tr>
         <tr><td>Composite</td><td>A weighted mix, by default half uncertainty and a quarter each diversity and density.</td></tr>
         <tr><td>Confidence</td><td>The model is confident it hears something; with species selected, confident it hears one of them.</td></tr>
       </tbody>

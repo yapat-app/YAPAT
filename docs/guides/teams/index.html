@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -78,8 +78,10 @@
     <p>
       The first link for a team without an owner makes the person its
       <strong>team owner</strong>. Later links add <strong>annotators</strong>.
-      People who sign up on their own, without a link, get an annotator account
-      that belongs to no team yet.
+      The current interface has no public sign-up link: accounts come from an
+      administrator or from an invitation link. The frontend does contain a
+      <code>/signUp</code> route that creates an annotator account with no team,
+      but nothing in the interface links to it.
     </p>
 
     <h2>Delete a team</h2>
@@ -107,7 +109,7 @@
     </div>
 
     <div class="callout callout--tip">
-      <strong>Next:</strong> <a href="../../concepts/annotation-feeds/active-learning/">Active Learning</a> — how YAPAT chooses which clips you see.
+      <strong>Next:</strong> <a href="../../concepts/annotation-feeds/active-learning/">Active Learning</a> — how YAPAT chooses which snippets you see.
     </div>
 
   </main>

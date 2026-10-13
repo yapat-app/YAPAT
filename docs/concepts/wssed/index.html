@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -36,7 +36,7 @@
     <p class="lede">
       <strong>Weakly Supervised Sound Event Detection (WSSED)</strong> is a way to train a sound event detection model from recordings that are labelled only with the species they contain, not with the exact time of each call. In YAPAT it runs on an optional training
       server that builds such a model, so active learning can start
-      from a trained model instead of from random clips.
+      from a trained model instead of from random snippets.
     </p>
 
     <h2>The idea in one paragraph</h2>
@@ -60,7 +60,7 @@
       Many projects already have <strong>focal recordings</strong>: recordings made
       to capture one animal or species, typically labelled with that species, for
       example from a sound library. WSSED turns such a collection into a first
-      sound event detection model. Registered in YAPAT, that model ranks the clips of the
+      sound event detection model. Registered in YAPAT, that model ranks the snippets of the
       dataset straight away, so annotators start in the
       <a href="../annotation-feeds/active-learning/">active-learning</a> loop
       rather than in bootstrap mode.
@@ -70,7 +70,7 @@
       <ol class="di-flow di-animate di-n4">
         <li style="--i:0">Focal recordings<span class="di-sub">a FOCAL_RECORDINGS dataset</span><span class="di-edge">train</span></li>
         <li class="di-key" style="--i:1">WSSED GPU server<span class="di-sub">trains a detection model</span><span class="di-edge">add</span></li>
-        <li style="--i:2">Active-learning model<span class="di-sub">copied into YAPAT, ranks the clips</span><span class="di-edge">use</span></li>
+        <li style="--i:2">Active-learning model<span class="di-sub">copied into YAPAT, ranks the snippets</span><span class="di-edge">use</span></li>
         <li style="--i:3">Annotation Hub<span class="di-sub">starts from a trained model</span></li>
       </ol>
       <figcaption>WSSED only trains. Annotation, retraining, and export happen in YAPAT as usual.</figcaption>
@@ -101,7 +101,7 @@
     <ol>
       <li>An administrator, or a user with access to a FOCAL_RECORDINGS dataset, opens the <strong>WSSED</strong> page from the Dashboard.</li>
       <li><strong>Start Training</strong> asks the YAPAT backend to create a training job, which it sends to the WSSED server. The page checks the job's progress every five seconds.</li>
-      <li>When the job has completed, <strong>Register for Active Learning</strong> copies the trained model into YAPAT's active-learning model store, registers it as a model family, and starts a first ranking of the dataset's clips.</li>
+      <li>When the job has completed, <strong>Register for Active Learning</strong> copies the trained model into YAPAT's active-learning model store, registers it as a model family, and starts a first ranking of the dataset's snippets.</li>
       <li><strong>Open Active Learning</strong> leads to the Annotation Hub.</li>
     </ol>
 

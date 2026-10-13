@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="How YAPAT's model chooses which clips you see, how it starts, and how it learns from your labels.">
+  <meta name="description" content="How YAPAT's model chooses which snippets you see, how it starts, and how it learns from your labels.">
   <title>YAPAT Documentation – Active Learning</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/base.css">
@@ -35,32 +35,32 @@
 
     <p class="lede">
       Active learning means the model asks for help where it needs it most.
-      Instead of going through recordings in order, you label the clips the model
+      Instead of going through recordings in order, you label the snippets the model
       is least sure about, so each label teaches it as much as possible.
     </p>
 
     <h2>The loop</h2>
 
-    <figure class="docs-infographic" aria-label="Active-learning loop: ranked clips, annotator labels, retrain after 10 labels, new ranking.">
+    <figure class="docs-infographic" aria-label="Active-learning loop: ranked snippets, annotator labels, retrain after 10 labels, new ranking.">
       <ol class="di-flow di-flow--loop di-animate di-n4" style="--n:4">
-        <li style="--i:0">Ranked clips<span class="di-sub">least certain first</span><span class="di-edge">listen</span></li>
-        <li style="--i:1">You label<span class="di-sub">one or more labels per clip</span><span class="di-edge">count</span></li>
+        <li style="--i:0">Ranked snippets<span class="di-sub">least certain first</span><span class="di-edge">listen</span></li>
+        <li style="--i:1">You label<span class="di-sub">one or more labels per snippet</span><span class="di-edge">count</span></li>
         <li style="--i:2">10 new labels<span class="di-sub">since the last training</span><span class="di-edge">train</span></li>
         <li class="di-key" style="--i:3">Model retrains<span class="di-sub">automatically, in the background</span></li>
         <span class="di-loop-label">new ranking</span>
       </ol>
-      <figcaption>After retraining, the model ranks the clips again and the loop repeats.</figcaption>
+      <figcaption>After retraining, the model ranks the snippets again and the loop repeats.</figcaption>
     </figure>
 
     <h2>Starting without a model</h2>
 
     <p>
-      A new dataset has no model yet. The <strong>Generate Feed</strong> dialog
+      A new dataset has no model yet. The <strong>Generate Feed</strong> dialog (see <a href="../../../guides/annotation-hub/#generating-a-feed">Generating a feed</a>)
       offers two ways to begin:
     </p>
 
     <ul>
-      <li><strong>Bootstrap mode</strong> — you label randomly chosen clips, and the first model is trained from those labels.</li>
+      <li><strong>Bootstrap mode</strong> — you label randomly chosen snippets, and the first model is trained from those labels.</li>
       <li><strong>Cold start</strong> — the first model is trained from existing ground-truth labels. Only administrators and team owners can start it.</li>
     </ul>
 
@@ -68,11 +68,11 @@
       A model trained with Weakly Supervised Sound Event Detection (WSSED) can also serve as the first model; see <a href="../../wssed/">WSSED</a>.
     </p>
 
-    <h2>How clips are ranked</h2>
+    <h2>How snippets are ranked</h2>
 
     <p>
-      The model scores every clip. The feed shows the ones it is most
-      <strong>uncertain</strong> about, up to the Top-K number you set. Each clip
+      The model scores every snippet. The feed shows the ones it is most
+      <strong>uncertain</strong> about, up to the Top-K number you set. Each snippet
       also carries diversity, density, and composite scores, which you can filter
       and sort by in phases 4 and 5; see
       <a href="../filter/">Filters and Model Scores</a>.
@@ -81,7 +81,7 @@
     <h2>Why the model's guess is hidden</h2>
 
     <p>
-      Labelling is <strong>blind</strong>: the clip never shows what the model
+      Labelling is <strong>blind</strong>: the snippet never shows what the model
       predicts. Each label is your own judgement, not a confirmation of the
       model's guess, and that independent judgement is what the model learns
       from.

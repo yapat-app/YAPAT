@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -47,15 +47,24 @@
     <h2>1. Sign in</h2>
 
     <p>
-      Register on the sign-up page, or open an invitation link from your
-      administrator, then sign in with your username and password. The
-      <strong>Dashboard</strong> greets you with your role and the number of
-      datasets you can access. <strong>Start Annotating</strong> opens the
-      Annotation Hub, and a card opens each area you can use: Dataset
-      Management, Annotate, Label Management, and, depending on your role, Team
-      Management, Weakly Supervised Sound Event Detection (WSSED), and Study Logs. The Feed History card lists older feeds
-      and is not needed for annotation; the Documentation card opens a
-      manual built into the app.
+      YAPAT has no public sign-up button. Open the YAPAT address and click
+      <strong>Sign in</strong> on the home page, then enter the username and
+      password of the account an administrator created for you. If you were
+      invited to a team, open the invitation link instead: it shows the login
+      form with your role filled in, and the button reads
+      <strong>Register</strong>. Choose a username and password, register, then
+      sign in. See <a href="../../guides/teams/">Teams</a>.
+    </p>
+
+    <p>
+      After signing in you land on the <strong>Dashboard</strong>. It greets you
+      with your role and the number of datasets you can access.
+      <strong>Start Annotating</strong> opens the Annotation Hub, and a card
+      opens each area you can use: Dataset Management, Annotate, Label
+      Management, and, depending on your role, Team Management, Weakly
+      Supervised Sound Event Detection (WSSED), and Study Logs. The Feed History
+      card lists older feeds and is not needed for annotation; the
+      Documentation card opens a manual built into the app.
     </p>
 
     <h2>2. Add a dataset</h2>
@@ -71,7 +80,7 @@
     <p>
       On the dataset card, the administrator clicks
       <strong>Generate Embeddings</strong>. YAPAT cuts the audio into 3-second
-      clips and prepares them for the model.
+      snippets and prepares them for the model.
       <a href="../../concepts/embeddings/">Embeddings →</a>
     </p>
 
@@ -79,17 +88,22 @@
 
     <p>
       Optional, but recommended. In <strong>Label Management</strong>, describe
-      what you want to label and freeze the list.
+      what you want to label and submit the list; a team owner then makes it
+      active. The short list of labels
+      annotators click is managed separately, as
+      <a href="../../guides/datasets/#quick-labels">quick labels</a> on the
+      dataset card.
       <a href="../../guides/label-management/">Label Management →</a>
     </p>
 
     <h2>5. Start annotating</h2>
 
     <p>
-      Open the <strong>Annotation Hub</strong>, choose the dataset, click
-      <strong>Generate Feed</strong> at the top right of the feed, and choose
-      <strong>bootstrap mode</strong>.
-      Listen to each clip and choose its labels.
+      Open the <strong>Annotation Hub</strong>, choose the dataset, and click
+      <strong>Generate Feed</strong> at the top right of the feed. For a new
+      dataset, enter a model family name and leave the ground-truth switch off
+      to start in bootstrap mode. Then listen to each snippet and choose its
+      labels. <a href="../../guides/annotation-hub/#generating-a-feed">How feeds are generated →</a>
       <a href="../../guides/annotation-hub/">Annotation Hub →</a>
     </p>
 
@@ -97,7 +111,7 @@
 
     <p>
       Keep labelling. After every 10 labels the model retrains on its own, and
-      the feed shows the clips it is now least sure about.
+      the feed shows the snippets it is now least sure about.
       <a href="../../concepts/annotation-feeds/active-learning/">Active Learning →</a>
     </p>
 

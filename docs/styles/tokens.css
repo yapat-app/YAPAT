@@ -10,9 +10,10 @@
   --surface: #ffffff;
   --surface-soft: #f7fafc;
 
-  --text: #172033;
-  --text-secondary: #667085;
-  --text-muted: #8793a8;
+  --text: #1f2933;
+  --text-body: #2e3a48;
+  --text-secondary: #4a5666;
+  --text-muted: #647082;
   --text-link: #4a709c;
 
   --border: #e5e7eb;
@@ -34,8 +35,8 @@
 
   --violet: #7c3aed;
 
-  --font-sans: "IBM Plex Sans";
-  --font-mono: "IBM Plex Mono";
+  --font-sans: "Inter";
+  --font-mono: "JetBrains Mono";
 
   --page-width: 1280px;
   --content-width: 1080px;
@@ -55,6 +56,10 @@
   color-scheme: light;
 }
 
+/* Wider layouts on large monitors. */
+@media (min-width: 1920px) { :root { --page-width: 1520px; } }
+@media (min-width: 2400px) { :root { --page-width: 1800px; } }
+
 /* Dark theme — applied to the documentation shell via
    data-theme="dark" on <html>. */
 html[data-theme="dark"] {
@@ -63,9 +68,10 @@ html[data-theme="dark"] {
   --surface: #181818;
   --surface-soft: #202020;
 
-  --text: #f2f2f2;
-  --text-secondary: #b5b5b5;
-  --text-muted: #858585;
+  --text: #e8edf3;
+  --text-body: #c3ccd6;   /* running text: dimmer than headings */
+  --text-secondary: #aab6c3;
+  --text-muted: #8b98a6;
   --text-link: #8ab4f8;
 
   --border: #303030;

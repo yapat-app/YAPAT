@@ -285,6 +285,8 @@
     var headings = contentRoot.querySelectorAll("h2, h3");
     if (!headings.length) return { list: "", items: [] };
 
+    // data-toc-depth="2" on the content root lists only the h2 headings.
+    var h2Only = contentRoot.getAttribute("data-toc-depth") === "2";
     var used = {};
     var items = [];
     headings.forEach(function (h) {
@@ -294,6 +296,7 @@
       used[base] = n;
       if (n > 1) id = base + "-" + n;
       h.id = id;
+      if (h2Only && h.tagName === "H3") return;
       items.push({ level: h.tagName === "H3" ? 3 : 2, id: id, text: h.textContent });
     });
 
@@ -534,38 +537,77 @@
 
   (function scrollspy() {
     var links = document.querySelectorAll(".docs-toc a, .docs-toc-mobile a");
+    if (!links.length) return;
+
+    // Desktop and mobile menus each have a link per heading.
+    var group = {};
+    links.forEach(function (a) {
+      var href = a.getAttribute("href");
+      (group[href] = group[href] || []).push(a);
+    });
+
+    // Only headings that have a toc entry (the toc can be h2-only).
     var headings = Array.prototype.filter.call(
       document.querySelectorAll(".docs-main h2, .docs-main h3"),
-      function (h) { return h.id; }
+      function (h) { return h.id && group["#" + h.id]; }
     );
-    if (!links.length || !headings.length) return;
+    if (!headings.length) return;
 
-    var group = {};
-    links.forEach(function (a) { group[a.getAttribute("href")] = a; });
+    var scroller = document.querySelector(".docs-scroll");
+    var active = null;       // heading id currently highlighted
+    var pinned = null;       // heading id chosen by clicking a toc link
 
-    var activeLink = null;
+    // A heading is current once it is within a few px of where a toc click
+    // lands it (its scroll-margin-top below the top of the scroll area).
+    function markerFor(h) {
+      var top = scroller ? scroller.getBoundingClientRect().top : 0;
+      return top + (parseFloat(getComputedStyle(h).scrollMarginTop) || 0) + 16;
+    }
 
-    function computeOffset() {
-      var header = document.querySelector(".docs-header");
-      return (header ? header.getBoundingClientRect().height : 64) + 40;
+    function atBottom() {
+      var el = scroller || document.documentElement;
+      return el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    }
+
+    function setActive(id) {
+      if (id === active) return;
+      if (active) (group["#" + active] || []).forEach(function (a) { a.classList.remove("is-active"); });
+      (group["#" + id] || []).forEach(function (a) { a.classList.add("is-active"); });
+      active = id;
     }
 
     function update() {
-      var marker = computeOffset();
+      if (pinned) return setActive(pinned);
       var current = null;
       for (var i = 0; i < headings.length; i++) {
-        var top = headings[i].getBoundingClientRect().top;
-        if (top <= marker) current = headings[i];
+        if (headings[i].getBoundingClientRect().top <= markerFor(headings[i])) current = headings[i];
         else break;
       }
-      var target = current ? group["#" + current.id] : null;
-      if (target === activeLink) return;
-      if (activeLink) activeLink.classList.remove("is-active");
-      if (target) target.classList.add("is-active");
-      activeLink = target;
+      // The last sections are often too short to reach the marker.
+      if (atBottom()) current = headings[headings.length - 1];
+      if (current) setActive(current.id);
+      else if (active) {
+        (group["#" + active] || []).forEach(function (a) { a.classList.remove("is-active"); });
+        active = null;
+      }
     }
 
-    var scroller = document.querySelector(".docs-scroll");
+    // A clicked link stays active even if its heading cannot reach the top
+    // (end of page); the pin is released as soon as the reader scrolls.
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest ? e.target.closest(".docs-toc a, .docs-toc-mobile a") : null;
+      if (!a) return;
+      pinned = a.getAttribute("href").slice(1);
+      update();
+    });
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (ev) {
+      (scroller || window).addEventListener(ev, function (e) {
+        if (!pinned) return;
+        if (e.target.closest && e.target.closest(".docs-toc, .docs-toc-mobile")) return;
+        pinned = null;
+      }, { passive: true });
+    });
+
     (scroller || window).addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     update();

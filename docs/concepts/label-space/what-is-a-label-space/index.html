@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/base.css">
@@ -69,7 +69,7 @@
     <ol>
       <li>Describe what you want to label in the label-space chat.</li>
       <li>Keep the suggested concepts that fit. See <a href="../grounding/">Grounding</a>.</li>
-      <li>Freeze the list. Its concepts now appear in the Annotation Hub for your team. See <a href="../managing-versions/">Freezing a Label Space</a>.</li>
+      <li>Submit the list. It becomes a version that the team owner makes active; the active version is the one your team annotates with. See <a href="../managing-versions/">Submitting a Label Space</a>.</li>
     </ol>
 
     <p>
@@ -80,7 +80,7 @@
     <div class="callout callout--dev">
       <strong>For developers.</strong>
       <ul>
-        <li>A frozen label space is stored as a custom taxonomy with status <code>active</code>. Statuses <code>draft</code> and <code>archived</code> exist in the model; archiving is API-only and hides the taxonomy from listings.</li>
+        <li>The interface now submits a label space as a numbered version that an owner makes active (see <a href="../managing-versions/">Submitting a Label Space</a>); the older freeze action stores a custom taxonomy with status <code>active</code>. Statuses <code>draft</code> and <code>archived</code> exist in the model; archiving is API-only and hides the taxonomy from listings.</li>
         <li>The taxonomy API covers GBIF and custom taxonomies: <code>GET /api/taxonomy/available</code>, <code>/suggest</code>, <code>/search</code>, <code>/resolve</code>. See <a href="../../../reference/rest-api/">REST API</a>.</li>
       </ul>
     </div>

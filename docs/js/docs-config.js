@@ -95,7 +95,7 @@ window.YAPAT_DOCS = {
           pages: [
             { id: "what-is-a-label-space", title: "What is a Label Space?", href: "concepts/label-space/what-is-a-label-space/" },
             { id: "grounding", title: "Grounding", href: "concepts/label-space/grounding/" },
-            { id: "managing-versions", title: "Freezing a Label Space", href: "concepts/label-space/managing-versions/" }
+            { id: "managing-versions", title: "Submitting a Label Space", href: "concepts/label-space/managing-versions/" }
           ]
         }
       ]

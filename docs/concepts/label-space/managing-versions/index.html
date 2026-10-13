@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Freezing turns your label space into a fixed list of concepts that the Annotation Hub uses for your team.">
-  <title>YAPAT Documentation – Freezing a Label Space</title>
+  <meta name="description" content="Submitting turns your label space into a new version that the team owner makes active, so the Annotation Hub uses it for your team.">
+  <title>YAPAT Documentation – Submitting a Label Space</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/base.css">
@@ -31,37 +31,51 @@
 </head>
 <body>
   <main data-docs-content>
-    <h1>Freezing a Label Space</h1>
+    <h1>Submitting a Label Space</h1>
 
     <p class="lede">
-      Freezing finishes a label space. The list becomes fixed, and its concepts
-      appear in the Annotation Hub for everyone in your team.
+      Submitting finishes a working label space. It becomes a numbered version
+      that waits for the team owner's approval. Once the owner makes it active,
+      its concepts are the label space the team annotates with.
     </p>
 
-    <figure class="docs-infographic" aria-label="Label-space lifecycle: conversation, concept list, freeze, annotation.">
+    <figure class="docs-infographic" aria-label="Label-space lifecycle: conversation, concept list, submitted version, active label space.">
       <ol class="di-flow di-animate di-n4">
         <li style="--i:0">Conversation<span class="di-sub">for one team</span><span class="di-edge">add</span></li>
-        <li style="--i:1">Concept list<span class="di-sub">still editable</span><span class="di-edge">freeze</span></li>
-        <li class="di-key" style="--i:2">Frozen label space<span class="di-sub">fixed from now on</span><span class="di-edge">use</span></li>
-        <li style="--i:3">Annotation Hub<span class="di-sub">concepts in the label list</span></li>
+        <li style="--i:1">Concept list<span class="di-sub">still editable</span><span class="di-edge">submit</span></li>
+        <li style="--i:2">Submitted version<span class="di-sub">awaits the team owner</span><span class="di-edge">make active</span></li>
+        <li style="--i:3">Active label space<span class="di-sub">the one in use</span></li>
       </ol>
-      <figcaption>Freezing again creates a new label space; it does not replace the earlier one.</figcaption>
+      <figcaption>Submitting again creates a new version; it does not replace the earlier ones.</figcaption>
     </figure>
 
-    <h2>How to freeze</h2>
+    <h2>How to submit</h2>
 
     <p>
       In <a href="../../../guides/label-management/">Label Management</a>, click
-      <strong>Add To label space list</strong>. The label space is saved as
-      "Label space" followed by the date and time, and the conversation closes.
+      <strong>Submit label space</strong> under the <strong>Current Label
+      Space</strong> list. The button is disabled while the list is empty. The
+      interface then confirms "Submitted as" and the version name, and that the
+      label space awaits the team owner's approval.
     </p>
 
-    <h2>Changing a frozen label space</h2>
+    <h2>Approving a version</h2>
 
     <p>
-      A frozen label space cannot be edited. To change it, build and freeze a new
-      one. The Hub uses your team's newest frozen label space; earlier ones are
-      kept.
+      Team owners, and administrators for every team, see a <strong>Label Space
+      Versions</strong> list under the current list. Each version can be
+      expanded to preview its concepts; <strong>Make active</strong> promotes it
+      and the interface confirms "Active label space updated". The active
+      version is marked <strong>Active</strong>. Until an owner has made a
+      version active, the team has no active label space.
+    </p>
+
+    <h2>Changing a label space</h2>
+
+    <p>
+      A submitted version is not edited. To change the label space, build a new
+      list, submit it, and have the owner make the new version active. Earlier
+      versions are kept in the list.
     </p>
 
     <h2>What happens to existing labels</h2>
@@ -72,10 +86,16 @@
     </p>
 
     <div class="callout callout--dev">
-      <strong>For developers.</strong> Freezing creates a custom taxonomy with
-      status <code>active</code>, owned by the conversation's team and attributed
-      to the user who froze it. There is no review or approval step, and a team
-      can hold several active taxonomies. Annotations store
+      <strong>For developers.</strong> The web interface submits with
+      <code>POST /api/taxonomy/chat/{id}/submit</code>, lists versions with
+      <code>GET /api/teams/{team_id}/label-space/submissions</code> (status
+      <code>submitted</code>, <code>active</code>, <code>archived</code> or
+      <code>all</code>), and reads or sets the active version with
+      <code>GET</code> and <code>PUT /api/teams/{team_id}/active-label-space</code>.
+      The backend version pinned in this repository still provides only the older
+      <code>POST /api/taxonomy/chat/{id}/freeze</code> (see
+      <a href="../../../reference/rest-api/">REST API</a>), so use a backend that
+      includes the versioned endpoints. Annotations store
       <code>taxon_id</code> and <code>resolved_name_snapshot</code>, not a
       reference to the taxonomy.
     </div>

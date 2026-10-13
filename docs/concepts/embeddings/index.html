@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -34,9 +34,9 @@
     <h1>Embeddings</h1>
 
     <p class="lede">
-      An embedding is a list of numbers that summarises what a clip sounds like.
-      Clips that sound alike get similar numbers. YAPAT computes one embedding per
-      3-second clip, once, and uses them everywhere the model needs to compare
+      An embedding is a list of numbers that summarises what a snippet sounds like.
+      Snippets that sound alike get similar numbers. YAPAT computes one embedding per
+      3-second snippet, once, and uses them everywhere the model needs to compare
       sounds.
     </p>
 
@@ -44,7 +44,7 @@
 
     <ul>
       <li><strong>Active learning</strong> — the model is trained on embeddings, not on the raw audio.</li>
-      <li><strong>The projection</strong> — the map of all clips in the Annotation Hub places clips with similar embeddings close together.</li>
+      <li><strong>The projection</strong> — the map of all snippets in the Annotation Hub places snippets with similar embeddings close together.</li>
     </ul>
 
     <p>
@@ -53,7 +53,7 @@
 
     <figure class="docs-shot docs-shot--medium">
       <img src="../../assets/screenshots/hub-projection.webp" width="662" height="841" loading="lazy" alt="The feature projection: thousands of grey points with coloured labelled points, and t-SNE, UMAP and PCA buttons.">
-      <figcaption>The projection in the Annotation Hub. Each point is a clip; coloured points are labelled. The buttons at the top switch between three ways of drawing the embeddings on a flat map: t-distributed stochastic neighbor embedding (t-SNE), Uniform Manifold Approximation and Projection (UMAP), and principal component analysis (PCA).</figcaption>
+      <figcaption>The projection in the Annotation Hub. Each point is a snippet; coloured points are labelled. The buttons at the top switch between three ways of drawing the embeddings on a flat map: t-distributed stochastic neighbor embedding (t-SNE), Uniform Manifold Approximation and Projection (UMAP), and principal component analysis (PCA).</figcaption>
     </figure>
 
 
@@ -62,8 +62,8 @@
     <p>
       YAPAT ships with <strong>BirdNET 2.4</strong>, a published neural network for
       recognising bird and other animal sounds. It listens in 3-second
-      windows and produces 1,024 numbers per clip. The model decides the clip
-      length, so every clip in a dataset is comparable.
+      windows and produces 1,024 numbers per snippet. The model decides the snippet
+      length, so every snippet in a dataset is comparable.
     </p>
 
     <h2>Generating embeddings</h2>
@@ -77,7 +77,7 @@
     <div class="callout callout--dev">
       <strong>For developers.</strong>
       <ul>
-        <li>An embedding job produces a <strong>snippet set</strong>: the clips and their vectors for one model and window. A dataset is ready when its default snippet set has status <code>ready</code>.</li>
+        <li>An embedding job produces a <strong>snippet set</strong>: the snippets and their vectors for one model and window. A dataset is ready when its default snippet set has status <code>ready</code>.</li>
         <li><code>POST /api/datasets/{id}/embeddings</code> starts a job (HTTP 409 if the same one exists); <code>GET /api/embeddings/{job_id}</code> reports progress. Jobs run on the <code>embeddings</code> Celery queue.</li>
         <li>Vectors are stored in PostgreSQL with pgvector. See <a href="../../workflow/snippets-and-embeddings/">Snippets &amp; Embeddings</a>.</li>
       </ul>

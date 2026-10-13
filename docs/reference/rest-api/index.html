@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -70,7 +70,7 @@
     <table>
       <thead><tr><th>Method &amp; path</th><th>Used by</th><th>Access</th></tr></thead>
       <tbody>
-        <tr><td><code>POST /api/auth/register</code></td><td>Sign-up page (role <code>user</code>) and the sign-in page opened from a team invitation link (role and <code>team_invitation_token</code> from the link). The backend stores the role the client sends.</td><td>Public</td></tr>
+        <tr><td><code>POST /api/auth/register</code></td><td>The sign-in page opened from a team invitation link (role and <code>team_invitation_token</code> from the link). The backend stores the role the client sends. The frontend also has a <code>/signUp</code> route (role <code>user</code>, no invitation token) that no page links to.</td><td>Public</td></tr>
         <tr><td><code>POST /api/auth/login</code></td><td>Sign-in page.</td><td>Public</td></tr>
         <tr><td><code>GET /api/auth/me</code></td><td>Every page, to load the signed-in user.</td><td>Authenticated</td></tr>
       </tbody>
@@ -151,7 +151,7 @@
         <tr><td><code>GET /api/taxonomy/chat/{id}/label-space</code></td><td>The concept list.</td><td>Conversation access</td></tr>
         <tr><td><code>POST /api/taxonomy/chat/{id}/add</code></td><td>Adding all or one of the suggested concepts.</td><td>Conversation access</td></tr>
         <tr><td><code>DELETE /api/taxonomy/chat/{id}/item/{item_id}</code></td><td>Removing a concept.</td><td>Conversation access</td></tr>
-        <tr><td><code>POST /api/taxonomy/chat/{id}/freeze</code></td><td>Add To label space list: freezes into an <code>active</code> custom taxonomy.</td><td>Conversation access</td></tr>
+        <tr><td><code>POST /api/taxonomy/chat/{id}/freeze</code></td><td>The older freeze action: freezes into an <code>active</code> custom taxonomy. The current interface submits a version instead (see <a href="../../concepts/label-space/managing-versions/">Submitting a Label Space</a>).</td><td>Conversation access</td></tr>
         <tr><td><code>GET /api/taxonomy/custom</code></td><td>Loading the team's custom taxonomies for the Hub's label list.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/taxonomy/suggest</code></td><td>GBIF search in the quick-label manager.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/taxonomy/envo/suggest</code></td><td>Environment Ontology (ENVO) search in the quick-label manager.</td><td>Public</td></tr>
@@ -210,7 +210,7 @@
       <thead><tr><th>Method &amp; path</th><th>Used by</th><th>Access</th></tr></thead>
       <tbody>
         <tr><td><code>GET /api/feed/</code></td><td>The older Generate Feed button on a dataset card (random method).</td><td>Authenticated</td></tr>
-        <tr><td><code>POST /api/feed/similarity-search</code></td><td>The same button (similarity method, from an uploaded clip).</td><td>Authenticated</td></tr>
+        <tr><td><code>POST /api/feed/similarity-search</code></td><td>The same button (similarity method, from an uploaded audio file).</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/feed/history</code></td><td>The Feed History page.</td><td>Authenticated</td></tr>
       </tbody>
     </table>

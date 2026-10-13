@@ -383,7 +383,7 @@ html.docs-js body:not(.docs-page) > [data-docs-content] {
   padding: 6px 10px;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.45;
   transition:
     color var(--transition-fast),
@@ -516,54 +516,66 @@ a.docs-nav-link.is-active:hover {
   margin-top: 0;
 }
 
+/* Large monitors: a little more room and type, so the page does not look
+   small in the middle of a wide screen. */
+@media (min-width: 1700px) {
+  .docs-content { max-width: 800px; }
+  .docs-content p,
+  .docs-content ul,
+  .docs-content ol { font-size: 16px; }
+  .docs-content .lede { font-size: 17.5px; }
+}
+
 .docs-content .eyebrow {
   margin-bottom: 14px;
 }
 
 .docs-content h1 {
-  margin: 0 0 10px;
-  font-family: var(--font-mono), monospace;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
+  margin: 0 0 16px;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
   color: var(--text);
   scroll-margin-top: 24px;
 }
 
 .docs-content h2 {
-  margin: 52px 0 16px;
-  padding-bottom: 10px;
+  margin: 36px 0 14px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-sans), sans-serif;
   font-size: 21px;
   font-weight: 600;
   letter-spacing: -0.02em;
+  line-height: 1.4;
   color: var(--text);
   scroll-margin-top: 24px;
 }
 
 .docs-content h3 {
-  margin: 36px 0 12px;
-  font-family: var(--font-mono), monospace;
-  font-size: 16px;
+  margin: 28px 0 10px;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 17px;
   font-weight: 600;
+  line-height: 1.5;
   color: var(--text);
   scroll-margin-top: 24px;
 }
 
 .docs-content p {
-  margin: 0 0 18px;
-  color: var(--text-secondary);
-  font-size: 14.5px;
-  line-height: 1.8;
+  margin: 0 0 16px;
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .docs-content .lede {
   margin-bottom: 28px;
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 16.5px;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .docs-content a {
@@ -579,15 +591,15 @@ a.docs-nav-link.is-active:hover {
 
 .docs-content ul,
 .docs-content ol {
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   padding-left: 24px;
-  color: var(--text-secondary);
-  font-size: 14.5px;
-  line-height: 1.8;
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .docs-content li {
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
 .docs-content li > ul,
@@ -620,7 +632,7 @@ a.docs-nav-link.is-active:hover {
   width: 100%;
   margin: 0 0 24px;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
 .docs-content th,
@@ -634,14 +646,13 @@ a.docs-nav-link.is-active:hover {
 .docs-content th {
   background: var(--surface-soft);
   color: var(--text);
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.04em;
 }
 
 .docs-content td {
-  color: var(--text-secondary);
+  color: var(--text-body);
   line-height: 1.6;
 }
 
@@ -653,7 +664,7 @@ a.docs-nav-link.is-active:hover {
   background: var(--surface-soft);
   color: var(--text);
   font-family: var(--font-mono), monospace;
-  font-size: 12px;
+  font-size: 0.85em;
 }
 
 .docs-content pre {
@@ -670,7 +681,7 @@ a.docs-nav-link.is-active:hover {
   padding: 0;
   border: 0;
   background: transparent;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -680,9 +691,9 @@ a.docs-nav-link.is-active:hover {
   border-left: 3px solid var(--primary);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--primary-soft);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.7;
+  color: var(--text-body);
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .docs-content img {
@@ -713,9 +724,9 @@ a.docs-nav-link.is-active:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface);
-  color: var(--text-secondary);
-  font-size: 13.5px;
-  line-height: 1.7;
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .docs-content .callout strong {
@@ -735,7 +746,7 @@ a.docs-nav-link.is-active:hover {
 
 .docs-content .callout--dev ul {
   margin: 8px 0 0;
-  font-size: 13.5px;
+  font-size: 15px;
 }
 
 .docs-content .callout--dev li {
@@ -962,7 +973,7 @@ a.docs-nav-link.is-active:hover {
 .docs-content .docs-needs {
   margin: -12px 0 24px;
   color: var(--text-muted);
-  font-size: 13.5px;
+  font-size: 15px;
 }
 
 /* ---------- Infographics ----------
@@ -974,7 +985,7 @@ a.docs-nav-link.is-active:hover {
      .di-flow--grid wraps into rows of four.
    - .di-cols: columns joined by arrows; .di-stack fans out to several nodes.
    - .di-tree: nested relationships.
-   Node modifiers: .di-key (blue, the step that matters), .di-opt (dashed,
+   Node modifiers: .di-key (marks the step that matters; no styling), .di-opt (dashed,
    optional), .di-code (monospace title). Items stack vertically on phones.
    Motion is a slow highlight stepping through the nodes (.di-animate +
    .di-n{count}); it is off under reduced motion. */
@@ -1032,12 +1043,6 @@ a.docs-nav-link.is-active:hover {
   font-size: 11.5px;
   font-weight: 400;
   line-height: 1.45;
-}
-
-.docs-content .di-key,
-.docs-content .di-flow > li.di-key {
-  border-color: var(--primary);
-  background: var(--primary-soft);
 }
 
 .docs-content .di-opt {
@@ -1341,9 +1346,6 @@ a.docs-nav-link.is-active:hover {
   .docs-content .di-n7 > li { --di-n: 7; animation-name: di-hl-7; }
   .docs-content .di-n8 > li { --di-n: 8; animation-name: di-hl-8; }
 
-  /* Key nodes stay blue; the highlight passes over the others. */
-  .docs-content .di-animate > li.di-key { animation-name: none; }
-
   @keyframes di-hl-3 {
     0% { border-color: var(--border); }
     3.75%, 21.25% { border-color: var(--primary); }
@@ -1515,7 +1517,7 @@ a.docs-nav-link.is-active:hover {
   margin-bottom: 12px;
   color: var(--text-muted);
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1534,7 +1536,7 @@ a.docs-nav-link.is-active:hover {
   border-left: 1px solid transparent;
   margin-left: -1px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   transition:
     color var(--transition-fast),
@@ -1556,7 +1558,7 @@ a.docs-nav-link.is-active:hover {
 }
 
 .docs-toc-level-3 a {
-  font-size: 11.5px;
+  font-size: 12.5px;
 }
 
 /* ---------- Mobile on-this-page ---------- */
@@ -1573,7 +1575,7 @@ a.docs-nav-link.is-active:hover {
   padding: 12px 14px;
   color: var(--text);
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2046,4 +2048,51 @@ a.docs-nav-link.is-active:hover {
   .docs-search-result {
     transition: none !important;
   }
+}
+
+
+/* ---------- Large monitors ----------
+   Wider page, wider reading column and slightly larger type, so the docs fill
+   a big display instead of sitting in a narrow strip. */
+
+@media (min-width: 1920px) {
+  .docs-page {
+    --page-width: 1760px;
+    --docs-sidebar-w: 270px;
+    --docs-toc-w: 240px;
+    --docs-col-gap: 56px;
+  }
+  .docs-content { max-width: 860px; }
+  .docs-content h1 { font-size: 32px; }
+  .docs-content h2 { font-size: 24px; }
+  .docs-content h3 { font-size: 19px; }
+  .docs-content p,
+  .docs-content ul,
+  .docs-content ol { font-size: 16.5px; }
+  .docs-content .lede { font-size: 18.5px; }
+  .docs-content table { font-size: 14.5px; }
+  .docs-content pre code { font-size: 14px; }
+  .docs-nav-link { font-size: 15px; }
+  .docs-toc-item a { font-size: 14px; }
+}
+
+@media (min-width: 2400px) {
+  .docs-page {
+    --page-width: 2080px;
+    --docs-sidebar-w: 300px;
+    --docs-toc-w: 270px;
+    --docs-col-gap: 64px;
+  }
+  .docs-content { max-width: 980px; }
+  .docs-content h1 { font-size: 36px; }
+  .docs-content h2 { font-size: 27px; }
+  .docs-content h3 { font-size: 21px; }
+  .docs-content p,
+  .docs-content ul,
+  .docs-content ol { font-size: 18px; }
+  .docs-content .lede { font-size: 20px; }
+  .docs-content table { font-size: 16px; }
+  .docs-content pre code { font-size: 15px; }
+  .docs-nav-link { font-size: 16.5px; }
+  .docs-toc-item a { font-size: 15.5px; }
 }

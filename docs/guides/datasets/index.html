@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -62,7 +62,7 @@
     <p>
       Before a dataset can be annotated, YAPAT needs
       <a href="../../concepts/embeddings/">embeddings</a>: a numeric summary of
-      every 3-second clip. On the dataset card, an administrator clicks
+      every 3-second snippet. On the dataset card, an administrator clicks
       <strong>Generate Embeddings</strong> and picks the embedding model. The job
       runs in the background; when it finishes, the dataset is ready and can be
       opened in the <a href="../annotation-hub/">Annotation Hub</a>.
@@ -70,7 +70,7 @@
 
     <figure class="docs-shot">
       <img src="../../assets/screenshots/datasets-card.webp" width="1680" height="500" loading="lazy" alt="A dataset card with its quick labels, Export, Metadata, Generate Feed and Active Learning buttons, and file, snippet and annotation counts.">
-      <figcaption>A dataset card. The counters show audio files, clips (snippets) and how many clips are labelled.</figcaption>
+      <figcaption>A dataset card. The counters show audio files, snippets and how many snippets are labelled.</figcaption>
     </figure>
 
     <h2>Finding a dataset</h2>
@@ -78,7 +78,7 @@
     <p>
       Administrators and team owners get a toolbar above the list: search by
       name or folder path, filter by team or dataset type, and sort by name,
-      age, number of clips, or number of labels.
+      age, number of snippets, or number of labels.
     </p>
 
     <h2>The dataset card</h2>
@@ -88,7 +88,7 @@
         <tr><th>On the card</th><th>What it does</th></tr>
       </thead>
       <tbody>
-        <tr><td>Audio files, snippets, annotated snippets</td><td>How many recordings and 3-second clips the dataset has, and how many clips are labelled. The file count opens a searchable list of the recordings.</td></tr>
+        <tr><td>Audio files, snippets, annotated snippets</td><td>How many recordings and 3-second snippets the dataset has, and how many snippets are labelled. The file count opens a searchable list of the recordings.</td></tr>
         <tr><td>Annotation spectrogram</td><td>The frequency range spectrograms show. <strong>Auto</strong> uses each file's full range; administrators and team owners can change it.</td></tr>
         <tr><td>Embeddings</td><td>Shows <strong>Embeddings ready</strong> once the dataset can be annotated; administrators see <strong>Generate Embeddings</strong> before that.</td></tr>
         <tr><td>Metadata</td><td>Download a comma-separated values (CSV) template, fill in location, date, and time for each recording, and upload it. You can review and rename locations before importing. The Hub's filters use these values.</td></tr>
@@ -100,7 +100,7 @@
 
     <div class="callout">
       <strong>Tip.</strong> Start annotation with <strong>Generate Feed</strong>
-      inside the Annotation Hub. The Generate Feed button on the dataset card
+      inside the <a href="../annotation-hub/#generating-a-feed">Annotation Hub</a>. The Generate Feed button on the dataset card
       creates feeds that the Hub does not show.
     </div>
 
