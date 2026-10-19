@@ -123,11 +123,6 @@
       <tbody>
         <tr><td><code>VITE_YAPAT_BACKEND_URL</code></td><td>No</td><td>Backend API base URL; defaults to <code>http://localhost:8000</code>. The frontend container can also set it at start-up.</td></tr>
         <tr><td><code>VITE_YAPAT_FRONTEND_URL</code></td><td>No</td><td>Public frontend URL used for invitation links.</td></tr>
-        <tr><td><code>VITE_STUDY_PHASE</code></td><td>No</td><td>Default study phase of the Annotation Hub (<code>P1</code> to <code>P5</code>); <code>P1</code> when unset.</td></tr>
-        <tr><td><code>VITE_STUDY_PHASE_LOCK</code></td><td>No</td><td>When true, the phase from the environment is used and the URL parameter and stored choice are ignored.</td></tr>
-        <tr><td><code>VITE_STUDY_PHASE_ALLOWED</code></td><td>No</td><td>Comma-separated phases a locked session may switch between, in order; also the sequence of the guided study flow.</td></tr>
-        <tr><td><code>VITE_STUDY_FLOW_ENABLED</code></td><td>No</td><td>Guided study flow: an instructions dialog and a guided tour for each phase. On by default when the phase is locked.</td></tr>
-        <tr><td><code>VITE_STUDY_PHASE_DURATION_MINUTES</code></td><td>No</td><td>Minutes per phase (default 5). The countdown that would use it is switched off in the frontend, so phases do not advance automatically; the value only appears in logged study-flow events.</td></tr>
         <tr><td><code>VITE_STUDY_LOGGING_ENABLED</code></td><td>No</td><td>Sends a timestamped log of interactions to <code>/api/study-events/batch</code>; off by default.</td></tr>
         <tr><td><code>VITE_STUDY_LOGGING_FLUSH_SECONDS</code></td><td>No</td><td>How often logged events are sent; default 10 seconds.</td></tr>
       </tbody>

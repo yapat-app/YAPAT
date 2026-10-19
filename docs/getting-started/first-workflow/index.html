@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Your first session with YAPAT, from signing in to exported labels, in seven steps.">
+  <meta name="description" content="Your first session with YAPAT, from signing in to exported labels, in eight steps.">
   <title>YAPAT Documentation – First Workflow</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
@@ -96,26 +96,54 @@
       <a href="../../guides/label-management/">Label Management →</a>
     </p>
 
-    <h2>5. Start annotating</h2>
+    <h2>5. Build your model</h2>
+
+    <p>
+      YAPAT ranks snippets with a classifier trained on the dataset's
+      embeddings. A new dataset has no classifier yet. When you generate the
+      first feed in step 6, you enter a <strong>model family name</strong> and
+      choose how the first model is trained:
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Start</th><th>First model</th><th>Suitable when</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Bootstrap</strong></td><td>Trained from your labels on randomly chosen snippets.</td><td>No labelled data is available. This is the default.</td></tr>
+        <tr><td><strong>Cold start</strong></td><td>Trained immediately from existing ground-truth labels, given as a metadata file and a label config file. Administrators and team owners only.</td><td>Part of the dataset is already labelled.</td></tr>
+        <tr><td><strong>WSSED model</strong></td><td>A model trained with <a href="../../concepts/wssed/">WSSED</a> is registered as the first model.</td><td>Recordings are labelled by species, but not by time.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      An administrator can also link a <strong>reference pool</strong> to the
+      dataset or its team: labelled datasets whose labels are added to every
+      training run. Each run saves a new <strong>checkpoint</strong> (v0, v1, …)
+      in the model family, and the active checkpoint ranks the feed.
+      <a href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built">How the model is built →</a>
+    </p>
+
+    <h2>6. Start annotating</h2>
 
     <p>
       Open the <strong>Annotation Hub</strong>, choose the dataset, and click
-      <strong>Generate Feed</strong> at the top right of the feed. For a new
-      dataset, enter a model family name and leave the ground-truth switch off
-      to start in bootstrap mode. Then listen to each snippet and choose its
-      labels. <a href="../../guides/annotation-hub/#generating-a-feed">How feeds are generated →</a>
+      <strong>Generate Feed</strong> at the top right of the feed. Enter the
+      model family name and the start chosen in step 5. Then listen to each
+      snippet and choose its labels.
+      <a href="../../guides/annotation-hub/#generating-a-feed">How feeds are generated →</a>
       <a href="../../guides/annotation-hub/">Annotation Hub →</a>
     </p>
 
-    <h2>6. Let the model learn</h2>
+    <h2>7. Let the model learn</h2>
 
     <p>
-      Keep labelling. After every 10 labels the model retrains on its own, and
-      the feed shows the snippets it is now least sure about.
+      Keep labelling. After every 10 labels the model retrains, saves a new
+      checkpoint, and the feed shows the snippets it is now least sure about.
       <a href="../../concepts/annotation-feeds/active-learning/">Active Learning →</a>
     </p>
 
-    <h2>7. Export</h2>
+    <h2>8. Export</h2>
 
     <p>
       Open the <strong>Export</strong> menu on the dataset card and choose

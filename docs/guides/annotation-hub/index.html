@@ -53,10 +53,21 @@
       <li>Move on to the next snippet. Your labels are saved automatically.</li>
     </ol>
 
-    <figure class="docs-shot docs-shot--medium">
-      <img src="../../assets/screenshots/hub-labelling.webp" width="870" height="841" loading="lazy" alt="A snippet in the feed: its spectrogram and audio player, the selected label ADEMAR, the GBIF search and the quick labels.">
-      <figcaption>Labelling a snippet: play it, read the spectrogram, and click a quick label. Selected labels appear under Labels.</figcaption>
+    <figure class="docs-shot">
+      <img src="../../assets/screenshots/hub-annotation.png" width="2000" height="1104" loading="lazy" alt="The Annotation Hub for the dataset anuraset_INCT4. On the left, the Filters sidebar with status, location, date range, month, time of day and model score histograms. In the middle, the Feature Projection in PCA view with 24360 snippets, 203 of them labelled and coloured by species. On the right, the Feed with sort options, snippet #11818 with its spectrogram and audio player, the label search and ten quick labels.">
+      <figcaption>The Annotation Hub: <strong>Filters</strong> on the left, the <strong>Feature Projection</strong> in the middle, and the <strong>Feed</strong> on the right. The ring in the projection marks the snippet open in the feed.</figcaption>
     </figure>
+
+    <h2>The three areas</h2>
+
+    <table>
+      <thead><tr><th>Area</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>Filters</td><td>Narrow the feed and the projection by label status, location, date, time of day, and model scores. See <a href="../../concepts/annotation-feeds/filter/">Filters and Model Scores</a>.</td></tr>
+        <tr><td>Feature Projection</td><td>A map of all snippets in the dataset, where similar sounds sit close together. Clicking a point opens that snippet. See <a href="#the-projection">The projection</a>.</td></tr>
+        <tr><td>Feed</td><td>The snippets to label, one at a time, with sort options above them.</td></tr>
+      </tbody>
+    </table>
 
     <h2>Generating a feed</h2>
 
@@ -103,6 +114,13 @@
       <li><strong>Off: bootstrap mode</strong> — start with randomly chosen snippets. The first model is trained from your labels. This is the usual choice.</li>
       <li><strong>On: cold start</strong> — train a first model from existing ground-truth labels, given as a metadata file and a label config file. Only administrators and team owners can do this.</li>
     </ul>
+
+    <p>
+      If a WSSED model is registered for the dataset, a model already exists
+      and the dialog skips this choice. Reference pools need no setting here.
+      See
+      <a href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built">How the model is built</a>.
+    </p>
 
     <p>
       Once a model exists, the dialog only sets how many snippets the feed shows
@@ -154,53 +172,10 @@
       refreshes the feed with the new ranking. There is nothing to click.
     </p>
 
-    <h2>Phases</h2>
+    <h2>The projection</h2>
 
     <p>
-      The Hub can introduce its tools step by step. The phase selector in the
-      toolbar switches between five phases:
-    </p>
-
-    <table>
-      <thead>
-        <tr><th>Phase</th><th>What you see</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>The feed of snippets only.</td></tr>
-        <tr><td>2</td><td>Adds the <strong>projection</strong>: a map of all snippets in the dataset, where similar sounds sit close together.</td></tr>
-        <tr><td>3</td><td>Adds the sidebar <a href="../../concepts/annotation-feeds/filter/">filters</a>: labelled or unlabelled, location, date, and time.</td></tr>
-        <tr><td>4</td><td>Adds the model scores as filters, and sorting of the feed.</td></tr>
-        <tr><td>5</td><td>Everything in phase 4; clicking a point in the projection opens that snippet.</td></tr>
-      </tbody>
-    </table>
-
-    <div class="docs-shot-tabs" aria-label="The Annotation Hub in each phase">
-      <figure class="docs-shot" data-tab="Phase 1">
-        <img src="../../assets/screenshots/hub-phase1.webp" width="1920" height="966" loading="lazy" alt="Phase 1: only the feed, with one snippet, its spectrogram and the quick labels.">
-        <figcaption>Phase 1: the feed only. Listen, look, label.</figcaption>
-      </figure>
-      <figure class="docs-shot" data-tab="Phase 2">
-        <img src="../../assets/screenshots/hub-phase2.webp" width="1920" height="966" loading="lazy" alt="Phase 2: the projection of all snippets next to the feed.">
-        <figcaption>Phase 2: the projection appears next to the feed. Similar snippets sit close together.</figcaption>
-      </figure>
-      <figure class="docs-shot" data-tab="Phase 3">
-        <img src="../../assets/screenshots/hub-phase3.webp" width="1920" height="966" loading="lazy" alt="Phase 3: the filter sidebar with status, location, date and time filters.">
-        <figcaption>Phase 3: the sidebar adds filters for label status, location, date, and time.</figcaption>
-      </figure>
-      <figure class="docs-shot" data-tab="Phase 4">
-        <img src="../../assets/screenshots/hub-phase4.webp" width="1920" height="966" loading="lazy" alt="Phase 4: model score histograms in the sidebar and sort options above the feed.">
-        <figcaption>Phase 4: model scores become filters, and the feed can be sorted.</figcaption>
-      </figure>
-      <figure class="docs-shot" data-tab="Phase 5">
-        <img src="../../assets/screenshots/hub-overview.webp" width="1920" height="966" loading="lazy" alt="Phase 5: all tools, with clickable points in the projection.">
-        <figcaption>Phase 5: everything from phase 4; clicking a point in the projection opens that snippet.</figcaption>
-      </figure>
-    </div>
-
-    <h3>The projection</h3>
-
-    <p>
-      From phase 2, the projection shows every snippet of the dataset as a point;
+      The projection shows every snippet of the dataset as a point;
       snippets that sound alike sit close together. Coloured points are labelled
       snippets, and the legend shows which colour belongs to which label. The
       buttons above it switch between three standard methods for drawing the
@@ -209,40 +184,28 @@
       (<strong>UMAP</strong>), and principal component analysis
       (<strong>PCA</strong>). Zoom with the
       <strong>+</strong> and <strong>−</strong> buttons, and double-click to
-      reset the zoom. The ring marks the snippet open in the feed.
+      reset the zoom. The ring marks the snippet open in the feed, and clicking
+      any point opens that snippet. The counter above the legend shows how many
+      snippets the current filters leave visible and how many of them are
+      labelled.
     </p>
 
-    <h2>Guided sessions and study logs</h2>
+    <h2>Study logs</h2>
 
     <p>
-      For guided sessions, such as introducing new annotators or running a
-      study, each phase can open with a <strong>Welcome to Phase N</strong>
-      introduction and a short tour of guide cards that point out what is new.
-      Click <strong>Begin annotating</strong> to start. The introduction
-      mentions a time per phase, but YAPAT does not enforce it: there is no
-      countdown, and you move to another phase with the phase selector.
-    </p>
-
-    <figure class="docs-shot docs-shot--medium">
-      <img src="../../assets/screenshots/hub-guided.webp" width="680" height="330" loading="lazy" alt="The Welcome to Phase 1 dialog explaining the feed, with a Begin annotating button.">
-      <figcaption>With guided sessions on, each phase opens with a short introduction.</figcaption>
-    </figure>
-
-    <p>
-      YAPAT can also record interactions such as label choices, playback, and
+      YAPAT can record interactions such as label choices, playback, and
       filter changes. Administrators review them under <strong>Study
       Logs</strong> on the Dashboard: first a list of participants, then each
       participant's sessions, then the timeline of events in a session, which
-      can be downloaded as comma-separated values (CSV). Both features are switched on by the
-      administrator.
+      can be downloaded as comma-separated values (CSV). Logging is off by
+      default; an administrator switches it on.
     </p>
 
     <div class="callout callout--dev">
       <strong>For developers.</strong>
       <ul>
-        <li>The Hub lives at <code>/annotate?dataset_id=&lt;id&gt;</code>; <code>&amp;phase=P1</code>…<code>P5</code> selects a phase.</li>
-        <li>Phases, the guided flow, and logging are set with <code>VITE_STUDY_*</code> variables; a deployment can lock the phase. See <a href="../../operations/environment/">Environment Setup</a>.</li>
-        <li><code>/annotate?study_reset=1</code> clears the guided flow's progress stored in the browser.</li>
+        <li>The Hub lives at <code>/annotate?dataset_id=&lt;id&gt;</code>.</li>
+        <li>Interaction logging is switched on with <code>VITE_STUDY_LOGGING_ENABLED</code>. See <a href="../../operations/environment/#frontend-variables">Environment Setup</a>.</li>
         <li>The retrain threshold is <code>RETRAIN_AFTER</code> in the backend's <code>active_learning/config.yaml</code>.</li>
         <li>Endpoints: <a href="../../reference/feed-methods/">Active Learning API</a>.</li>
       </ul>

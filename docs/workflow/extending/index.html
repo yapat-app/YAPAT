@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Common ways to adapt YAPAT: tune active learning, change the phases and their introductions, add an embedding model, and add an API endpoint.">
+  <meta name="description" content="Common ways to adapt YAPAT: tune active learning, add an embedding model, and add an API endpoint.">
   <title>YAPAT Documentation – Extending YAPAT</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
@@ -65,25 +65,6 @@
     <p>
       The classifiers are in <code>active_learning/model_zoo/</code> and the
       scores in <code>active_learning/samplers.py</code>.
-    </p>
-
-    <h2>Change the phases</h2>
-
-    <p>
-      Each phase is one entry in the frontend's
-      <code>src/studyPhases/phases.ts</code>. An entry switches parts of the Hub
-      on or off: the projection (<code>visualization.mode</code>), clicking
-      points (<code>allowPointClick</code>), the sidebar sections
-      (<code>sidebar.sampleProperties</code>, <code>sidebar.modelScores</code>),
-      and sorting (<code>sort.nonModel</code>, <code>sort.model</code>). The
-      introduction and guide cards shown for each phase are in
-      <code>src/studyFlow/phaseContent.ts</code>.
-    </p>
-
-    <p>
-      Which phases a deployment offers, and whether one is locked, is set with
-      <code>VITE_STUDY_*</code> variables, without code changes; see
-      <a href="../../operations/environment/#frontend-variables">Environment Setup</a>.
     </p>
 
     <h2>Add an embedding model</h2>

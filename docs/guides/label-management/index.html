@@ -34,25 +34,43 @@
     <h1>Label Management</h1>
 
     <p class="lede">
-      Label Management is where your team decides what to label. You describe
-      the sounds you care about in plain language, the assistant finds matching
-      entries in trusted sources such as the Global Biodiversity Information Facility (GBIF), and you keep the ones you want.
-      The result is your team's <a href="../../concepts/label-space/what-is-a-label-space/">label space</a>.
+      Labels are managed at two levels. The
+      <a href="../../concepts/label-space/what-is-a-label-space/">label space</a>
+      defines the concepts a team annotates with. Quick labels are the short list
+      of labels annotators select from in the Annotation Hub.
     </p>
 
     <p class="docs-needs">
-      <strong>You need:</strong> the ontology service running. See
-      <a href="../../getting-started/installation/">Installation</a>.
+      <strong>You need:</strong> for the label space, the oe_yapat service with
+      an OpenAI API key (see <a href="#set-up-the-taxonomy-assistant">Set up the
+      Taxonomy Assistant</a>). Quick labels need no additional service.
     </p>
 
-    <h2>Steps</h2>
+    <h2>Where labels are managed</h2>
+
+    <table>
+      <thead>
+        <tr><th>Where</th><th>Manages</th><th>Applies to</th><th>Takes effect</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Label Management</strong> page<br>Dashboard → Label Management</td><td>The label space</td><td>The team</td><td>When the team owner activates the version</td></tr>
+        <tr><td><strong>Manage</strong> on the dataset card<br>Dashboard → Dataset Management</td><td>Quick labels</td><td>One dataset</td><td>On saving</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      In the Annotation Hub, annotators choose from both lists, together with
+      the model's species and their own pinned species.
+    </p>
+
+    <h2>Build a label space</h2>
 
     <ol>
       <li>Open <strong>Label Management</strong> on the Dashboard. The page is titled <strong>Pre-Annotation</strong>. Choose the <strong>Dataset</strong> at the top (administrators also choose the team).</li>
       <li>Describe what you want to label, for example "I want to annotate Panthera leo", and press <kbd>Enter</kbd> or <strong>Send</strong>. <kbd>Shift</kbd>+<kbd>Enter</kbd> starts a new line.</li>
       <li>Review the suggested concepts and add the ones you want: <strong>Add All</strong>, or one at a time.</li>
       <li>Refine with more messages, and remove anything you added by mistake.</li>
-      <li>Click <strong>Submit label space</strong> under the list to propose it as a new version. It then awaits the team owner's approval; once promoted, it becomes the active label space used for annotation.</li>
+      <li>Click <strong>Submit label space</strong> under the list. The list is submitted as a new version for the team owner to approve.</li>
     </ol>
 
     <figure class="docs-shot">
@@ -60,34 +78,97 @@
       <figcaption>Label Management. The <strong>Taxonomy Assistant</strong> chat is on the left; the <strong>Current Label Space</strong> on the right lists each concept with its source and identifier. Remove a concept with <strong>×</strong>, or use <strong>Remove all labels</strong>.</figcaption>
     </figure>
 
-    <h2>The two panels</h2>
+    <table>
+      <thead>
+        <tr><th>Panel</th><th>Contents</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Taxonomy Assistant</td><td>The chat with the assistant and its suggested concepts.</td></tr>
+        <tr><td>Current Label Space</td><td>The list being built. The heading shows the number of concepts, <strong>Active version</strong> names the version in use, and each concept shows its source (for example ENVO, WIKIPEDIA or LOCAL), a description, and its identifier.</td></tr>
+      </tbody>
+    </table>
 
-    <ul>
-      <li><strong>Taxonomy Assistant</strong> — the chat, where you talk with the assistant and see its suggestions.</li>
-      <li><strong>Current Label Space</strong> — the list you are building. The count in the heading is the number of concepts, <strong>Active version</strong> names the version in use, and each concept shows its source (for example ENVO, WIKIPEDIA or LOCAL), a description and its identifier.</li>
-    </ul>
-
-    <p>
-      Quick labels, the short list annotators click in the Hub, are a separate
-      list per dataset. See <a href="../datasets/#quick-labels">Quick labels</a>.
-    </p>
-
-    <h2>After submitting</h2>
+    <h2>Activate a label space</h2>
 
     <p>
-      A submitted version is not edited. It waits for the team owner, who
-      expands it under <strong>Label Space Versions</strong> and clicks
-      <strong>Make active</strong>. The active version is the label space the
-      team annotates with. To change it, build and submit a new list; earlier
-      versions are kept. See
+      A submitted version cannot be edited. The team owner expands it under
+      <strong>Label Space Versions</strong> and clicks <strong>Make active</strong>.
+      The active version is the label space the team annotates with. To change
+      it, build and submit a new list; earlier versions are kept. See
       <a href="../../concepts/label-space/managing-versions/">Submitting a Label Space</a>.
     </p>
+
+    <h2>Edit quick labels</h2>
+
+    <ol>
+      <li>Open <strong>Dataset Management</strong> on the Dashboard.</li>
+      <li>On the dataset card, click <strong>Manage</strong> at the end of the <strong>Quick labels</strong> row.</li>
+      <li>Choose a source: <strong>GBIF</strong> for species, <strong>ENVO</strong> for environmental sounds such as rain or wind, or <strong>Local</strong> for a free-text label such as "No biophony".</li>
+      <li>Search, add or remove labels, and click <strong>Save</strong>.</li>
+    </ol>
+
+    <figure class="docs-shot">
+      <img src="../../assets/screenshots/datasets-card.webp" width="1680" height="500" loading="lazy" alt="A dataset card with the quick labels SCIALT, DENELE, SCIRIZ, LEPFLA, RHIORN, +5 more, and a Manage button, next to Export, Metadata, Generate Feed and Active Learning.">
+      <figcaption>A dataset card. <strong>Manage</strong> at the end of the <strong>Quick labels</strong> row opens the dataset's quick-label list.</figcaption>
+    </figure>
+
+    <p>
+      Annotators can also add a species to their own quick labels from the GBIF
+      search in the Hub. See <a href="../datasets/#quick-labels">Quick labels</a>.
+    </p>
+
+    <h2>Set up the Taxonomy Assistant</h2>
+
+    <p>
+      The Taxonomy Assistant is provided by the separate
+      <a href="https://github.com/yapat-app/oe_yapat" target="_blank" rel="noopener noreferrer">oe_yapat</a>
+      service, which is not part of the YAPAT Compose stack. It runs on the
+      YAPAT host or on any machine the backend can reach, and consists of two
+      servers:
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Server</th><th>Port</th><th>Role</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Tool server (MCP)</td><td><code>8001</code></td><td>Looks up concepts in GBIF, ENVO, and Wikipedia.</td></tr>
+        <tr><td>HTTP API</td><td><code>8002</code></td><td>Receives chat messages from the YAPAT backend.</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The language model is OpenAI's. The service therefore requires an OpenAI
+      API key and outbound internet access, even when it runs locally.
+    </p>
+
+    <ol>
+      <li>Check out the <code>feature/yapatIntegration</code> branch of oe_yapat. The HTTP API (<code>http_api_server.py</code>) is only on that branch; the copy pinned in the YAPAT repository contains the tool server only.</li>
+      <li>Create a <code>.env</code> file in the oe_yapat folder:
+<pre><code>OPENAI_API_KEY=sk-...
+# Optional; default gpt-3.5-turbo-0125
+OPENAI_MODEL=gpt-4o-mini</code></pre>
+      </li>
+      <li>Start both servers with <code>docker compose up -d</code>, or without Docker with <code>./run_full_service.sh</code>.</li>
+      <li>Open <code>http://localhost:8002/health</code> to confirm that the API is running.</li>
+      <li>In the backend's <code>.env</code>, set <code>OE_YAPAT_SERVICE_URL</code> to <code>http://host.docker.internal:8002</code> if the backend runs in Docker, or to <code>http://localhost:8002</code> otherwise. Restart the backend.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>Good to know.</strong> A chat message can take up to two minutes,
+      the backend's <code>OE_YAPAT_TIMEOUT</code>. If the chat returns an error,
+      check the <code>OPENAI_API_KEY</code>, that both ports are running, and
+      that the backend can reach port 8002. See
+      <a href="../../operations/troubleshooting/">Troubleshooting</a>.
+    </div>
 
     <div class="callout callout--dev">
       <strong>For developers.</strong>
       <ul>
         <li>The page is at <code>/pre-annotation</code>; the chat API is under <code>/api/taxonomy/chat</code>.</li>
-        <li>Each message is forwarded to the oe_yapat service at <code>OE_YAPAT_SERVICE_URL</code>. See <a href="../../concepts/label-space/grounding/">Grounding</a>.</li>
+        <li>Each message is forwarded to <code>POST {OE_YAPAT_SERVICE_URL}/api/generate-taxonomy</code>. See <a href="../../concepts/label-space/grounding/">Grounding</a>.</li>
+        <li>Backend settings: <code>OE_YAPAT_SERVICE_URL</code>, <code>OE_YAPAT_API_KEY</code> (optional bearer token), and <code>OE_YAPAT_TIMEOUT</code>. See <a href="../../operations/environment/">Environment Setup</a>.</li>
+        <li>Quick labels are read and saved with <code>GET</code> and <code>PUT /api/datasets/{dataset_id}/quick-labels</code>.</li>
       </ul>
     </div>
 

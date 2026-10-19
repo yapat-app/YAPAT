@@ -52,21 +52,52 @@
       <figcaption>After retraining, the model ranks the snippets again and the loop repeats.</figcaption>
     </figure>
 
-    <h2>Starting without a model</h2>
+    <h2>How the model is built</h2>
 
     <p>
-      A new dataset has no model yet. The <strong>Generate Feed</strong> dialog (see <a href="../../../guides/annotation-hub/#generating-a-feed">Generating a feed</a>)
-      offers two ways to begin:
+      The model is a classifier trained on the snippets'
+      <a href="../../embeddings/">embeddings</a>. A new dataset has no model,
+      so the <strong>Generate Feed</strong> dialog (see
+      <a href="../../../guides/annotation-hub/#generating-a-feed">Generating a feed</a>)
+      asks for a <strong>model family name</strong> and a way to start:
     </p>
 
     <ul>
-      <li><strong>Bootstrap mode</strong> — you label randomly chosen snippets, and the first model is trained from those labels.</li>
-      <li><strong>Cold start</strong> — the first model is trained from existing ground-truth labels. Only administrators and team owners can start it.</li>
+      <li><strong>Bootstrap</strong> — you label randomly chosen snippets, and the first model is trained from those labels. This is the usual choice.</li>
+      <li><strong>Cold start</strong> — the first model is trained immediately from existing ground-truth labels, given as a metadata file and a label config file. Only administrators and team owners can start it.</li>
+      <li><strong>WSSED model</strong> — a model trained with Weakly Supervised Sound Event Detection is registered as the first model. See <a href="../../wssed/">WSSED</a>.</li>
     </ul>
 
+    <h3>Reference pools</h3>
+
     <p>
-      A model trained with Weakly Supervised Sound Event Detection (WSSED) can also serve as the first model; see <a href="../../wssed/">WSSED</a>.
+      A reference dataset is a labelled dataset used only for training; it is
+      never shown for annotation. An administrator adds it with
+      <strong>Add Dataset</strong> and links it to a dataset or a team under
+      <strong>Reference pools</strong> on the dataset card. Its labels are then
+      added to every training run of the linked datasets, including the first.
+      A reference dataset must use the same embedding model as the datasets it
+      is linked to.
     </p>
+
+    <h3>Checkpoints</h3>
+
+    <p>
+      Each training run saves a <strong>checkpoint</strong>: a numbered version
+      of the model (v0, v1, …) in its <strong>model family</strong>. For each
+      dataset and family one checkpoint is active, and the Hub ranks the feed
+      with it.
+    </p>
+
+    <figure class="docs-infographic" aria-label="How the model is built: choose a start, train the first checkpoint, label, retrain into new checkpoints.">
+      <ol class="di-flow di-animate di-n4" style="--n:4">
+        <li style="--i:0">Choose a start<span class="di-sub">bootstrap, cold start or WSSED</span></li>
+        <li style="--i:1">First checkpoint<span class="di-sub">v0, plus any reference pool</span></li>
+        <li style="--i:2">You label<span class="di-sub">10 new labels</span></li>
+        <li class="di-key" style="--i:3">Next checkpoint<span class="di-sub">v1, v2, … ranks the feed</span></li>
+      </ol>
+      <figcaption>The start is chosen once per model family. Every further 10 labels produce a new checkpoint.</figcaption>
+    </figure>
 
     <h2>How snippets are ranked</h2>
 
@@ -74,7 +105,7 @@
       The model scores every snippet. The feed shows the ones it is most
       <strong>uncertain</strong> about, up to the Top-K number you set. Each snippet
       also carries diversity, density, and composite scores, which you can filter
-      and sort by in phases 4 and 5; see
+      and sort by; see
       <a href="../filter/">Filters and Model Scores</a>.
     </p>
 
@@ -87,21 +118,13 @@
       from.
     </p>
 
-    <h2>Models and families</h2>
-
-    <p>
-      A trained model is saved as a <strong>checkpoint</strong> in a
-      <strong>model family</strong>, the name you give in the Generate Feed dialog.
-      For each dataset and family one checkpoint is active, and the Hub uses it;
-      training and retraining create new checkpoints.
-    </p>
-
     <div class="callout callout--dev">
       <strong>For developers.</strong>
       <ul>
         <li>Feed: <code>POST /api/pam-al/inference/get-or-create</code> with <code>suggestion_strategy: "uncertainty"</code> and <code>k</code>.</li>
         <li>Labels are sent to <code>POST /api/pam-al/feedback</code> with <code>action: "MODIFY"</code>.</li>
         <li>The retrain threshold is <code>RETRAIN_AFTER</code> (10) in <code>active_learning/config.yaml</code>; a dataset's <code>retrain_after_threshold</code> overrides it. Training runs on the <code>pam_al</code> Celery queue.</li>
+        <li>Cold-start metadata and label config paths are resolved relative to the data root. Reference pools are linked with <code>/api/reference-links/</code> (administrators only).</li>
         <li>Full details: <a href="../../../reference/feed-methods/">Active Learning API</a>.</li>
       </ul>
     </div>

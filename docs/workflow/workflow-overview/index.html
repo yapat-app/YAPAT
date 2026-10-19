@@ -97,6 +97,10 @@
       accumulate, retrain, and generate a new batch ranked by the updated model.
       Before a model exists, the first feed comes from bootstrap mode, which
       offers randomly sampled snippets until enough labels exist to train one.
+      The first checkpoint can instead be trained from ground-truth metadata
+      (cold start) or registered from a WSSED run. Linked reference pools are
+      added to every training run. See
+      <a href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built">How the model is built</a>.
     </p>
 
     <div class="callout callout--tip">

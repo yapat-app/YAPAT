@@ -41,28 +41,49 @@
 
     <h2>Filters</h2>
 
-    <table>
-      <thead>
-        <tr><th>Filter</th><th>Shows</th><th>From phase</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Status</td><td>All, unlabelled, or labelled snippets; labelled snippets can be narrowed to chosen species.</td><td>3</td></tr>
-        <tr><td>Location</td><td>Snippets from one or more recording sites.</td><td>3</td></tr>
-        <tr><td>Date and time</td><td>A date range, months of the year, and a time of day.</td><td>3</td></tr>
-        <tr><td>Model scores</td><td>Snippets within a range of each score, set with sliders over a histogram.</td><td>4</td></tr>
-      </tbody>
-    </table>
+    <div class="docs-split">
+      <figure class="docs-shot docs-split__media">
+        <img src="../../../assets/screenshots/hub-filters.webp" width="388" height="841" loading="lazy" alt="The filter sidebar: status, location, date range, month, time of day, and model score histograms.">
+        <figcaption>The filter sidebar. Drag the handles under each histogram to narrow the snippets.</figcaption>
+      </figure>
 
-    <figure class="docs-shot docs-shot--narrow">
-      <img src="../../../assets/screenshots/hub-filters.webp" width="388" height="841" loading="lazy" alt="The filter sidebar: status, location, date range, month, time of day, and model score histograms.">
-      <figcaption>The filter sidebar in phase 5. Drag the handles under each histogram to narrow the snippets.</figcaption>
-    </figure>
+      <div class="docs-split__body">
+        <p>
+          The sidebar on the left of the Annotation Hub contains the
+          following filters:
+        </p>
 
-    <p>
-      Location, date, and time come from each recording's metadata: read from
-      file names such as <code>SITE_YYYYMMDD_HHMMSS</code>, or uploaded as a comma-separated values (CSV) on
-      the <a href="../../../guides/datasets/">Datasets</a> page.
-    </p>
+        <table>
+          <thead>
+            <tr><th>Filter</th><th>Shows</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Status</td><td>All, unlabelled, or labelled snippets; labelled snippets can be narrowed to chosen species.</td></tr>
+            <tr><td>Location</td><td>Snippets from one or more recording sites.</td></tr>
+            <tr><td>Date and time</td><td>A date range, months of the year, and a time of day.</td></tr>
+            <tr><td>Model scores</td><td>Snippets within a range of each score, set with sliders over a histogram.</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          Each histogram shows how the snippets are distributed over that
+          value.
+        </p>
+
+        <p>
+          Location, date, and time come from each recording's metadata: read
+          from file names such as <code>SITE_YYYYMMDD_HHMMSS</code>, or uploaded
+          as a comma-separated values (CSV) file on the
+          <a href="../../../guides/datasets/">Datasets</a> page.
+        </p>
+
+        <p>
+          The <strong>Sample properties</strong> and <strong>Model derived
+          scores</strong> sections can be collapsed, and the icon next to
+          <strong>Filters</strong> hides the sidebar.
+        </p>
+      </div>
+    </div>
 
     <h2>What the model scores mean</h2>
 
@@ -87,8 +108,8 @@
     <h2>Sorting</h2>
 
     <p>
-      From phase 4, the feed can be sorted by one or more of: confidence,
-      composite, uncertainty, diversity, density, date, and time.
+      The <strong>Sort</strong> bar above the feed sorts it by one or more of:
+      confidence, composite, uncertainty, diversity, density, date, and time.
     </p>
 
     <div class="callout callout--dev">

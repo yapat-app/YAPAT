@@ -92,16 +92,6 @@ docker compose logs -f api        # follow one service's log</code></pre>
 
     <h2>Annotation</h2>
 
-    <h3>Only phase 1 is available</h3>
-
-    <p>
-      The example frontend settings lock the Hub to phase 1. In
-      <code>frontend/.env</code>, list the phases you want in
-      <code>VITE_STUDY_PHASE_ALLOWED</code> (or remove it to allow all five), set
-      <code>VITE_STUDY_PHASE_LOCK=false</code>, and restart the frontend. See
-      <a href="../environment/#frontend-variables">Environment Setup</a>.
-    </p>
-
     <h3>The model does not seem to retrain</h3>
 
     <p>
@@ -140,7 +130,10 @@ docker compose logs -f api        # follow one service's log</code></pre>
       The chat needs the ontology service. Check that it is running and that
       <code>OE_YAPAT_SERVICE_URL</code> points to it; from Docker, use
       <code>http://host.docker.internal:8002</code> for a service on the same
-      host. See <a href="../../getting-started/installation/#optional-services">Installation</a>.
+      host. The service also requires a valid <code>OPENAI_API_KEY</code> in its
+      <code>.env</code> file; <code>http://localhost:8002/health</code> reports
+      whether it is running. See
+      <a href="../../guides/label-management/#set-up-the-taxonomy-assistant">Set up the Taxonomy Assistant</a>.
     </p>
 
     <h3>Team Management shows "Team not found."</h3>

@@ -795,6 +795,39 @@ a.docs-nav-link.is-active:hover {
   max-width: min(100%, 560px);
 }
 
+/* Tall, narrow screenshot beside its explanation (e.g. the filter sidebar),
+   so the column next to it is not left empty. Stacks on small screens. */
+.docs-content .docs-split {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+  margin: 8px 0 28px;
+}
+
+.docs-content .docs-split__media {
+  margin: 0;
+}
+
+.docs-content .docs-split__body > :first-child {
+  margin-top: 0;
+}
+
+.docs-content .docs-split__body > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 639px) {
+  .docs-content .docs-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-content .docs-split__media img {
+    width: auto;
+    max-width: min(100%, 320px);
+  }
+}
+
 .docs-content .docs-shot figcaption {
   margin-top: 10px;
   font-family: var(--font-sans), sans-serif;

@@ -88,13 +88,6 @@ npm run dev</code></pre>
       <a href="../first-workflow/">First Workflow</a>.
     </p>
 
-    <div class="callout">
-      <strong>Phases.</strong> The example frontend settings lock the Annotation
-      Hub to phase 1 and turn on guided instructions. To use all five phases,
-      change the <code>VITE_STUDY_*</code> values in <code>frontend/.env</code>;
-      see <a href="../../operations/environment/#frontend-variables">Environment Setup</a>.
-    </div>
-
     <h2>Optional services</h2>
 
     <table>
@@ -102,7 +95,7 @@ npm run dev</code></pre>
         <tr><th>Service</th><th>Needed for</th><th>Setting</th></tr>
       </thead>
       <tbody>
-        <tr><td>Ontology service (oe_yapat)</td><td>The label-space chat in Label Management</td><td><code>OE_YAPAT_SERVICE_URL</code> (default <code>http://localhost:8002</code>)</td></tr>
+        <tr><td>Ontology service (oe_yapat)</td><td>The label-space chat (Taxonomy Assistant) in Label Management; needs an OpenAI API key</td><td><code>OE_YAPAT_SERVICE_URL</code> (default <code>http://localhost:8002</code>)</td></tr>
         <tr><td>Weakly Supervised Sound Event Detection (WSSED) server</td><td>Training <a href="../../concepts/wssed/">sound event detection models</a> from labelled recordings (FOCAL_RECORDINGS datasets), used as a first active-learning model</td><td><code>WSSED_GPU_SERVER_URL</code> (default <code>http://localhost:8003</code>)</td></tr>
       </tbody>
     </table>
@@ -110,9 +103,9 @@ npm run dev</code></pre>
     <p>
       Everything else works without them. When the backend runs in Docker and a
       service runs on the same host, use <code>http://host.docker.internal:&lt;port&gt;</code>.
-      Ask the project maintainers how the ontology service's HTTP endpoint is
-      deployed; the oe_yapat repository contains the tool server but not that
-      endpoint.
+      The ontology service provides the Taxonomy Assistant and requires an
+      OpenAI API key. See
+      <a href="../../guides/label-management/#set-up-the-taxonomy-assistant">Set up the Taxonomy Assistant</a>.
     </p>
 
     <div class="callout callout--dev">
