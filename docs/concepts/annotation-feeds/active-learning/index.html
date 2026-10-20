@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="How active learning works in the user-study version of YAPAT: the first model, uncertainty ranking, blind labelling, and automatic retraining.">
-  <title>Active Learning — YAPAT Documentation</title>
+  <meta name="description" content="How YAPAT's model chooses which snippets you see, how it starts, and how it learns from your labels.">
+  <title>YAPAT Documentation – Active Learning</title>
   <link rel="icon" type="image/svg+xml" href="../../../assets/yapat-icon.svg">
 
   <script>
@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../../styles/tokens.css">
   <link rel="stylesheet" href="../../../styles/base.css">
@@ -34,129 +34,99 @@
     <h1>Active Learning</h1>
 
     <p class="lede">
-      In the user-study version, annotation in the Annotation Hub is active
-      learning. A model trained on the labels collected so far scores the
-      dataset's snippets, the feed presents them ranked, and the model is
-      retrained as annotators add labels.
+      Active learning means the model asks for help where it needs it most.
+      Instead of going through recordings in order, you label the snippets the model
+      is least sure about, so each label teaches it as much as possible.
     </p>
 
-    <h2>Model checkpoints and families</h2>
+    <h2>The loop</h2>
+
+    <figure class="docs-infographic" aria-label="Active-learning loop: ranked snippets, annotator labels, retrain after 10 labels, new ranking.">
+      <ol class="di-flow di-flow--loop di-animate di-n4" style="--n:4">
+        <li style="--i:0">Ranked snippets<span class="di-sub">least certain first</span><span class="di-edge">listen</span></li>
+        <li style="--i:1">You label<span class="di-sub">one or more labels per snippet</span><span class="di-edge">count</span></li>
+        <li style="--i:2">10 new labels<span class="di-sub">since the last training</span><span class="di-edge">train</span></li>
+        <li class="di-key" style="--i:3">Model retrains<span class="di-sub">automatically, in the background</span></li>
+        <span class="di-loop-label">new ranking</span>
+      </ol>
+      <figcaption>After retraining, the model ranks the snippets again and the loop repeats.</figcaption>
+    </figure>
+
+    <h2>How the model is built</h2>
 
     <p>
-      A model is stored as a <strong>checkpoint</strong> that belongs to a
-      <strong>model family</strong>, named in the Generate Feed dialog. For a
-      given dataset and family, one checkpoint is active at a time, and the Hub
-      works with that active checkpoint. Training and retraining create new
-      checkpoints.
-    </p>
-
-    <h2>The first model</h2>
-
-    <p>
-      When a dataset has no checkpoint yet, the Generate Feed dialog asks
-      whether ground-truth metadata is available:
+      The model is a classifier trained on the snippets'
+      <a href="../../embeddings/">embeddings</a>. A new dataset has no model,
+      so the <strong>Generate Feed</strong> dialog (see
+      <a href="../../../guides/annotation-hub/#generating-a-feed">Generating a feed</a>)
+      asks for a <strong>model family name</strong> and a way to start:
     </p>
 
     <ul>
-      <li>
-        <strong>Cold start</strong> — with ground-truth metadata, a first model is
-        trained from scratch. The dialog asks for an embedding model, the
-        metadata file, the label-config file, the training device, and whether to
-        run inference after training. Only administrators and team owners can
-        start this training.
-      </li>
-      <li>
-        <strong>Bootstrap mode</strong> — without ground-truth metadata, the feed
-        starts with randomly chosen snippets. The annotators' labels are stored
-        as feedback, and once the retrain threshold is reached a first model is
-        trained from them.
-      </li>
+      <li><strong>Bootstrap</strong> — you label randomly chosen snippets, and the first model is trained from those labels. This is the usual choice.</li>
+      <li><strong>Cold start</strong> — the first model is trained immediately from existing ground-truth labels, given as a metadata file and a label config file. Only administrators and team owners can start it.</li>
+      <li><strong>WSSED model</strong> — a model trained with Weakly Supervised Sound Event Detection is registered as the first model. See <a href="../../wssed/">WSSED</a>.</li>
     </ul>
 
-    <h2>How the feed is ranked</h2>
+    <h3>Reference pools</h3>
 
     <p>
-      Once a checkpoint exists, the Hub requests model predictions for the
-      dataset's default snippet set, ranked by the model's
-      <strong>uncertainty</strong>, and shows the Top-K snippets (1 to 500, set
-      in the Generate Feed dialog). The user-study interface offers no other
-      ranking strategy. Each returned snippet carries its uncertainty, diversity,
-      density, and composite scores. In study phases 4 and 5, the sidebar shows
-      these scores and the model's confidence as histograms, and annotators can
-      filter and sort the feed and the projection by them.
+      A reference dataset is a labelled dataset used only for training; it is
+      never shown for annotation. An administrator adds it with
+      <strong>Add Dataset</strong> and links it to a dataset or a team under
+      <strong>Reference pools</strong> on the dataset card. Its labels are then
+      added to every training run of the linked datasets, including the first.
+      A reference dataset must use the same embedding model as the datasets it
+      is linked to.
     </p>
 
-    <pre><code>POST /api/pam-al/inference/get-or-create
-{
-  "dataset_id": 1,
-  "snippet_set_id": 1,
-  "model_family_name": "cold_start_base",
-  "sample_suggestion": true,
-  "suggestion_strategy": "uncertainty",
-  "k": 20
-}</code></pre>
+    <h3>Checkpoints</h3>
 
     <p>
-      If predictions for the active checkpoint are already stored they are
-      returned directly; otherwise an inference job is started and the Hub polls
-      for it. When the dataset has no checkpoint, random snippet suggestions are
-      returned immediately.
+      Each training run saves a <strong>checkpoint</strong>: a numbered version
+      of the model (v0, v1, …) in its <strong>model family</strong>. For each
+      dataset and family one checkpoint is active, and the Hub ranks the feed
+      with it.
     </p>
 
-    <h2>Feedback loop</h2>
-
-    <p>
-      Labelling is blind: the model's predicted labels are not shown. For each
-      snippet the annotator selects one or more labels, and the Hub sends them
-      as feedback with the action <code>MODIFY</code> shortly after the selection
-      changes:
-    </p>
-
-    <pre><code>POST /api/pam-al/feedback
-{ "dataset_id": 1, "model_family_name": "cold_start_base",
-  "snippet_id": 42, "action": "MODIFY", "labels": ["Turdus merula"] }</code></pre>
-
-    <p>
-      Feedback is counted per dataset. When the count since the last retrain
-      reaches the threshold, a retrain job starts automatically. The threshold
-      is <code>RETRAIN_AFTER</code> from the backend's
-      <code>active_learning/config.yaml</code> (10), unless the dataset record
-      has a <code>retrain_after_threshold</code> value, which then takes
-      precedence; the user-study interface has no setting for it. The interface
-      has no manual retrain control. When a retrain finishes, the Hub requests
-      new predictions and refreshes the feed.
-    </p>
-
-    <figure class="docs-infographic" aria-label="Active-learning loop: ranked snippets, annotator labels, retrain threshold, retrain job.">
-      <ol class="di-flow di-animate di-n4">
-        <li style="--i:0">Ranked snippets<span class="di-sub">from inference</span></li>
-        <li style="--i:1">Feedback<span class="di-sub">labels chosen by the annotator</span></li>
-        <li style="--i:2">Threshold reached<span class="di-sub">feedback count since the last retrain</span></li>
-        <li style="--i:3">Retrain job<span class="di-sub">starts automatically</span></li>
+    <figure class="docs-infographic" aria-label="How the model is built: choose a start, train the first checkpoint, label, retrain into new checkpoints.">
+      <ol class="di-flow di-animate di-n4" style="--n:4">
+        <li style="--i:0">Choose a start<span class="di-sub">bootstrap, cold start or WSSED</span></li>
+        <li style="--i:1">First checkpoint<span class="di-sub">v0, plus any reference pool</span></li>
+        <li style="--i:2">You label<span class="di-sub">10 new labels</span></li>
+        <li class="di-key" style="--i:3">Next checkpoint<span class="di-sub">v1, v2, … ranks the feed</span></li>
       </ol>
-      <figcaption>After retraining, new predictions rank the next snippets and the loop repeats.</figcaption>
+      <figcaption>The start is chosen once per model family. Every further 10 labels produce a new checkpoint.</figcaption>
     </figure>
 
-    <h2>In the interface</h2>
+    <h2>How snippets are ranked</h2>
 
     <p>
-      From study phase 2 on, the Annotation Hub shows a
-      <strong>ProjectionView</strong> beside the feed: a two-dimensional view of
-      the whole dataset, computed with PCA by default or with UMAP or t-SNE, in
-      which labelled snippets are marked. The sidebar
-      filters and the model-score thresholds hide the points that do not match,
-      and in phase 5 a point can be clicked to select its snippet.
+      The model scores every snippet. The feed shows the ones it is most
+      <strong>uncertain</strong> about, up to the Top-K number you set. Each snippet
+      also carries diversity, density, and composite scores, which you can filter
+      and sort by; see
+      <a href="../filter/">Filters and Model Scores</a>.
     </p>
 
-    <div class="callout callout--tip">
-      <strong>Related.</strong> Cold-start runs use ground-truth labels, the
-      labels with source <code>ground_truth</code> described under
-      <a href="../../pam-and-annotations/">PAM and Annotations</a>. The
-      <a href="../../../guides/annotation-hub/">Annotation Hub</a> guide shows
-      where these steps appear in the interface, and
-      <a href="../../../reference/feed-methods/">Active Learning API</a> lists
-      the endpoints behind them. WSSED can also supply a first model: see
-      <a href="../../../guides/datasets/">Datasets</a>.
+    <h2>Why the model's guess is hidden</h2>
+
+    <p>
+      Labelling is <strong>blind</strong>: the snippet never shows what the model
+      predicts. Each label is your own judgement, not a confirmation of the
+      model's guess, and that independent judgement is what the model learns
+      from.
+    </p>
+
+    <div class="callout callout--dev">
+      <strong>For developers.</strong>
+      <ul>
+        <li>Feed: <code>POST /api/pam-al/inference/get-or-create</code> with <code>suggestion_strategy: "uncertainty"</code> and <code>k</code>.</li>
+        <li>Labels are sent to <code>POST /api/pam-al/feedback</code> with <code>action: "MODIFY"</code>.</li>
+        <li>The retrain threshold is <code>RETRAIN_AFTER</code> (10) in <code>active_learning/config.yaml</code>; a dataset's <code>retrain_after_threshold</code> overrides it. Training runs on the <code>pam_al</code> Celery queue.</li>
+        <li>Cold-start metadata and label config paths are resolved relative to the data root. Reference pools are linked with <code>/api/reference-links/</code> (administrators only).</li>
+        <li>Full details: <a href="../../../reference/feed-methods/">Active Learning API</a>.</li>
+      </ul>
     </div>
 
   </main>

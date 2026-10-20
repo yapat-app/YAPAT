@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A first pass through YAPAT: account, dataset registration, embeddings, feeds, annotation, and export.">
-  <title>First Workflow — YAPAT Documentation</title>
+  <meta name="description" content="Your first session with YAPAT, from signing in to exported labels, in eight steps.">
+  <title>YAPAT Documentation – First Workflow</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
   <script>
@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../styles/tokens.css">
   <link rel="stylesheet" href="../../styles/base.css">
@@ -34,116 +34,125 @@
     <h1>First Workflow</h1>
 
     <p class="lede">
-      This walkthrough follows one dataset from registration to exported
-      annotations. It assumes a running backend and frontend, as described in
-      <a href="../installation/">Installation</a>.
+      This page takes you from a fresh YAPAT installation to your first exported
+      labels. Each step links to the guide with the details.
     </p>
 
-    <h2>1. Create an account and sign in</h2>
+    <p class="docs-needs">
+      <strong>You need:</strong> YAPAT running (see
+      <a href="../installation/">Installation</a>) and a folder of audio files on
+      its data volume.
+    </p>
+
+    <h2>1. Sign in</h2>
 
     <p>
-      The sign-up page creates an account with the global role
-      <code>user</code> that belongs to no team. An administrator can instead
-      send a team invitation link from the team list; opening it shows the
-      sign-in form in registration mode, and the new account joins that team.
-      An owner link gives the account the global role <code>team_owner</code>, a
-      member link the role <code>user</code>. Links expire after two days. After
-      registering, sign in with the new account. See
-      <a href="../../guides/teams/">Teams</a> for the details.
+      YAPAT has no public sign-up button. Open the YAPAT address and click
+      <strong>Sign in</strong> on the home page, then enter the username and
+      password of the account an administrator created for you. If you were
+      invited to a team, open the invitation link instead: it shows the login
+      form with your role filled in, and the button reads
+      <strong>Register</strong>. Choose a username and password, register, then
+      sign in. See <a href="../../guides/teams/">Teams</a>.
     </p>
 
     <p>
-      Signing in opens the <strong>Dashboard</strong>. It greets you with your
-      role (Administrator, Team owner, or Annotator) and the number of datasets
-      you can access, offers a <strong>Start Annotating</strong> button that
-      opens the Annotation Hub, and shows a card for each service your role may
-      use:
+      After signing in you land on the <strong>Dashboard</strong>. It greets you
+      with your role and the number of datasets you can access.
+      <strong>Start Annotating</strong> opens the Annotation Hub, and a card
+      opens each area you can use: Dataset Management, Annotate, Label
+      Management, and, depending on your role, Team Management, Weakly
+      Supervised Sound Event Detection (WSSED), and Study Logs. The Feed History
+      card lists older feeds and is not needed for annotation; the
+      Documentation card opens a manual built into the app.
     </p>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Card</th>
-          <th>Shown to</th>
-          <th>Opens</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Dataset Management</td><td>Everyone</td><td>The <a href="../../guides/datasets/">Datasets</a> page.</td></tr>
-        <tr><td>Annotate</td><td>Everyone</td><td>The <a href="../../guides/annotation-hub/">Annotation Hub</a>. The card's text still mentions random feeds and similarity search; the Hub itself offers only active learning.</td></tr>
-        <tr><td>WSSED</td><td>Administrators, and users with access to a <code>FOCAL_RECORDINGS</code> dataset</td><td>The WSSED training page; see <a href="../../guides/datasets/">Datasets</a>.</td></tr>
-        <tr><td>Label Management</td><td>Everyone</td><td>The <a href="../../guides/label-management/">label-space chat</a>.</td></tr>
-        <tr><td>Feed History</td><td>Everyone</td><td>A page from an older feed design that is not part of the user-study workflow.</td></tr>
-        <tr><td>Team Management</td><td>Administrators and team owners</td><td>The <a href="../../guides/teams/">team list</a>.</td></tr>
-        <tr><td>Study Logs</td><td>Administrators</td><td>The study-log viewer; see <a href="../../guides/annotation-hub/">Annotation Hub</a>.</td></tr>
-        <tr><td>Documentation</td><td>Everyone</td><td>A user manual built into the frontend (<code>/documentation</code>), separate from these pages.</td></tr>
-      </tbody>
-    </table>
-
-    <h2>2. Register a dataset</h2>
+    <h2>2. Add a dataset</h2>
 
     <p>
-      In the web interface, administrators add datasets from the
-      <a href="../../guides/datasets/">Datasets</a> page. Adding a dataset means
-      choosing a folder on the mounted data volume and a dataset type,
-      <code>PAM</code> or <code>FOCAL_RECORDINGS</code>. A background task then
-      scans the folder and records each audio file it finds.
+      An administrator clicks <strong>Add Dataset</strong> on the Datasets page and
+      picks the folder with the audio. YAPAT scans it in the background.
+      <a href="../../guides/datasets/">Datasets →</a>
     </p>
 
     <h2>3. Generate embeddings</h2>
 
     <p>
-      Embeddings are vectors computed for short audio segments. Active learning
-      and the projection view depend on them. On the dataset card, an
-      administrator chooses an embedding model and starts the job. It runs on a
-      Celery worker and, when finished, leaves the dataset with a snippet set that
-      feeds can use.
+      On the dataset card, the administrator clicks
+      <strong>Generate Embeddings</strong>. YAPAT cuts the audio into 3-second
+      snippets and prepares them for the model.
+      <a href="../../concepts/embeddings/">Embeddings →</a>
     </p>
 
-    <h2>4. Build a feed</h2>
+    <h2>4. Build a label space</h2>
 
     <p>
-      Once the dataset is ready for feeds, open the
-      <a href="../../guides/annotation-hub/">Annotation Hub</a>, select the
-      dataset, and click <strong>Generate Feed</strong>. If the dataset has no
-      model checkpoint yet, the dialog asks for a model family name and offers two
-      starts: a cold start that trains a first model from a ground-truth metadata
-      file, or bootstrap mode, which begins with randomly sampled snippets. Once a
-      checkpoint exists, the model ranks the snippets and the dialog sets how many
-      are returned (Top-K).
+      Optional, but recommended. In <strong>Label Management</strong>, describe
+      what you want to label and submit the list; a team owner then makes it
+      active. The short list of labels
+      annotators click is managed separately, as
+      <a href="../../guides/datasets/#quick-labels">quick labels</a> on the
+      dataset card.
+      <a href="../../guides/label-management/">Label Management →</a>
     </p>
 
-    <h2>5. Annotate</h2>
+    <h2>5. Build your model</h2>
 
     <p>
-      Review each snippet's spectrogram and audio, and assign one or more labels.
-      The model's predicted labels are not shown; you choose labels from the
-      quick-label list or find a species through the GBIF search. Your selection
-      is saved to the backend as soon as it changes.
+      YAPAT ranks snippets with a classifier trained on the dataset's
+      embeddings. A new dataset has no classifier yet. When you generate the
+      first feed in step 6, you enter a <strong>model family name</strong> and
+      choose how the first model is trained:
     </p>
 
-    <h2>6. Let the model retrain</h2>
+    <table>
+      <thead>
+        <tr><th>Start</th><th>First model</th><th>Suitable when</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Bootstrap</strong></td><td>Trained from your labels on randomly chosen snippets.</td><td>No labelled data is available. This is the default.</td></tr>
+        <tr><td><strong>Cold start</strong></td><td>Trained immediately from existing ground-truth labels, given as a metadata file and a label config file. Administrators and team owners only.</td><td>Part of the dataset is already labelled.</td></tr>
+        <tr><td><strong>WSSED model</strong></td><td>A model trained with <a href="../../concepts/wssed/">WSSED</a> is registered as the first model.</td><td>Recordings are labelled by species, but not by time.</td></tr>
+      </tbody>
+    </table>
 
     <p>
-      Each labelled snippet counts as feedback for the dataset's model. When the
-      count reaches the retrain threshold, a retrain job starts automatically, and
-      the feed is ranked again with the updated model.
+      An administrator can also link a <strong>reference pool</strong> to the
+      dataset or its team: labelled datasets whose labels are added to every
+      training run. Each run saves a new <strong>checkpoint</strong> (v0, v1, …)
+      in the model family, and the active checkpoint ranks the feed.
+      <a href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built">How the model is built →</a>
     </p>
 
-    <h2>7. Export</h2>
+    <h2>6. Start annotating</h2>
 
     <p>
-      A dataset's annotations can be exported as JSON or CSV. See
-      <a href="../../workflow/import-export/">Import &amp; Export</a> for the
-      filters and the columns.
+      Open the <strong>Annotation Hub</strong>, choose the dataset, and click
+      <strong>Generate Feed</strong> at the top right of the feed. Enter the
+      model family name and the start chosen in step 5. Then listen to each
+      snippet and choose its labels.
+      <a href="../../guides/annotation-hub/#generating-a-feed">How feeds are generated →</a>
+      <a href="../../guides/annotation-hub/">Annotation Hub →</a>
+    </p>
+
+    <h2>7. Let the model learn</h2>
+
+    <p>
+      Keep labelling. After every 10 labels the model retrains, saves a new
+      checkpoint, and the feed shows the snippets it is now least sure about.
+      <a href="../../concepts/annotation-feeds/active-learning/">Active Learning →</a>
+    </p>
+
+    <h2>8. Export</h2>
+
+    <p>
+      Open the <strong>Export</strong> menu on the dataset card and choose
+      <strong>Export as CSV</strong> or <strong>Export as JSON</strong>. <a href="../../workflow/import-export/">Import &amp; Export →</a>
     </p>
 
     <div class="callout callout--tip">
-      <strong>Study phases.</strong>
-      Which views and filters the Annotation Hub shows depends on the study
-      phase. See the <a href="../../guides/annotation-hub/">Annotation Hub</a>
-      guide and <a href="../../concepts/annotation-feeds/active-learning/">Active
-      Learning</a>.
+      <strong>Something not working?</strong> See
+      <a href="../../operations/troubleshooting/">Troubleshooting</a>.
     </div>
 
   </main>

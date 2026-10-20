@@ -285,6 +285,8 @@
     var headings = contentRoot.querySelectorAll("h2, h3");
     if (!headings.length) return { list: "", items: [] };
 
+    // data-toc-depth="2" on the content root lists only the h2 headings.
+    var h2Only = contentRoot.getAttribute("data-toc-depth") === "2";
     var used = {};
     var items = [];
     headings.forEach(function (h) {
@@ -294,6 +296,7 @@
       used[base] = n;
       if (n > 1) id = base + "-" + n;
       h.id = id;
+      if (h2Only && h.tagName === "H3") return;
       items.push({ level: h.tagName === "H3" ? 3 : 2, id: id, text: h.textContent });
     });
 
@@ -390,10 +393,14 @@
     '<div class="docs-scroll" tabindex="-1"><div class="docs-body">' +
       '<aside class="docs-sidebar-outer">' + renderSidebar() + "</aside>" +
       '<main class="docs-main">' +
-        renderBreadcrumbs() +
-        (toc.list
-          ? '<details class="docs-toc-mobile"><summary>On this page</summary>' + toc.list + "</details>"
-          : "") +
+        // Breadcrumbs and the compact on-this-page menu share one bar, which
+        // sticks to the top of the scroll area on tablets and phones.
+        '<div class="docs-pagebar">' +
+          renderBreadcrumbs() +
+          (toc.list
+            ? '<details class="docs-toc-mobile"><summary>On this page</summary>' + toc.list + "</details>"
+            : "") +
+        "</div>" +
         '<article class="docs-content" data-main-content>' + contentHTML + "</article>" +
         renderPrevNext() +
       "</main>" +
@@ -530,38 +537,77 @@
 
   (function scrollspy() {
     var links = document.querySelectorAll(".docs-toc a, .docs-toc-mobile a");
+    if (!links.length) return;
+
+    // Desktop and mobile menus each have a link per heading.
+    var group = {};
+    links.forEach(function (a) {
+      var href = a.getAttribute("href");
+      (group[href] = group[href] || []).push(a);
+    });
+
+    // Only headings that have a toc entry (the toc can be h2-only).
     var headings = Array.prototype.filter.call(
       document.querySelectorAll(".docs-main h2, .docs-main h3"),
-      function (h) { return h.id; }
+      function (h) { return h.id && group["#" + h.id]; }
     );
-    if (!links.length || !headings.length) return;
+    if (!headings.length) return;
 
-    var group = {};
-    links.forEach(function (a) { group[a.getAttribute("href")] = a; });
+    var scroller = document.querySelector(".docs-scroll");
+    var active = null;       // heading id currently highlighted
+    var pinned = null;       // heading id chosen by clicking a toc link
 
-    var activeLink = null;
+    // A heading is current once it is within a few px of where a toc click
+    // lands it (its scroll-margin-top below the top of the scroll area).
+    function markerFor(h) {
+      var top = scroller ? scroller.getBoundingClientRect().top : 0;
+      return top + (parseFloat(getComputedStyle(h).scrollMarginTop) || 0) + 16;
+    }
 
-    function computeOffset() {
-      var header = document.querySelector(".docs-header");
-      return (header ? header.getBoundingClientRect().height : 64) + 40;
+    function atBottom() {
+      var el = scroller || document.documentElement;
+      return el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    }
+
+    function setActive(id) {
+      if (id === active) return;
+      if (active) (group["#" + active] || []).forEach(function (a) { a.classList.remove("is-active"); });
+      (group["#" + id] || []).forEach(function (a) { a.classList.add("is-active"); });
+      active = id;
     }
 
     function update() {
-      var marker = computeOffset();
+      if (pinned) return setActive(pinned);
       var current = null;
       for (var i = 0; i < headings.length; i++) {
-        var top = headings[i].getBoundingClientRect().top;
-        if (top <= marker) current = headings[i];
+        if (headings[i].getBoundingClientRect().top <= markerFor(headings[i])) current = headings[i];
         else break;
       }
-      var target = current ? group["#" + current.id] : null;
-      if (target === activeLink) return;
-      if (activeLink) activeLink.classList.remove("is-active");
-      if (target) target.classList.add("is-active");
-      activeLink = target;
+      // The last sections are often too short to reach the marker.
+      if (atBottom()) current = headings[headings.length - 1];
+      if (current) setActive(current.id);
+      else if (active) {
+        (group["#" + active] || []).forEach(function (a) { a.classList.remove("is-active"); });
+        active = null;
+      }
     }
 
-    var scroller = document.querySelector(".docs-scroll");
+    // A clicked link stays active even if its heading cannot reach the top
+    // (end of page); the pin is released as soon as the reader scrolls.
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest ? e.target.closest(".docs-toc a, .docs-toc-mobile a") : null;
+      if (!a) return;
+      pinned = a.getAttribute("href").slice(1);
+      update();
+    });
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (ev) {
+      (scroller || window).addEventListener(ev, function (e) {
+        if (!pinned) return;
+        if (e.target.closest && e.target.closest(".docs-toc, .docs-toc-mobile")) return;
+        pinned = null;
+      }, { passive: true });
+    });
+
     (scroller || window).addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     update();
@@ -579,10 +625,19 @@
       var target = document.getElementById(id);
       if (!target) return;
       e.preventDefault();
+      var menu = a.closest(".docs-toc-mobile");
+      if (menu) menu.open = false;   // close the pinned menu before scrolling
       target.scrollIntoView({ behavior: "smooth", block: "start" });
       history.replaceState(null, "", "#" + id);
     });
   }
+
+  // Close the pinned on-this-page menu after a link in it is chosen (also
+  // when the smooth-scroll handler above is off for reduced motion).
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest ? e.target.closest(".docs-toc-mobile a") : null;
+    if (a) a.closest(".docs-toc-mobile").open = false;
+  });
 
   // ---- mobile navigation drawer -------------------------------------
 
@@ -722,6 +777,110 @@
       if (ar.top < sr.top) side.scrollTop -= sr.top - ar.top + 8;
       else if (ar.bottom > sr.bottom) side.scrollTop += ar.bottom - sr.bottom + 8;
     }
+  })();
+
+  // ---- screenshot tabs -----------------------------------------------
+  // <div class="docs-shot-tabs"> holding several <figure class="docs-shot"
+  // data-tab="Label"> becomes one figure with a row of tabs above it. Without
+  // JS every figure stays visible.
+
+  (function shotTabs() {
+    Array.prototype.forEach.call(document.querySelectorAll(".docs-shot-tabs"), function (group, g) {
+      var figures = group.querySelectorAll(":scope > .docs-shot[data-tab]");
+      if (figures.length < 2) return;
+      var list = document.createElement("div");
+      list.className = "docs-shot-tablist";
+      list.setAttribute("role", "tablist");
+      list.setAttribute("aria-label", group.getAttribute("aria-label") || "Screenshots");
+
+      var tabs = Array.prototype.map.call(figures, function (fig, i) {
+        var id = "shot-" + g + "-" + i;
+        fig.id = id;
+        fig.setAttribute("role", "tabpanel");
+        var tab = document.createElement("button");
+        tab.type = "button";
+        tab.className = "docs-shot-tab";
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-controls", id);
+        tab.textContent = fig.getAttribute("data-tab");
+        tab.addEventListener("click", function () { select(i); });
+        tab.addEventListener("keydown", function (e) {
+          var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+          if (!d) return;
+          e.preventDefault();
+          var n = (i + d + figures.length) % figures.length;
+          select(n);
+          tabs[n].focus();
+        });
+        list.appendChild(tab);
+        return tab;
+      });
+
+      function select(n) {
+        tabs.forEach(function (t, i) {
+          t.setAttribute("aria-selected", i === n ? "true" : "false");
+          t.tabIndex = i === n ? 0 : -1;
+          figures[i].hidden = i !== n;
+        });
+      }
+
+      group.insertBefore(list, figures[0]);
+      group.classList.add("is-tabbed");
+      select(0);
+    });
+  })();
+
+  // ---- screenshot lightbox -------------------------------------------
+  // <figure class="docs-shot"><img …><figcaption>…</figcaption></figure>
+  // Clicking (or Enter/Space on) a screenshot opens it full size in a modal
+  // <dialog>: dark backdrop, caption below, close button, Esc or backdrop
+  // click to close. Focus returns to the image afterwards.
+
+  (function lightbox() {
+    var shots = document.querySelectorAll(".docs-shot img");
+    if (!shots.length) return;
+
+    var dialog = document.createElement("dialog");
+    dialog.className = "docs-lightbox";
+    dialog.setAttribute("aria-label", "Screenshot");
+    dialog.innerHTML =
+      '<button class="docs-lightbox-close" type="button" aria-label="Close">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+      "</button>" +
+      '<figure class="docs-lightbox-figure"><img alt=""><figcaption></figcaption></figure>';
+    document.body.appendChild(dialog);
+
+    var img = dialog.querySelector("img");
+    var caption = dialog.querySelector("figcaption");
+    var opener = null;
+
+    function open(shot) {
+      opener = shot;
+      img.src = shot.currentSrc || shot.src;
+      img.alt = shot.alt;
+      var cap = shot.closest("figure").querySelector("figcaption");
+      caption.textContent = cap ? cap.textContent : "";
+      caption.hidden = !cap;
+      dialog.showModal();
+    }
+
+    dialog.addEventListener("click", function (e) {
+      // Close on the close button or on the backdrop, not on the image itself.
+      if (e.target === dialog || e.target.closest(".docs-lightbox-close")) dialog.close();
+    });
+    dialog.addEventListener("close", function () {
+      if (opener) opener.focus({ preventScroll: true });
+    });
+
+    Array.prototype.forEach.call(shots, function (shot) {
+      shot.tabIndex = 0;
+      shot.setAttribute("role", "button");
+      shot.setAttribute("aria-label", "Enlarge: " + shot.alt);
+      shot.addEventListener("click", function () { open(shot); });
+      shot.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(shot); }
+      });
+    });
   })();
 
   // ---- theme toggle --------------------------------------------------

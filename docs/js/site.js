@@ -28,31 +28,23 @@
 
   // ---- Documentation entry cards ----------------------------------------
 
-  // Inline-SVG illustrations (64px grid); colour and stroke come from CSS.
+  // One icon family: 24px grid, 1.6 stroke, round caps; colour comes from CSS.
   var icons = {
-    "getting-started":
-      '<path d="M12 50 30 34 52 14"/>' +
-      '<circle class="knock" cx="12" cy="50" r="6"/><circle class="knock" cx="30" cy="34" r="6"/>' +
-      '<circle class="fill" cx="52" cy="14" r="7"/>',
-    concepts:
-      '<path d="M32 12 18 32 10 52M32 12 46 32 54 52"/>' +
-      '<circle class="fill" cx="32" cy="12" r="6"/>' +
-      '<circle class="knock" cx="18" cy="32" r="5"/><circle class="knock" cx="46" cy="32" r="5"/>' +
-      '<circle class="knock" cx="10" cy="52" r="5"/><circle class="knock" cx="54" cy="52" r="5"/>',
-    guides:
-      '<rect x="12" y="6" width="40" height="52" rx="6"/>' +
-      '<path d="M20 20l3 3 6-6M35 21h9M20 32l3 3 6-6M35 33h9M20 44l3 3 6-6M35 45h9"/>',
-    reference:
-      '<path d="M32 16C24 10 14 10 8 12v36c6-2 16-2 24 4 8-6 18-6 24-4V12c-6-2-16-2-24 4zM32 16v36"/>' +
-      '<path d="M25 24l-8 7 8 7M39 24l8 7-8 7"/>'
+    "getting-started": '<circle cx="12" cy="12" r="9"/><path d="M10 8.6v6.8l5.4-3.4z"/>',
+    guides: '<path d="M3 5.6c3-1.1 6-.9 9 1.1 3-2 6-2.2 9-1.1v13.2c-3-1.1-6-.9-9 1.1-3-2-6-2.2-9-1.1z"/><path d="M12 6.7v13.2"/>',
+    concepts: '<circle cx="6" cy="7" r="2.2"/><circle cx="18" cy="7" r="2.2"/><circle cx="12" cy="17.5" r="2.2"/><path d="M8.2 7h7.6M7.1 9l3.8 6.6M16.9 9l-3.8 6.6"/>',
+    workflow: '<path d="M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5M13.4 5l-2.8 14"/>'
   };
 
+  // One colour per section, as on the first homepage design.
   var tones = {
     "getting-started": "violet",
-    concepts: "blue",
     guides: "green",
-    reference: "amber"
+    concepts: "blue",
+    workflow: "amber"
   };
+
+  // ---- Documentation entry cards ------------------------------------------
 
   var mount = document.querySelector("[data-doc-cards]");
   if (mount) {
@@ -61,30 +53,19 @@
 
     mount.innerHTML = cards.map(function (s, i) {
       var page = firstPage(s);
-
+      if (!page) return "";
       var icon = icons[s.id]
-        ? '<span class="card-icon tone-' + (tones[s.id] || "blue") + '" aria-hidden="true"><svg class="card-icon-svg" viewBox="0 0 64 64">' + icons[s.id] + "</svg></span>"
-        : '<span class="card-icon" aria-hidden="true"></span>';
-      var inner =
-        '<div class="card-head">' +
-        '<span class="card-index">' + pad(i + 1) + "</span>" +
-        icon +
-        "</div>" +
-        '<h3 class="card-title">' + s.label + "</h3>" +
-        '<p class="card-desc">' + s.summary + "</p>";
-
-      if (page) {
-        return (
-          '<a class="card" href="' + page.href + '">' + inner +
-          '<span class="card-cta">Explore section <span>→</span></span>' +
-          "</a>"
-        );
-      }
-
+        ? '<span class="card-icon tone-' + (tones[s.id] || "blue") + '" aria-hidden="true"><svg viewBox="0 0 24 24">' + icons[s.id] + "</svg></span>"
+        : "";
       return (
-        '<div class="card is-coming" aria-disabled="true">' + inner +
-        '<span class="coming-badge">Coming soon</span>' +
-        "</div>"
+        '<a class="card" href="' + page.href + '">' +
+          '<span class="card-head">' + icon +
+            '<span class="card-title">' + s.label + "</span>" +
+            '<span class="card-index">' + pad(i + 1) + "</span>" +
+          "</span>" +
+          '<span class="card-desc">' + (s.homeText || s.summary) + "</span>" +
+          '<span class="card-cta">' + (s.homeCta || "Open section") + ' <span aria-hidden="true">→</span></span>' +
+        "</a>"
       );
     }).join("");
   }
@@ -180,6 +161,13 @@
   var pz = svg.querySelector(".v-pz");
   var playhead = svg.querySelector(".v-playhead");
   var timeNow = svg.querySelector(".v-time-now");
+  var specScroll = svg.querySelector(".v-spec-scroll");
+  var SPEC_X = 24, SPEC_W = 222;   // visible spectrogram span (SVG units)
+  // Call events inside the spectrogram tile (and its scrolling copy, +222).
+  var calls = Array.prototype.slice.call(svg.querySelectorAll(".v-call")).map(function (el) {
+    var b = el.getBBox();
+    return { el: el, x0: b.x, x1: b.x + b.width, timers: [] };
+  });
   var bars = Array.prototype.slice.call(svg.querySelectorAll(".hb"));
   var points = Array.prototype.slice.call(svg.querySelectorAll(".v-pz .pt"));
   var cells = Array.prototype.slice.call(svg.querySelectorAll(".s1, .s2, .s3"));
@@ -241,6 +229,33 @@
     return "00:" + (t.length < 4 ? "0" : "") + t;
   }
 
+  // Call activity: when the red playback line crosses a call, the call lights
+  // up (yellow through the viridis filter) and then fades back into the
+  // heatmap. The line covers [from, to] of the clip during the next beat; the
+  // spectrogram scrolls, so call positions are read from its current offset.
+  function callActivity(from, to) {
+    if (!calls.length || !specScroll || !window.DOMMatrixReadOnly) return;
+    var offset = new DOMMatrixReadOnly(getComputedStyle(specScroll).transform).m41;
+    var hx0 = SPEC_X + from * SPEC_W, hx1 = SPEC_X + to * SPEC_W;
+    calls.forEach(function (c) {
+      [0, SPEC_W].forEach(function (copy) {
+        var x0 = c.x0 + offset + copy, x1 = c.x1 + offset + copy;
+        if (x1 < hx0 || x0 > hx1) return;
+        var delay = clamp((x0 - hx0) / (hx1 - hx0), 0, 1) * BEAT;
+        c.timers.push(window.setTimeout(function () { c.el.classList.add("hot"); }, delay));
+        c.timers.push(window.setTimeout(function () { c.el.classList.remove("hot"); }, delay + 1400));
+      });
+    });
+  }
+
+  function quietCalls() {
+    calls.forEach(function (c) {
+      c.timers.forEach(window.clearTimeout);
+      c.timers = [];
+      c.el.classList.remove("hot");
+    });
+  }
+
   // Audio playhead: same beat clock. Each beat starts a 1 s linear move to the
   // next slice of the pass; at the end it fades out, jumps back unseen, fades in.
   function audio(n) {
@@ -254,6 +269,7 @@
     }
     var next = (k + 1) / AUDIO_BEATS;
     svg.style.setProperty("--ph", next.toFixed(4));
+    callActivity(k / AUDIO_BEATS, next);
     if (k === AUDIO_BEATS - 1) svg.classList.add("ph-end");
     if (timeNow) timeNow.textContent = clock(next * AUDIO_SECS);
     return next;
@@ -313,6 +329,7 @@
   function stop() {
     window.clearInterval(timer);
     timer = 0;
+    quietCalls();
   }
 
   function resetStatic() {
