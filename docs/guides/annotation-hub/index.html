@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Label audio snippets in the Annotation Hub: generate a feed, listen, choose labels, and let the model retrain as you go.">
+  <meta name="description" content="Label audio snippets in the Annotation Hub: listen, choose labels, and let the model retrain as you go.">
   <title>YAPAT Documentation – Annotation Hub</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
 
@@ -48,7 +48,7 @@
 
     <ol>
       <li>Open <strong>Start Annotating</strong> on the Dashboard, or <strong>Active Learning</strong> on a dataset card.</li>
-      <li>Choose the dataset in the toolbar, then click <strong>Generate Feed</strong> at the top right of the feed.</li>
+      <li>Choose the dataset in the toolbar. If it has a model, the feed loads on its own; otherwise an administrator or team owner starts it with <strong>Generate Feed</strong> at the top right of the feed (see <a href="#the-feed">The feed</a>).</li>
       <li>On each snippet, look at the spectrogram, play the audio, and choose one or more labels.</li>
       <li>Move on to the next snippet. Your labels are saved automatically.</li>
     </ol>
@@ -69,64 +69,43 @@
       </tbody>
     </table>
 
-    <h2>Generating a feed</h2>
+    <h2>The feed</h2>
 
     <p>
-      A <strong>feed</strong> is the ordered batch of snippets the Hub shows you
-      to label. It is the step between preparing a dataset and labelling:
-      embeddings must exist first, then you generate a feed, label what it
-      shows, and generate or refresh it again as you go. The button at the top
-      right of the feed starts the process. It reads <strong>Generate Feed</strong>
-      until a feed exists and <strong>Edit Feed</strong> afterwards, and both open
-      the same settings dialog. Click <strong>Apply</strong> to build the feed.
+      The <strong>feed</strong> is the ordered list of snippets the Hub shows you
+      to label. How it starts depends on whether the dataset already has a
+      model.
     </p>
 
+    <h3>A dataset with a model</h3>
+
     <p>
-      The mode switcher in the toolbar decides how snippets are chosen:
+      When the dataset has an active model checkpoint, for example from earlier
+      training or a registered WSSED model, the Hub ranks its snippets and loads
+      the feed on its own, least certain first, with the first snippet open.
+      There is nothing to click.
     </p>
 
-    <table>
-      <thead><tr><th>Mode</th><th>What the feed contains</th></tr></thead>
-      <tbody>
-        <tr><td>Random</td><td>A random sample of snippets from the dataset, for broad first coverage.</td></tr>
-        <tr><td>Similarity</td><td>Snippets that sound like a reference audio file you upload. Generating is disabled until a file is uploaded.</td></tr>
-        <tr><td>Filter</td><td>Snippets selected by metadata filters.</td></tr>
-        <tr><td>Active Learning</td><td>Snippets ranked by the model, least certain first. This is the usual choice, and the rest of this section describes it.</td></tr>
-        <tr><td>Validate</td><td>Unlabelled snippets ranked by the model's confidence, so you can check its predictions. The dialog adds <strong>Focus on species</strong> and <strong>Minimum confidence</strong>.</td></tr>
-      </tbody>
-    </table>
+    <h3>A dataset without a model</h3>
 
     <p>
-      Random, Similarity and Filter feeds are set with <strong>Location</strong>,
-      <strong>Annotation status</strong>, <strong>Species</strong> and
-      <strong>Feed limit</strong>.
-    </p>
-
-    <h3>Active Learning feeds</h3>
-
-    <p>
-      The first time you use a dataset there is no model yet, so the dialog asks
-      for a <strong>Model family name</strong> and how to start. The
-      <strong>Do you have ground-truth metadata?</strong> switch chooses:
+      The first time a dataset is used there is no model yet. Administrators
+      and team owners then see a <strong>Generate Feed</strong> button at the
+      top right of the feed; annotators see the feed once the dataset has a
+      model. The button opens a dialog that asks for a <strong>Model family name</strong>
+      and how to start. The <strong>Do you have ground-truth metadata?</strong>
+      switch chooses:
     </p>
 
     <ul>
-      <li><strong>Off: bootstrap mode</strong> — start with randomly chosen snippets. The first model is trained from your labels. This is the usual choice.</li>
-      <li><strong>On: cold start</strong> — train a first model from existing ground-truth labels, given as a metadata file and a label config file. Only administrators and team owners can do this.</li>
+      <li><strong>Off: bootstrap mode</strong> — start with randomly chosen snippets. The first model is trained from your labels. This is the usual choice. <strong>Top-K</strong> (1 to 500) sets how many snippets the feed shows; with <strong>Return only Top-K suggestions</strong> switched off, it returns all of them.</li>
+      <li><strong>On: cold start</strong> — train a first model from existing ground-truth labels. The dialog then asks for the embedding model, the metadata path, the label config path, and the device (CPU or CUDA), and can run inference automatically once training finishes.</li>
     </ul>
 
     <p>
-      If a WSSED model is registered for the dataset, a model already exists
-      and the dialog skips this choice. Reference pools need no setting here.
-      See
+      Click <strong>Apply</strong> to start. Once the dataset has a model, the
+      button disappears and the feed loads on its own from then on. See
       <a href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built">How the model is built</a>.
-    </p>
-
-    <p>
-      Once a model exists, the dialog only sets how many snippets the feed shows
-      (<strong>Top-K</strong>, 1 to 500). With <strong>Return only Top-K
-      suggestions</strong> switched off, the feed returns all predictions for the
-      dataset instead.
     </p>
 
     <div class="callout callout--tip">
@@ -137,10 +116,9 @@
     </div>
 
     <p>
-      <strong>What happens next:</strong> the feed appears, with the first
-      snippet open. Label it as described below. After every 10 labels the model
-      retrains in the background and the feed refreshes with a new ranking.
-      Use <strong>Edit Feed</strong> to change its settings at any time.
+      <strong>What happens next:</strong> label the open snippet as described
+      below. After every 10 labels the model retrains in the background and the
+      feed refreshes with a new ranking.
     </p>
 
     <h2>Labelling a snippet</h2>
@@ -162,7 +140,6 @@
       <li>Remove one label with its <strong>×</strong>, or all of a snippet's labels with <strong>Clear all</strong>.</li>
       <li>A labelled snippet shows a <strong>Labeled</strong> badge next to its file name.</li>
       <li>Use <strong>No biophony</strong> when you hear no animal sound at all. YAPAT treats it as "none of the target species", so the model learns from it without turning it into a species.</li>
-      <li><strong>Edit Feed</strong> reopens the feed settings, for example to show more snippets.</li>
     </ul>
 
     <h2>The model retrains on its own</h2>

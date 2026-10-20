@@ -1,132 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="YAPAT is an AI-powered annotation tool for passive acoustic monitoring audio, with a model that picks the snippets worth an expert's time.">
-  <title>YAPAT Documentation – What is YAPAT?</title>
-  <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="YAPAT is an AI-powered annotation tool for passive acoustic monitoring audio, with a model that picks the snippets worth an expert's time."
+    />
+    <title>YAPAT Documentation – What is YAPAT?</title>
+    <link rel="icon" type="image/svg+xml" href="../../assets/yapat-icon.svg" />
 
-  <script>
-    /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
-    (function () {
-      var d = document.documentElement, t = null;
-      d.classList.add("docs-js");
-      try { t = localStorage.getItem("yapat-docs-theme"); } catch (e) {}
-      if (t !== "dark" && t !== "light") {
-        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      }
-      if (t === "dark") d.setAttribute("data-theme", "dark");
-    })();
-  </script>
+    <script>
+      /* Apply theme + JS flag before first paint (avoids unstyled/wrong-theme flash). */
+      (function () {
+        var d = document.documentElement,
+          t = null;
+        d.classList.add("docs-js");
+        try {
+          t = localStorage.getItem("yapat-docs-theme");
+        } catch (e) {}
+        if (t !== "dark" && t !== "light") {
+          t =
+            window.matchMedia &&
+            matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        }
+        if (t === "dark") d.setAttribute("data-theme", "dark");
+      })();
+    </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="stylesheet" href="../../styles/tokens.css">
-  <link rel="stylesheet" href="../../styles/base.css">
-  <link rel="stylesheet" href="../../styles/components.css">
-  <link rel="stylesheet" href="../../styles/docs.css">
-</head>
-<body>
-  <main data-docs-content>
-    <h1>What is YAPAT?</h1>
+    <link rel="stylesheet" href="../../styles/tokens.css" />
+    <link rel="stylesheet" href="../../styles/base.css" />
+    <link rel="stylesheet" href="../../styles/components.css" />
+    <link rel="stylesheet" href="../../styles/docs.css" />
+  </head>
+  <body>
+    <main data-docs-content>
+      <h1>What is YAPAT?</h1>
 
-    <p class="lede">
-      YAPAT (Yet Another PAM Annotation Tool) is an AI-powered annotation tool for
-      audio from <strong>passive acoustic monitoring</strong> (PAM): recorders left
-      in the field that capture sound for days or months.
-    </p>
+      <p class="lede">
+        YAPAT (Yet Another PAM Annotation Tool) is an AI-powered annotation tool
+        for audio from <strong>passive acoustic monitoring</strong> (PAM):
+        recorders left in the field that capture sound for days or months.
+      </p>
 
-    <p>
-      Listening through all of that audio takes experts far too long. YAPAT uses a
-      model to pick the short snippets most worth an expert's attention, and learns
-      from every label the expert gives. You spend your time where it improves the
-      data most.
-    </p>
+      <p>
+        Listening through all of that audio takes experts far too long. YAPAT
+        uses a model to pick the short snippets most worth an expert's
+        attention, and learns from every label the expert gives. You spend your
+        time where it improves the data most.
+      </p>
 
-    <figure class="docs-shot">
-      <img src="../../assets/screenshots/hub-annotation.png" width="2000" height="1104" loading="lazy" alt="The Annotation Hub with filters, the projection of all snippets, and the feed of snippets to label.">
-      <figcaption>The Annotation Hub: filters on the left, a map of every snippet in the centre, and the snippet to label on the right.</figcaption>
-    </figure>
+      <figure class="docs-shot">
+        <img
+          src="../../assets/screenshots/hub-annotation.png"
+          width="2000"
+          height="1104"
+          loading="lazy"
+          alt="The Annotation Hub with filters, the projection of all snippets, and the feed of snippets to label."
+        />
+        <figcaption>
+          The Annotation Hub: filters on the left, a map of every snippet in the
+          centre, and the snippet to label on the right.
+        </figcaption>
+      </figure>
 
-    <h2>How it works</h2>
+      <h2>How it works</h2>
 
-    <ol>
-      <li><strong>Add your recordings.</strong> Point YAPAT at a folder of audio. It cuts the recordings into 3-second snippets and computes <a href="../../concepts/embeddings/">embeddings</a> for them.</li>
-      <li><strong>Decide what to label.</strong> Build your team's <a href="../../concepts/label-space/what-is-a-label-space/">label space</a>: describe the sounds in plain language and keep the matching species and concepts.</li>
-      <li><strong>Label.</strong> The <a href="../../guides/annotation-hub/">Annotation Hub</a> shows you the snippets the model is least sure about. You listen, look at the spectrogram, and choose labels.</li>
-      <li><strong>The model learns.</strong> After every 10 labels it retrains and picks the next snippets. Repeat.</li>
-      <li><strong>Export.</strong> Download your labels as comma-separated values (CSV) or JavaScript Object Notation (JSON).</li>
-    </ol>
+      <ol>
+        <li>
+          <strong>Add your recordings.</strong> Point YAPAT at a folder of
+          audio. It cuts the recordings into 3-second snippets and computes
+          <a href="../../concepts/embeddings/">embeddings</a> for them.
+        </li>
+        <li>
+          <strong>Decide what to label.</strong> Build your team's
+          <a href="../../concepts/label-space/what-is-a-label-space/"
+            >label space</a
+          >: describe the sounds in plain language and keep the matching species
+          and concepts.
+        </li>
+        <li>
+          <strong>Label.</strong> The
+          <a href="../../guides/annotation-hub/">Annotation Hub</a> shows you
+          the snippets the model is least sure about. You listen, look at the
+          spectrogram, and choose labels.
+        </li>
+        <li>
+          <strong>The model learns.</strong> After every 10 labels it retrains
+          and picks the next snippets. Repeat.
+        </li>
+        <li>
+          <strong>Export.</strong> Download your annotations as comma-separated
+          values (CSV) or JavaScript Object Notation (JSON).
+        </li>
+      </ol>
 
-    <div class="callout callout--tip">
-      <strong>You stay in charge.</strong> The model decides the order of the
-      snippets, never the answer. Its guesses are not shown, and every stored label
-      is one a person chose.
-    </div>
-
-    <h2>Main features</h2>
-
-    <table>
-      <thead>
-        <tr><th>Feature</th><th>What it gives you</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><a href="../../concepts/annotation-feeds/active-learning/">Active learning</a></td><td>A feed of the most useful snippets, re-ranked as you label.</td></tr>
-        <tr><td><a href="../../guides/label-management/">Label spaces</a></td><td>Labels linked to trusted sources such as the Global Biodiversity Information Facility (GBIF), built in a chat.</td></tr>
-        <tr><td><a href="../../concepts/annotation-feeds/filter/">Projection and filters</a></td><td>A map of all snippets, and filters by location, date, time, and model scores.</td></tr>
-        <tr><td><a href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built">Model start options</a></td><td>Train the first model from new labels, from existing ground-truth labels, or from a WSSED model, with optional labelled reference data.</td></tr>
-        <tr><td><a href="../../guides/teams/">Teams</a></td><td>Share datasets and label spaces, with administrator, owner, and annotator roles.</td></tr>
-        <tr><td><a href="../../concepts/wssed/">Sound event detection (WSSED)</a></td><td>Weakly Supervised Sound Event Detection (WSSED): a way to train a sound event detection model from recordings that are labelled only with the species they contain, not with the exact time of each call. An optional training server builds such a model, and active learning can start from it instead of from random snippets.</td></tr>
-      </tbody>
-    </table>
-
-    <h2>Architecture</h2>
-
-    <figure class="docs-infographic" aria-label="How the YAPAT components connect: the frontend calls the backend REST API, which uses PostgreSQL, Redis with Celery workers, and the optional ontology and GPU services.">
-      <div class="di-cols">
-        <div class="di-node">Frontend<span class="di-sub">React, TypeScript, Vite</span></div>
-        <span class="di-arrow" aria-hidden="true">&rarr;</span>
-        <div class="di-node di-key">Backend API<span class="di-sub">FastAPI, served under /api</span></div>
-        <span class="di-arrow" aria-hidden="true">&rarr;</span>
-        <div class="di-stack">
-          <div class="di-node">PostgreSQL (pgvector)<span class="di-sub">datasets, snippets, embeddings, annotations</span></div>
-          <div class="di-node">Redis and Celery workers<span class="di-sub">scanning, embeddings, training</span></div>
-          <div class="di-node di-opt">Ontology service (oe_yapat)<span class="di-sub">optional &middot; label-space chat</span></div>
-          <div class="di-node di-opt">WSSED GPU server<span class="di-sub">optional &middot; trains detection models</span></div>
-        </div>
+      <div class="callout callout--tip">
+        <strong>You stay in charge.</strong> The model decides the order of the
+        snippets, never the answer. Its guesses are not shown, and every stored
+        label is one a person chose.
       </div>
-      <figcaption>Component overview. Dashed boxes are optional.</figcaption>
-    </figure>
 
-    <p>
-      Two services are optional. The <strong>ontology service</strong> (oe_yapat)
-      looks up species and environmental terms for the
-      <a href="../../guides/label-management/">label-space chat</a>. The
-      <strong>WSSED server</strong> runs on a machine with a graphics processing
-      unit (GPU) and trains a sound event detection model from labelled recordings, which
-      YAPAT can then use as its first active-learning model; see
-      <a href="../../concepts/wssed/">WSSED</a>. Everything else
-      works without them.
-    </p>
+      <h2>Main features</h2>
 
-    <div class="callout callout--dev">
-      <strong>For developers.</strong> Every feature is available through the
-      REST API (the HTTP interface the web app itself uses) under
-      <code>/api</code>; long-running work runs on Celery background workers.
-      Start with <a href="../../workflow/architecture/">Architecture</a>
-      and the <a href="../../reference/rest-api/">REST API</a> reference.
-    </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>What it gives you</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="../../concepts/annotation-feeds/active-learning/"
+                >Active learning</a
+              >
+            </td>
+            <td>A feed of the most useful snippets, re-ranked as you label.</td>
+          </tr>
+          <tr>
+            <td><a href="../../guides/label-management/">Label spaces</a></td>
+            <td>
+              Labels linked to trusted sources such as the Global Biodiversity
+              Information Facility (GBIF), built in a chat.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="../../concepts/annotation-feeds/filter/"
+                >Projection and filters</a
+              >
+            </td>
+            <td>
+              A map of all snippets, and filters by location, date, time, and
+              model scores.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a
+                href="../../concepts/annotation-feeds/active-learning/#how-the-model-is-built"
+                >Model start options</a
+              >
+            </td>
+            <td>
+              Train the first model from new labels, from existing ground-truth
+              labels, or from a WSSED model, with optional labelled reference
+              data.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="../../guides/teams/">Teams</a></td>
+            <td>
+              Share datasets and label spaces, with administrator, owner, and
+              annotator roles.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="../../concepts/wssed/">Sound event detection (WSSED)</a>
+            </td>
+            <td>
+              Weakly Supervised Sound Event Detection (WSSED): a way to train a
+              sound event detection model from recordings that are labelled only
+              with the species they contain, not with the exact time of each
+              call. An optional training server builds such a model, and active
+              learning can start from it instead of from random snippets.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="callout callout--tip">
-      <strong>Next:</strong> <a href="../installation/">Installation</a> — run YAPAT on your machine.
-    </div>
+      <h2>Architecture</h2>
 
-  </main>
+      <figure
+        class="docs-infographic"
+        aria-label="How the YAPAT components connect: the frontend calls the backend REST API, which uses PostgreSQL, Redis with Celery workers, and the optional ontology and GPU services."
+      >
+        <div class="di-cols">
+          <div class="di-node">
+            Frontend<span class="di-sub">React, TypeScript, Vite</span>
+          </div>
+          <span class="di-arrow" aria-hidden="true">&rarr;</span>
+          <div class="di-node di-key">
+            Backend API<span class="di-sub">FastAPI, served under /api</span>
+          </div>
+          <span class="di-arrow" aria-hidden="true">&rarr;</span>
+          <div class="di-stack">
+            <div class="di-node">
+              PostgreSQL (pgvector)<span class="di-sub"
+                >datasets, snippets, embeddings, annotations</span
+              >
+            </div>
+            <div class="di-node">
+              Redis and Celery workers<span class="di-sub"
+                >scanning, embeddings, training</span
+              >
+            </div>
+            <div class="di-node di-opt">
+              Ontology service (oe_yapat)<span class="di-sub"
+                >optional &middot; label-space chat</span
+              >
+            </div>
+            <div class="di-node di-opt">
+              WSSED GPU server<span class="di-sub"
+                >optional &middot; trains detection models</span
+              >
+            </div>
+          </div>
+        </div>
+        <figcaption>Component overview. Dashed boxes are optional.</figcaption>
+      </figure>
 
-  <script src="../../js/docs-config.js"></script>
-  <script src="../../js/docs-framework.js"></script>
-</body>
+      <p>
+        Two services are optional. The
+        <strong>ontology service</strong> (oe_yapat) looks up species and
+        environmental terms for the
+        <a href="../../guides/label-management/">label-space chat</a>. The
+        <strong>WSSED server</strong> runs on a machine with a graphics
+        processing unit (GPU) and trains a sound event detection model from
+        labelled recordings, which YAPAT can then use as its first
+        active-learning model; see <a href="../../concepts/wssed/">WSSED</a>.
+        Everything else works without them.
+      </p>
+
+      <div class="callout callout--dev">
+        <strong>For developers.</strong> Every feature is available through the
+        REST API (the HTTP interface the web app itself uses) under
+        <code>/api</code>; long-running work runs on Celery background workers.
+        Start with <a href="../../workflow/architecture/">Architecture</a> and
+        the <a href="../../reference/rest-api/">REST API</a> reference.
+      </div>
+
+      <div class="callout callout--tip">
+        <strong>Next:</strong> <a href="../installation/">Installation</a> — run
+        YAPAT on your machine.
+      </div>
+    </main>
+
+    <script src="../../js/docs-config.js"></script>
+    <script src="../../js/docs-framework.js"></script>
+  </body>
 </html>
