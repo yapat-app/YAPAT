@@ -118,7 +118,7 @@
     <table>
       <thead><tr><th>Method &amp; path</th><th>Used by</th><th>Access</th></tr></thead>
       <tbody>
-        <tr><td><code>GET /api/pam-al/checkpoints</code></td><td>Generate Feed dialog; quick-label list.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/pam-al/checkpoints</code></td><td>Loading the dataset's model in the Hub and deciding whether to show Generate Feed; quick-label list.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/pam-al/datasets/{dataset_id}/training-path-defaults</code></td><td>Cold-start fields.</td><td>Authenticated</td></tr>
         <tr><td><code>POST /api/pam-al/train-from-scratch</code></td><td>Cold start.</td><td>Admin or team owner</td></tr>
         <tr><td><code>POST /api/pam-al/inference/get-or-create</code></td><td>The Hub's feed; random suggestions when no checkpoint exists.</td><td>Authenticated</td></tr>
@@ -198,23 +198,6 @@
       </tbody>
     </table>
 
-    <h3>Legacy feed endpoints</h3>
-
-    <p>
-      The Generate Feed button on a dataset card and the Feed History page
-      still call an older feed API. Its results are not shown in the Annotation
-      Hub; use the <a href="../feed-methods/">Active Learning API</a> instead.
-    </p>
-
-    <table>
-      <thead><tr><th>Method &amp; path</th><th>Used by</th><th>Access</th></tr></thead>
-      <tbody>
-        <tr><td><code>GET /api/feed/</code></td><td>The older Generate Feed button on a dataset card (random method).</td><td>Authenticated</td></tr>
-        <tr><td><code>POST /api/feed/similarity-search</code></td><td>The same button (similarity method, from an uploaded audio file).</td><td>Authenticated</td></tr>
-        <tr><td><code>GET /api/feed/history</code></td><td>The Feed History page.</td><td>Authenticated</td></tr>
-      </tbody>
-    </table>
-
     <h2>Other backend endpoints</h2>
 
     <p>
@@ -257,6 +240,8 @@
         <tr><td><code>POST|GET /api/reference-links/</code>, <code>DELETE /api/reference-links/{link_id}</code></td><td>Link a reference dataset (<code>is_reference</code>) to a dataset or team.</td><td>Admin</td></tr>
         <tr><td><code>POST /api/wssed/training-jobs/{id}/dispatch</code></td><td>Re-enqueue a pending WSSED training job.</td><td>Access to the WSSED dataset</td></tr>
         <tr><td><code>GET /api/wssed/suggestions</code>, <code>POST /api/wssed/label</code>, <code>POST /api/wssed/retrain</code>, <code>GET /api/wssed/histogram</code></td><td>Suggestions from a WSSED model, accept/reject labels, retraining for one species, and a confidence histogram.</td><td>WSSED dataset or WSSED access</td></tr>
+        <tr><td><code>GET /api/feed/</code>, <code>POST /api/feed/similarity-search</code></td><td>An older feed API: random or similarity-based snippet batches. The Annotation Hub uses the <a href="../feed-methods/">Active Learning API</a> instead.</td><td>Authenticated</td></tr>
+        <tr><td><code>GET /api/feed/history</code></td><td>Feeds created with the older feed API.</td><td>Authenticated</td></tr>
         <tr><td><code>GET /api/tasks/status/{task_id}</code></td><td>Celery task status and metadata.</td><td>Authenticated</td></tr>
         <tr><td><code>POST /api/tasks/datasets/{id}/scan</code>, <code>POST /api/tasks/datasets/{id}/process</code></td><td>Scan a dataset again, or run the dataset pipeline.</td><td>Authenticated</td></tr>
         <tr><td><code>DELETE /api/tasks/cancel/{task_id}</code></td><td>Revoke a running task.</td><td>Authenticated</td></tr>

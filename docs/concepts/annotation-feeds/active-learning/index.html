@@ -57,9 +57,12 @@
     <p>
       The model is a classifier trained on the snippets'
       <a href="../../embeddings/">embeddings</a>. A new dataset has no model,
-      so the <strong>Generate Feed</strong> dialog (see
-      <a href="../../../guides/annotation-hub/#generating-a-feed">Generating a feed</a>)
-      asks for a <strong>model family name</strong> and a way to start:
+      so the Annotation Hub shows administrators and team owners a
+      <strong>Generate Feed</strong> button (see
+      <a href="../../../guides/annotation-hub/#the-feed">The feed</a>) that
+      asks for a <strong>model family name</strong> and a way to start. Once a
+      model exists, the feed loads on its own. The first model is built in one
+      of three ways:
     </p>
 
     <ul>
@@ -103,7 +106,7 @@
 
     <p>
       The model scores every snippet. The feed shows the ones it is most
-      <strong>uncertain</strong> about, up to the Top-K number you set. Each snippet
+      <strong>uncertain</strong> about first. Each snippet
       also carries diversity, density, and composite scores, which you can filter
       and sort by; see
       <a href="../filter/">Filters and Model Scores</a>.

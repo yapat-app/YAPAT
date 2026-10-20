@@ -48,7 +48,7 @@
         <tr><th>Endpoint</th><th>Used for</th></tr>
       </thead>
       <tbody>
-        <tr><td><code>GET /api/pam-al/checkpoints?dataset_id=</code></td><td>Whether the dataset already has an active checkpoint. Without one, the Generate Feed dialog offers a cold start or bootstrap mode.</td></tr>
+        <tr><td><code>GET /api/pam-al/checkpoints?dataset_id=</code></td><td>Whether the dataset already has an active checkpoint. With one, the Hub requests the feed on its own; without one, it shows administrators and team owners Generate Feed, which offers a cold start or bootstrap mode.</td></tr>
         <tr><td><code>GET /api/pam-al/datasets/{dataset_id}/training-path-defaults</code></td><td>Default metadata and label-config paths for the cold-start fields.</td></tr>
         <tr><td><code>POST /api/pam-al/train-from-scratch</code></td><td>Starts a cold-start training job from ground-truth metadata. Administrators and team owners only.</td></tr>
       </tbody>
@@ -73,10 +73,10 @@
       <tbody>
         <tr><td><code>dataset_id</code></td><td>Target dataset.</td></tr>
         <tr><td><code>snippet_set_id</code></td><td>The dataset's default snippet set.</td></tr>
-        <tr><td><code>model_family_name</code></td><td>The model family entered in the Generate Feed dialog.</td></tr>
-        <tr><td><code>sample_suggestion</code></td><td><code>true</code> when "Return only Top-K suggestions" is on, so that a ranked subset is returned; <code>false</code> returns all predictions for the snippet set.</td></tr>
+        <tr><td><code>model_family_name</code></td><td>The model family of the dataset's active checkpoint, or the one entered in the Generate Feed dialog.</td></tr>
+        <tr><td><code>sample_suggestion</code></td><td><code>true</code> returns a ranked subset of <code>k</code> rows; <code>false</code> returns all predictions for the snippet set.</td></tr>
         <tr><td><code>suggestion_strategy</code></td><td>The ranking; the Hub sends <code>uncertainty</code>.</td></tr>
-        <tr><td><code>k</code></td><td>Top-K, 1 to 500 in the Generate Feed dialog.</td></tr>
+        <tr><td><code>k</code></td><td>Number of rows returned when <code>sample_suggestion</code> is <code>true</code>.</td></tr>
       </tbody>
     </table>
 
