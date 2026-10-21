@@ -168,33 +168,6 @@
             <clipPath id="hero-clip-proj"><rect x="272" y="72" width="224" height="115" rx="6"/></clipPath>
             <clipPath id="hero-clip-feed"><rect x="0" y="290" width="520" height="52"/></clipPath>
             <clipPath id="hero-clip-spec"><rect x="24" y="78" width="222" height="166" rx="4"/></clipPath>
-            <linearGradient id="spec-body" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#fff" stop-opacity="0.08"/>
-              <stop offset="0.03" stop-color="#fff" stop-opacity="0.46"/>
-              <stop offset="0.3" stop-color="#fff" stop-opacity="0.55"/>
-              <stop offset="0.55" stop-color="#fff" stop-opacity="0.5"/>
-              <stop offset="0.9" stop-color="#fff" stop-opacity="0.55"/>
-              <stop offset="1" stop-color="#fff" stop-opacity="0.6"/>
-            </linearGradient>
-            <linearGradient id="spec-chorus" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.45"/><stop offset="0.13" stop-color="#fff" stop-opacity="0.75"/><stop offset="0.28" stop-color="#fff" stop-opacity="0.4"/><stop offset="0.45" stop-color="#fff" stop-opacity="0.2"/><stop offset="0.62" stop-color="#fff" stop-opacity="0.8"/><stop offset="0.8" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0.45"/></linearGradient>
-            <linearGradient id="spec-stripe" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.34"/><stop offset="0.25" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.32"/><stop offset="0.72" stop-color="#fff" stop-opacity="0.6"/><stop offset="1" stop-color="#fff" stop-opacity="0.34"/></linearGradient>
-            <linearGradient id="spec-low" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="24" y1="0" x2="246" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0.68"/><stop offset="0.4" stop-color="#fff" stop-opacity="0.5"/><stop offset="0.7" stop-color="#fff" stop-opacity="0.8"/><stop offset="1" stop-color="#fff" stop-opacity="0.68"/></linearGradient>
-            <filter id="spec-call-soft" filterUnits="userSpaceOnUse" x="18" y="78" width="234" height="166">
-              <feGaussianBlur stdDeviation="1.6 1.1"/>
-            </filter>
-            <filter id="spec-map" filterUnits="userSpaceOnUse" x="18" y="78" width="234" height="166" color-interpolation-filters="sRGB">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="0.8 1.4" result="e"/>
-              <feColorMatrix in="e" type="matrix" values="0 0 0 1 0  0 0 0 1 0  0 0 0 1 0  0 0 0 0 1" result="eg"/>
-              <feTurbulence x="24" y="78" width="222" height="166" stitchTiles="stitch" type="fractalNoise" baseFrequency="1.15 0.06" numOctaves="3" seed="3" result="n"/>
-              <feColorMatrix in="n" type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="ng"/>
-              <feComposite x="24" y="78" width="222" height="166" in="eg" in2="ng" operator="arithmetic" k1="0" k2="1" k3="0.36" k4="-0.180"/>
-              <feComponentTransfer x="24" y="78" width="222" height="166">
-                <feFuncR type="table" tableValues="0.267 0.278 0.231 0.173 0.129 0.157 0.369 0.678 0.992"/>
-                <feFuncG type="table" tableValues="0.004 0.176 0.322 0.447 0.569 0.682 0.788 0.863 0.906"/>
-                <feFuncB type="table" tableValues="0.329 0.482 0.545 0.557 0.549 0.502 0.384 0.188 0.145"/>
-                <feFuncA type="linear" slope="0" intercept="1"/>
-              </feComponentTransfer>
-            </filter>
             <clipPath id="hero-clip-progress"><rect class="v-progress" x="52" y="-2" width="328" height="24"/></clipPath>
           </defs>
 
@@ -209,34 +182,10 @@
           <!-- 01 Spectrogram -->
           <text class="v-label" x="24" y="64">01 SPECTROGRAM</text>
           <rect class="v-plot" x="16" y="72" width="240" height="180" rx="6"/>
-          <!-- Spectrogram in the style of YAPAT's spectrogram player (viridis):
-               time runs left to right, frequency bottom to top. The tile and its
-               copy scroll left in a seamless loop (see .v-spec-scroll in home.css). -->
+          <!-- Real YAPAT spectrogram (viridis mel spectrogram, cropped from the
+               spectrogram player). Static; the red line is the playhead. -->
           <g class="v-spec" clip-path="url(#hero-clip-spec)">
-            <g class="v-spec-scroll">
-            <g id="hero-spec-tile" filter="url(#spec-map)" fill="none" stroke-linecap="round">
-              <rect x="18" y="78" width="234" height="166" fill="url(#spec-body)"/>
-              <path d="M18 94.6H252" stroke="url(#spec-chorus)" stroke-width="12"/>
-              <path d="M18 105.4H252" stroke="url(#spec-chorus)" stroke-width="4"/>
-              <path d="M18 112.9H252" stroke="url(#spec-stripe)" stroke-width="1.6"/>
-              <path d="M18 118.7H252" stroke="url(#spec-stripe)" stroke-width="1.2"/>
-              <path d="M18 124.5H252" stroke="url(#spec-stripe)" stroke-width="1.5"/>
-              <path d="M18 129.5H252" stroke="url(#spec-stripe)" stroke-width="1"/>
-              <path d="M18 135.3H252" stroke="url(#spec-stripe)" stroke-width="1.3"/>
-              <path d="M18 141.1H252" stroke="url(#spec-stripe)" stroke-width="1"/>
-              <path d="M18 147.7H252" stroke="url(#spec-stripe)" stroke-width="1.2"/>
-              <path d="M18 242.0H252" stroke="url(#spec-low)" stroke-width="5"/>
-              <!-- Calls: short, bright harmonic stacks. Their intensity rises and
-                   falls (see .v-call in home.css), reading as stronger or weaker
-                   detections inside the heatmap itself. -->
-              <g class="v-calls" filter="url(#spec-call-soft)" stroke="#fff" stroke-width="3.6">
-                <path class="v-call" style="--d:0s" d="M50 176q12 -5 27 -3M53 163q10 -4 22 -2M57 152q6 -2 13 -1"/>
-                <path class="v-call" style="--d:-2s" d="M116 141q14 3 31 -4M120 128q11 2 23 -3"/>
-                <path class="v-call" style="--d:-4s" d="M176 199q10 -6 24 -6M179 187q8 -5 20 -4M183 176q5 -3 11 -2"/>
-              </g>
-            </g>
-            <use href="#hero-spec-tile" x="222"/>
-            </g>
+            <image href="assets/img/hero-spectrogram.jpg" x="24" y="78" width="222" height="166" preserveAspectRatio="none"/>
           </g>
           <!-- Red playback line: follows the audio playhead below (same --ph value
                and transitions; see js/site.js → audio). -->
@@ -369,41 +318,36 @@
             <g transform="translate(0 0)">
               <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
               <circle class="c1" cx="34" cy="11" r="4"/>
-              <text class="v-chiptext" x="46" y="15">species</text>
-              <text class="v-feedtext" x="116" y="15">call_A</text>
-              <text class="v-feedmuted" x="176" y="15">00:03.2</text>
+              <text class="v-chiptext" x="46" y="15">ADEMAR</text>
+              <text class="v-feedmuted" x="116" y="15">00:03.2</text>
               <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.94</text>
             </g>
             <g transform="translate(0 26)">
               <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
               <circle class="c2" cx="34" cy="11" r="4"/>
-              <text class="v-chiptext" x="46" y="15">call</text>
-              <text class="v-feedtext" x="116" y="15">call_B</text>
-              <text class="v-feedmuted" x="176" y="15">00:04.6</text>
+              <text class="v-chiptext" x="46" y="15">noise</text>
+              <text class="v-feedmuted" x="116" y="15">00:04.6</text>
               <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.88</text>
             </g>
             <g transform="translate(0 52)">
               <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
               <circle class="c3" cx="34" cy="11" r="4"/>
-              <text class="v-chiptext" x="46" y="15">noise</text>
-              <text class="v-feedtext" x="116" y="15">call_C</text>
-              <text class="v-feedmuted" x="176" y="15">00:06.1</text>
+              <text class="v-chiptext" x="46" y="15">BOAALM</text>
+              <text class="v-feedmuted" x="116" y="15">00:06.1</text>
               <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.71</text>
             </g>
             <g transform="translate(0 78)">
               <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
               <circle class="c1" cx="34" cy="11" r="4"/>
-              <text class="v-chiptext" x="46" y="15">species</text>
-              <text class="v-feedtext" x="116" y="15">call_A</text>
-              <text class="v-feedmuted" x="176" y="15">00:03.2</text>
+              <text class="v-chiptext" x="46" y="15">ADEMAR</text>
+              <text class="v-feedmuted" x="116" y="15">00:03.2</text>
               <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.94</text>
             </g>
             <g transform="translate(0 104)">
               <rect class="v-chip" x="20" y="0" width="84" height="22" rx="11"/>
               <circle class="c2" cx="34" cy="11" r="4"/>
-              <text class="v-chiptext" x="46" y="15">call</text>
-              <text class="v-feedtext" x="116" y="15">call_B</text>
-              <text class="v-feedmuted" x="176" y="15">00:04.6</text>
+              <text class="v-chiptext" x="46" y="15">noise</text>
+              <text class="v-feedmuted" x="116" y="15">00:04.6</text>
               <text class="v-feedmuted" x="496" y="15" text-anchor="end">0.88</text>
             </g>
             </g>
