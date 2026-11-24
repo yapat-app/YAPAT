@@ -105,11 +105,18 @@
     <h2>How snippets are ranked</h2>
 
     <p>
-      The model scores every snippet. The feed shows the ones it is most
-      <strong>uncertain</strong> about first. Each snippet
-      also carries diversity, density, and composite scores, which you can filter
-      and sort by; see
+      The model scores every snippet. By default the feed is ordered by the
+      <strong>composite score</strong>, a mix of three signals: uncertainty (how
+      unsure the model is, half of the score), diversity (how unlike the
+      snippets you've already labelled, a quarter) and density (how many similar
+      snippets there are, a quarter). So the feed starts with snippets that are
+      both uncertain and informative, and labelled snippets come after. You can
+      sort or filter by any single score instead, for example uncertainty alone;
+      see
       <a href="../filter/">Filters and Model Scores</a>.
+      Before the first model exists there is nothing to rank by, so the feed
+      lists the snippets in their natural order, by recording and time. Your
+      first labels train the first model.
     </p>
 
     <h2>Why the model's guess is hidden</h2>
